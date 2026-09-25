@@ -1,0 +1,225 @@
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #dae2fd;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(19, 27, 46, 0.04);
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 92, 85, 0.12);
+    border-color: #005c55;
+  }
+}
+
+.imageBox {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  background: #f2f3ff;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.badgeStack {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.certBadge {
+  background: rgba(0, 92, 85, 0.92);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sterilizedBadge {
+  background: rgba(0, 99, 152, 0.92);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.categoryTag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #006398;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #131b2e;
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-decoration: none;
+
+  &:hover {
+    color: #005c55;
+  }
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6e7977;
+  margin-bottom: 0.875rem;
+
+  .stars {
+    display: flex;
+    align-items: center;
+    color: #ea580c;
+  }
+
+  .score {
+    font-weight: 700;
+    color: #131b2e;
+  }
+}
+
+.pricingSplit {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 0.875rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  border: 1px solid #e2e8f0;
+
+  .priceCol {
+    display: flex;
+    flex-direction: column;
+
+    &:first-child {
+      border-right: 1px solid #dae2fd;
+      padding-right: 0.5rem;
+    }
+
+    .label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #6e7977;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .amount {
+      font-size: 1.0625rem;
+      font-weight: 800;
+      color: #005c55;
+    }
+
+    .rentAmount {
+      font-size: 1.0625rem;
+      font-weight: 800;
+      color: #ea580c;
+    }
+
+    .subinfo {
+      font-size: 0.6875rem;
+      color: #6e7977;
+    }
+
+    .mrpStrikethrough {
+      font-size: 0.6875rem;
+      text-decoration: line-through;
+      color: #8c9b98;
+    }
+  }
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: auto;
+
+  .buyBtn {
+    background: #005c55;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    &:hover {
+      background: #004741;
+    }
+  }
+
+  .rentBtn {
+    background: #fff0eb;
+    color: #ea580c;
+    border: 1px solid #ffdbce;
+    border-radius: 8px;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    &:hover {
+      background: #ea580c;
+      color: #ffffff;
+    }
+  }
+}

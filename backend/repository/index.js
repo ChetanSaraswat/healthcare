@@ -1,0 +1,18 @@
+module.exports = {
+  baseRepository: require('./base.repository'),
+  categoryRepository: require('./category.repository'),
+  productRepository: require('./product.repository'),
+  tagRepository: require('./tag.repository'),
+  orderRepository: require('./order.repository'),
+  orderItemRepository: require('./order-item.repository'),
+  rentalRepository: require('./rental.repository'),
+  rentalItemRepository: require('./rental-item.repository'),
+  userRepository: require('./user.repository'),
+  addressRepository: require('./address.repository'),
+  conditionPageRepository: require('./condition-page.repository'),
+  reviewRepository: require('./review.repository'),
+  blogPostRepository: require('./blog-post.repository'),
+  bannerRepository: require('./banner.repository'),
+  paymentRepository: require('./payment.repository'),
+  webhookEventRepository: require('./webhook-event.repository'),
+};

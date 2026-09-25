@@ -1,0 +1,24 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Legacy / unused submodules
+rules_docs/crud-revision/crud-revision-typeorm/
+
+# Project-internal docs & assets (not pushed)
+designs/
+docs/
+rules_docs/
+agent.md
+AGENTS.md
+context.md

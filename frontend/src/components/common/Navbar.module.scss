@@ -1,0 +1,323 @@
+.navbarWrapper {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 92, 85, 0.08);
+}
+
+.topBar {
+  background: linear-gradient(135deg, #005c55 0%, #004741 100%);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .leftPill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .supportText {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 500;
+
+      strong {
+        color: #9cf2e8;
+      }
+    }
+  }
+
+  .rightLinks {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    a {
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      transition: color 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+.mainNav {
+  background: #ffffff;
+  padding: 0.875rem 0;
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .brandLogo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+
+    img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+    }
+  }
+
+  .searchForm {
+    flex: 1;
+    max-width: 580px;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .searchInput {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.75rem;
+      border: 1.5px solid #bdc9c6;
+      border-radius: 9999px;
+      font-size: 0.9375rem;
+      background: #faf8ff;
+      transition: all 0.2s ease;
+      outline: none;
+      font-family: inherit;
+
+      &:focus {
+        border-color: #005c55;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(0, 92, 85, 0.12);
+      }
+    }
+
+    .searchIcon {
+      position: absolute;
+      left: 1rem;
+      color: #6e7977;
+      pointer-events: none;
+    }
+
+    .searchBtn {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      bottom: 4px;
+      background: #005c55;
+      color: #ffffff;
+      border: none;
+      border-radius: 9999px;
+      padding: 0 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #004741;
+      }
+    }
+  }
+
+  .navActions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-shrink: 0;
+
+    .languageToggle {
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 9999px;
+      padding: 2px;
+      gap: 2px;
+
+      .langBtn {
+        border: none;
+        background: transparent;
+        padding: 5px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+
+        &:hover {
+          color: #0f172a;
+        }
+
+        &.active {
+          background: #005c55;
+          color: #ffffff;
+          box-shadow: 0 1px 3px rgba(0, 92, 85, 0.25);
+        }
+      }
+    }
+
+    .cityPicker {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f2f3ff;
+      border: 1px solid #dae2fd;
+      border-radius: 8px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #00201d;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: #eaedff;
+        border-color: #005c55;
+      }
+    }
+
+    .actionLink {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #131b2e;
+      font-size: 0.75rem;
+      font-weight: 600;
+      gap: 0.2rem;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: #005c55;
+      }
+    }
+
+    .cartBtn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #005c55;
+      color: #ffffff;
+      padding: 0.6rem 1.1rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #004741;
+        box-shadow: 0 4px 12px rgba(0, 92, 85, 0.25);
+      }
+
+      .badge {
+        background: #ea580c;
+        color: #ffffff;
+        font-size: 0.75rem;
+        border-radius: 9999px;
+        padding: 2px 7px;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.categorySubNav {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .navItem {
+    padding: 0.75rem 0;
+    text-decoration: none;
+    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+
+    &:hover,
+    &.active {
+      color: #005c55;
+      border-bottom-color: #005c55;
+    }
+
+    &.highlight {
+      color: #913200;
+      font-weight: 700;
+
+      &:hover {
+        color: #ea580c;
+        border-bottom-color: #ea580c;
+      }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .topBar {
+    display: none;
+  }
+  .mainNav .container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .mainNav .searchForm {
+    order: 3;
+    max-width: 100%;
+    width: 100%;
+  }
+}

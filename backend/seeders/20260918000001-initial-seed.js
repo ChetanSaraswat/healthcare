@@ -1,0 +1,399 @@
+'use strict';
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    const passwordHash = await bcrypt.hash('Admin@12345', 10);
+    const now = new Date();
+
+    // 1. Users
+    const users = await queryInterface.bulkInsert(
+      'users',
+      [
+        {
+          uuid: uuidv4(),
+          name: 'Super Admin',
+          email: 'admin@aarogyamed.com',
+          phone: '+919876543210',
+          password_hash: passwordHash,
+          role: 'super_admin',
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Dr. Ananya Iyer',
+          email: 'ananya.iyer@aarogyamed.com',
+          phone: '+919820111223',
+          password_hash: passwordHash,
+          role: 'content_editor',
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Kavita Sundaram',
+          email: 'kavita.s@aarogyamed.com',
+          phone: '+919845199887',
+          password_hash: passwordHash,
+          role: 'operations_staff',
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Rohan Deshmukh',
+          email: 'rohan.d@aarogyamed.com',
+          phone: '+919711033445',
+          password_hash: passwordHash,
+          role: 'catalog_editor',
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Rajesh Kumar',
+          email: 'rajesh.kumar@example.com',
+          phone: '+919811122233',
+          password_hash: passwordHash,
+          role: 'customer',
+          created_at: now,
+          updated_at: now,
+        },
+      ],
+      { returning: true }
+    );
+
+    // 2. Categories
+    const categories = await queryInterface.bulkInsert(
+      'categories',
+      [
+        {
+          uuid: uuidv4(),
+          name: 'Respiratory & Sleep',
+          slug: 'respiratory-sleep',
+          description: 'CPAP, BiPAP, Oxygen Concentrators, Nebulizers and respiratory supplies.',
+          display_order: 1,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Mobility Aids',
+          slug: 'mobility-aids',
+          description: 'Wheelchairs, walkers, rollators, and patient lifts.',
+          display_order: 2,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Home Care Equipment',
+          slug: 'home-care',
+          description: 'Electric hospital beds, air mattresses, commodes, and monitors.',
+          display_order: 3,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Hospital & Clinical',
+          slug: 'hospital-clinical',
+          description: 'ICU monitors, defibrillators, infusion pumps, and clinical devices.',
+          display_order: 4,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+      ],
+      { returning: true }
+    );
+
+    // 3. Subcategories
+    const respCat = categories[0];
+    const mobilityCat = categories[1];
+    const homeCareCat = categories[2];
+
+    const subcategories = await queryInterface.bulkInsert(
+      'categories',
+      [
+        {
+          uuid: uuidv4(),
+          name: 'CPAP & BiPAP Machines',
+          slug: 'cpap-bipap-machines',
+          parent_id: respCat.id,
+          display_order: 1,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Oxygen Concentrators',
+          slug: 'oxygen-concentrators',
+          parent_id: respCat.id,
+          display_order: 2,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Electric Wheelchairs',
+          slug: 'electric-wheelchairs',
+          parent_id: mobilityCat.id,
+          display_order: 1,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'ICU Hospital Beds',
+          slug: 'icu-hospital-beds',
+          parent_id: homeCareCat.id,
+          display_order: 1,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        },
+      ],
+      { returning: true }
+    );
+
+    // 4. Tags
+    const tags = await queryInterface.bulkInsert(
+      'tags',
+      [
+        { uuid: uuidv4(), name: 'sleep-apnea', display_name: 'Sleep Apnea', created_at: now, updated_at: now },
+        { uuid: uuidv4(), name: 'copd', display_name: 'COPD & Lung Care', created_at: now, updated_at: now },
+        { uuid: uuidv4(), name: 'post-surgery-mobility', display_name: 'Post-Surgery Mobility', created_at: now, updated_at: now },
+        { uuid: uuidv4(), name: 'elderly-care', display_name: 'Elderly Home Care', created_at: now, updated_at: now },
+      ],
+      { returning: true }
+    );
+
+    // 5. Products
+    const products = await queryInterface.bulkInsert(
+      'products',
+      [
+        {
+          uuid: uuidv4(),
+          name: 'ResMed AirSense 10 AutoSet CPAP Machine',
+          slug: 'resmed-airsense-10-autoset-cpap',
+          category_id: respCat.id,
+          subcategory_id: subcategories[0].id,
+          brand: 'ResMed',
+          description: 'The world’s leading auto-adjusting CPAP machine with integrated HumidAir heated humidifier and climate control. Designed for comfortable, whisper-quiet sleep apnea therapy.',
+          images: JSON.stringify(['/images/products/airsense-10.png']),
+          videos: JSON.stringify([]),
+          specifications: JSON.stringify([
+            { label: 'Pressure Range', value: '4 to 20 cm H2O' },
+            { label: 'Sound Level', value: '26.6 dBA (Whisper Quiet)' },
+            { label: 'Weight', value: '1.25 kg' },
+            { label: 'Humidification', value: 'Integrated HumidAir Heated Chamber' },
+            { label: 'Data Connectivity', value: 'Built-in 4G Wireless' },
+          ]),
+          buy_price: 64999.00,
+          buy_mrp: 75000.00,
+          buy_available: true,
+          rent_price_daily: 250.00,
+          rent_price_weekly: 1400.00,
+          rent_price_monthly: 4500.00,
+          rent_deposit: 8000.00,
+          rent_min_period_days: 7,
+          rent_available: true,
+          stock_quantity: 25,
+          warranty_info: '3-Year Manufacturer Warranty with Doorstep Replacement Guarantee',
+          status: 'active',
+          related_product_ids: JSON.stringify([]),
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Philips EverFlo 5L Home Oxygen Concentrator',
+          slug: 'philips-everflo-5l-oxygen-concentrator',
+          category_id: respCat.id,
+          subcategory_id: subcategories[1].id,
+          brand: 'Philips Respironics',
+          description: 'Compact 5-liter stationary oxygen concentrator delivering continuous flow medical oxygen with low power consumption and ultra-durable recessed flow meter.',
+          images: JSON.stringify(['/images/products/everflo-5l.png']),
+          videos: JSON.stringify([]),
+          specifications: JSON.stringify([
+            { label: 'Flow Rate', value: '0.5 to 5 LPM' },
+            { label: 'Oxygen Purity', value: '93% ± 3%' },
+            { label: 'Sound Level', value: '< 45 dBA' },
+            { label: 'Power Consumption', value: '350 Watts' },
+            { label: 'Weight', value: '14 kg' },
+          ]),
+          buy_price: 52000.00,
+          buy_mrp: 62000.00,
+          buy_available: true,
+          rent_price_daily: 220.00,
+          rent_price_weekly: 1250.00,
+          rent_price_monthly: 4000.00,
+          rent_deposit: 7000.00,
+          rent_min_period_days: 7,
+          rent_available: true,
+          stock_quantity: 18,
+          warranty_info: '2-Year Onsite Warranty',
+          status: 'active',
+          related_product_ids: JSON.stringify([]),
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Motorized 5-Function ICU Electric Hospital Bed',
+          slug: 'motorized-5-function-icu-electric-hospital-bed',
+          category_id: homeCareCat.id,
+          subcategory_id: subcategories[3].id,
+          brand: 'AarogyaCare Pro',
+          description: 'Heavy-duty motorized 5-function ICU bed with remote handset, Trendelenburg positioning, ABS collapsible railings, and central braking system.',
+          images: JSON.stringify(['/images/products/icu-bed.png']),
+          videos: JSON.stringify([]),
+          specifications: JSON.stringify([
+            { label: 'Functions', value: 'Backrest, Knee rest, Height Adjustment, Trendelenburg, Reverse Trendelenburg' },
+            { label: 'Safe Working Load', value: '250 kg' },
+            { label: 'Actuators', value: 'Heavy Duty Medical Linear Actuators' },
+            { label: 'Castors', value: '125mm Central Locking Castors' },
+          ]),
+          buy_price: 89000.00,
+          buy_mrp: 110000.00,
+          buy_available: true,
+          rent_price_daily: 350.00,
+          rent_price_weekly: 2100.00,
+          rent_price_monthly: 6500.00,
+          rent_deposit: 12000.00,
+          rent_min_period_days: 15,
+          rent_available: true,
+          stock_quantity: 10,
+          warranty_info: '2-Year Comprehensive Warranty',
+          status: 'active',
+          related_product_ids: JSON.stringify([]),
+          created_at: now,
+          updated_at: now,
+        },
+        {
+          uuid: uuidv4(),
+          name: 'Karma Ergo Lite Lightweight Wheelchair',
+          slug: 'karma-ergo-lite-lightweight-wheelchair',
+          category_id: mobilityCat.id,
+          subcategory_id: subcategories[2].id,
+          brand: 'Karma Healthcare',
+          description: 'Ultra-lightweight aircraft-grade aluminum wheelchair with patented S-Ergo seating system to relieve pressure and prevent slippage.',
+          images: JSON.stringify(['/images/products/karma-wheelchair.png']),
+          videos: JSON.stringify([]),
+          specifications: JSON.stringify([
+            { label: 'Frame Material', value: 'Aircraft Grade Aluminum' },
+            { label: 'Weight', value: '8.5 kg (Ultra Light)' },
+            { label: 'Max User Weight', value: '100 kg' },
+            { label: 'Seat Width', value: '16 inches / 18 inches' },
+          ]),
+          buy_price: 18500.00,
+          buy_mrp: 23000.00,
+          buy_available: true,
+          rent_price_daily: 90.00,
+          rent_price_weekly: 500.00,
+          rent_price_monthly: 1600.00,
+          rent_deposit: 3000.00,
+          rent_min_period_days: 7,
+          rent_available: true,
+          stock_quantity: 30,
+          warranty_info: '1-Year Warranty on Frame',
+          status: 'active',
+          related_product_ids: JSON.stringify([]),
+          created_at: now,
+          updated_at: now,
+        },
+      ],
+      { returning: true }
+    );
+
+    // 6. Link Products to Tags
+    await queryInterface.bulkInsert('product_tags', [
+      { product_id: products[0].id, tag_id: tags[0].id, created_at: now, updated_at: now },
+      { product_id: products[1].id, tag_id: tags[1].id, created_at: now, updated_at: now },
+      { product_id: products[2].id, tag_id: tags[2].id, created_at: now, updated_at: now },
+      { product_id: products[2].id, tag_id: tags[3].id, created_at: now, updated_at: now },
+      { product_id: products[3].id, tag_id: tags[2].id, created_at: now, updated_at: now },
+      { product_id: products[3].id, tag_id: tags[3].id, created_at: now, updated_at: now },
+    ]);
+
+    // 7. Condition Pages
+    await queryInterface.bulkInsert('condition_pages', [
+      {
+        uuid: uuidv4(),
+        title: 'Sleep Apnea: Symptoms, Testing & CPAP Therapy',
+        slug: 'sleep-apnea',
+        subtitle: 'Understand Obstructive Sleep Apnea (OSA) and explore proven respiratory therapy solutions.',
+        body: 'Sleep apnea is a common sleep disorder characterized by repeated interruptions in breathing during sleep. The gold-standard treatment is Continuous Positive Airway Pressure (CPAP) therapy, which keeps the upper airway open throughout the night.',
+        symptoms: JSON.stringify([
+          'Loud, disruptive chronic snoring',
+          'Waking up gasping or choking for breath',
+          'Excessive daytime sleepiness and fatigue',
+          'Morning dry mouth and headaches',
+        ]),
+        treatments: JSON.stringify([
+          'Auto-titrating CPAP (Continuous Positive Airway Pressure) therapy',
+          'Bi-level PAP therapy for high-pressure intolerance',
+          'Heated humidification to prevent nasal dryness',
+        ]),
+        related_tag_id: tags[0].id,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        uuid: uuidv4(),
+        title: 'Post-Surgery Mobility & In-Home Recovery',
+        slug: 'post-surgery-mobility',
+        subtitle: 'Accelerate patient recovery with ergonomic wheelchairs, motorized beds, and mobility support.',
+        body: 'Following orthopedic or abdominal surgery, minimizing strain while ensuring safe transfers is critical for healing and caregiver safety. Motorized beds and ergonomic lightweight wheelchairs empower patients to recover with dignity.',
+        symptoms: JSON.stringify([
+          'Restricted weight-bearing ability',
+          'Pain during bed transfers',
+          'Need for elevated head and knee positioning',
+        ]),
+        treatments: JSON.stringify([
+          'Multi-function motorized hospital beds with Trendelenburg positioning',
+          'Pressure relief alternating air mattresses',
+          'Ergonomic wheelchairs for safe transport',
+        ]),
+        related_tag_id: tags[2].id,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+      },
+    ]);
+
+    // 8. Banners
+    await queryInterface.bulkInsert('banners', [
+      {
+        uuid: uuidv4(),
+        title: 'Hospital-Grade Care Delivered to Your Doorstep',
+        image_url: '/images/banners/hero-banner-1.png',
+        link_url: '/shop/respiratory',
+        display_order: 1,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+      },
+    ]);
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkDelete('banners', null, {});
+    await queryInterface.bulkDelete('condition_pages', null, {});
+    await queryInterface.bulkDelete('product_tags', null, {});
+    await queryInterface.bulkDelete('products', null, {});
+    await queryInterface.bulkDelete('tags', null, {});
+    await queryInterface.bulkDelete('categories', null, {});
+    await queryInterface.bulkDelete('users', null, {});
+  },
+};

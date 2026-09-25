@@ -1,0 +1,448 @@
+.homeWrapper {
+  width: 100%;
+}
+
+.heroSection {
+  background: linear-gradient(135deg, #004741 0%, #005c55 50%, #006398 100%);
+  color: #ffffff;
+  padding: 4.5rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(156, 242, 232, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 3.5rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.heroContent {
+  .urgencyPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #9cf2e8;
+    margin-bottom: 1.25rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+
+    span {
+      color: #9cf2e8;
+    }
+
+    @media (max-width: 640px) {
+      font-size: 2.25rem;
+    }
+  }
+
+  p {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: #dae2fd;
+    margin-bottom: 2rem;
+    max-width: 580px;
+  }
+}
+
+.heroCtas {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+
+  .btnRentPrimary {
+    background: #ea580c;
+    color: #ffffff;
+    padding: 0.9rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.35);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #c2410c;
+      transform: translateY(-2px);
+    }
+  }
+
+  .btnBuySecondary {
+    background: #ffffff;
+    color: #005c55;
+    padding: 0.9rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f2f3ff;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.heroTrustStats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  flex-wrap: wrap;
+
+  .statItem {
+    .num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #9cf2e8;
+    }
+    .lbl {
+      font-size: 0.75rem;
+      color: #bdc9c6;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  }
+}
+
+.heroMedia {
+  position: relative;
+
+  .imageWrapper {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 48px rgba(0, 32, 29, 0.35);
+    border: 4px solid rgba(255, 255, 255, 0.2);
+
+    img {
+      width: 100%;
+      height: 480px;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .floatingBadge {
+    position: absolute;
+    bottom: -20px;
+    left: 20px;
+    background: #ffffff;
+    color: #131b2e;
+    padding: 12px 18px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 280px;
+
+    .iconCircle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eaf8f6;
+      color: #005c55;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .badgeText {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      line-height: 1.3;
+      span {
+        display: block;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        color: #6e7977;
+      }
+    }
+  }
+}
+
+/* Category Grid Section */
+.categoriesSection {
+  padding: 5rem 0 3rem;
+  background: #faf8ff;
+}
+
+.sectionTitleRow {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 3rem;
+
+  .pretitle {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #006398;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #131b2e;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #3e4947;
+    line-height: 1.6;
+  }
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.catCard {
+  background: #ffffff;
+  border: 1px solid #dae2fd;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #005c55;
+    box-shadow: 0 10px 24px rgba(0, 92, 85, 0.1);
+  }
+
+  .catIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #eaf8f6;
+    color: #005c55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #131b2e;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    font-size: 0.8125rem;
+    color: #6e7977;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    flex: 1;
+  }
+
+  .catFooter {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #006398;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+/* Sanitization Protocol Section */
+.protocolSection {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.protocolBox {
+  background: linear-gradient(135deg, #f2f3ff 0%, #faf8ff 100%);
+  border: 1.5px solid #dae2fd;
+  border-radius: 24px;
+  padding: 3rem;
+
+  @media (max-width: 640px) {
+    padding: 1.5rem;
+  }
+}
+
+.protocolGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+
+.protocolStep {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid #dae2fd;
+
+  .stepNum {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #005c55;
+    background: #eaf8f6;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+  }
+
+  h4 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #131b2e;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    font-size: 0.8125rem;
+    color: #6e7977;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
+
+/* Featured Products Grid */
+.productsSection {
+  padding: 5rem 0;
+  background: #faf8ff;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.75rem;
+}
+
+/* Condition Guides Carousel Section */
+.conditionsSection {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.conditionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
+}
+
+.condCard {
+  background: #faf8ff;
+  border: 1px solid #dae2fd;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #006398;
+    box-shadow: 0 12px 28px rgba(0, 99, 152, 0.12);
+  }
+
+  .condImg {
+    height: 160px;
+    background: #eaedff;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .condBody {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #131b2e;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.875rem;
+      color: #3e4947;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+
+    .condLink {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #005c55;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+}

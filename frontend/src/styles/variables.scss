@@ -1,0 +1,65 @@
+// Warm Clinical Trust Design Tokens (AarogyaMed)
+
+// Colors - Primary (Deep Clinical Emerald)
+$primary: #005c55;
+$on-primary: #ffffff;
+$primary-container: #0f766e;
+$on-primary-container: #a3faef;
+$primary-fixed: #9cf2e8;
+$primary-fixed-dim: #80d5cb;
+$on-primary-fixed: #00201d;
+
+// Colors - Secondary (Oceanic Trust Blue)
+$secondary: #006398;
+$on-secondary: #ffffff;
+$secondary-container: #5bb8fe;
+$on-secondary-container: #00476e;
+$secondary-fixed: #cce5ff;
+$secondary-fixed-dim: #93ccff;
+
+// Colors - Tertiary (Warm Terracotta Accent)
+$tertiary: #913200;
+$on-tertiary: #ffffff;
+$tertiary-container: #b94200;
+$on-tertiary-container: #ffe5dc;
+$tertiary-fixed: #ffdbce;
+
+// Colors - Surface & Background
+$surface: #faf8ff;
+$surface-dim: #d2d9f4;
+$surface-bright: #faf8ff;
+$surface-container-lowest: #ffffff;
+$surface-container-low: #f2f3ff;
+$surface-container: #eaedff;
+$surface-container-high: #e2e7ff;
+$surface-container-highest: #dae2fd;
+$on-surface: #131b2e;
+$on-surface-variant: #3e4947;
+$outline: #6e7977;
+$outline-variant: #bdc9c6;
+
+// Colors - Error & Alerts
+$error: #ba1a1a;
+$on-error: #ffffff;
+$error-container: #ffdad6;
+$on-error-container: #93000a;
+
+// Typography
+$font-family-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Radii
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(19, 27, 46, 0.08);
+$shadow-md: 0 4px 12px rgba(19, 27, 46, 0.08);
+$shadow-lg: 0 8px 24px rgba(19, 27, 46, 0.12);
+$shadow-hover: 0 12px 32px rgba(0, 92, 85, 0.14);
+
+// Transitions
+$transition-fast: 0.15s ease-in-out;
+$transition-normal: 0.25s ease-in-out;

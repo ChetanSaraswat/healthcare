@@ -1,0 +1,81 @@
+services:
+  database:
+    image: postgres:16.1-alpine3.18
+    container_name: aarogyamed-database
+    restart: always
+    ports:
+      - "${DB_FORWARD_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_DATABASE:-aarogyamed_db}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - aarogyamed_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: aarogyamed-pgadmin
+    restart: always
+    ports:
+      - "${PGADMIN_FORWARD_PORT:-8888}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@aarogyamed.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - aarogyamed_network
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: aarogyamed-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAIL_FORWARD_PORT:-1026}:1025"
+      - "${MAIL_WEB_UI_FORWARD_PORT:-8026}:8025"
+    networks:
+      - aarogyamed_network
+
+  backend:
+    container_name: aarogyamed-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    ports:
+      - "${APP_FORWARD_PORT:-8080}:${APP_PORT:-8080}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - aarogyamed_network
+    restart: on-failure
+    tty: true
+    stdin_open: true
+
+  test-database:
+    image: postgres:16.1-alpine3.18
+    container_name: aarogyamed-test-postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_TEST_PORT:-5433}:5432"
+    environment:
+      - POSTGRES_USER=${DB_TEST_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_TEST_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_TEST_DATABASE:-aarogyamed_test_db}
+    volumes:
+      - pg_test_data:/var/lib/postgresql/data
+    networks:
+      - aarogyamed_network
+
+networks:
+  aarogyamed_network:
+    name: aarogyamed-shared-network
+    external: true
+
+volumes:
+  pg_data: {}
+  pgadmin_data: {}
+  pg_test_data: {}

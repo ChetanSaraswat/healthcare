@@ -1,0 +1,37 @@
+import type { Metadata } from 'next';
+import StoreProvider from './store-provider';
+import '@/styles/globals.scss';
+import { AppShell } from '@/components/common/AppShell';
+
+export const metadata: Metadata = {
+  title: 'AarogyaMed — Buy & Rent Hospital-Grade Medical Equipment in India',
+  description:
+    'Pan-India clinical platform for families & caregivers to buy and rent genuine hospital-grade medical equipment with equal-weight journeys, 10-step sterilization, and 4-hour dispatch.',
+  icons: {
+    icon: '/images/logo.svg',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
+        <StoreProvider>
+          <AppShell>{children}</AppShell>
+        </StoreProvider>
+      </body>
+    </html>
+  );
+}
