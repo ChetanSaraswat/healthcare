@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useAppSelector } from '@/store/hooks';
 import { ProductCard } from '@/components/product/ProductCard';
 import { INITIAL_MOCK_PRODUCTS } from '@/features/products/list-products/list-products.service';
 import { INITIAL_MOCK_CATEGORIES } from '@/features/categories/list-categories/list-categories.service';
@@ -23,11 +24,97 @@ import {
   CheckCircle2,
   PhoneCall,
   Clock,
+  MapPin,
 } from 'lucide-react';
 
 export default function HomePage() {
   const { t, locale } = useTranslation();
-  const featuredProducts = INITIAL_MOCK_PRODUCTS.slice(0, 4);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Live Redux catalog data binding with fallback
+  const reduxProducts = useAppSelector((state) => state.products?.products);
+  const reduxCategories = useAppSelector((state) => state.categories?.categories);
+
+  const productsList = reduxProducts && reduxProducts.length > 0 ? reduxProducts : INITIAL_MOCK_PRODUCTS;
+  const categoriesList = reduxCategories && reduxCategories.length > 0 ? reduxCategories : INITIAL_MOCK_CATEGORIES;
+  const featuredProducts = productsList.slice(0, 4);
+
+  const heroSlides = [
+    {
+      pillEn: '4-Hour Emergency Dispatch Across 40+ Cities',
+      pillHi: '40+ शहरों में 4 घंटे के भीतर आपातकालीन डिलीवरी',
+      titleEn: (
+        <>
+          Hospital-Grade Medical Equipment. <span>Buy or Rent</span> with Complete Trust.
+        </>
+      ),
+      titleHi: (
+        <>
+          अस्पताल-ग्रेड चिकित्सा उपकरण। <span>खरीदें या किराए पर लें</span> पूर्ण विश्वास के साथ।
+        </>
+      ),
+      subtitleEn:
+        'From ICU motorized beds and 10L oxygen concentrators to auto-CPAP machines. Delivered, sanitized to biomedical standards, and installed directly at your home by certified technicians.',
+      subtitleHi:
+        'आईसीयू मोटराइज्ड बेड और 10L ऑक्सीजन कंसंट्रेटर से लेकर ऑटो-सीपैप मशीनों तक। रोगाणुरहित कैलिब्रेटेड उपकरण, प्रमाणित तकनीशियनों द्वारा सीधे आपके घर पर स्थापित।',
+      primaryCtaTextEn: 'Explore Rental Plans',
+      primaryCtaTextHi: 'रेंटल योजनाएं देखें',
+      primaryCtaLink: '/shop?mode=rent',
+      secondaryCtaTextEn: 'Buy Outright',
+      secondaryCtaTextHi: 'सीधे खरीदें',
+      secondaryCtaLink: '/shop?mode=buy',
+    },
+    {
+      pillEn: 'Pre-Calibrated Pressure & Purity Standards',
+      pillHi: 'दबाव और शुद्धता के लिए पूर्व-कैलिब्रेटेड मानक',
+      titleEn: (
+        <>
+          Critical Care <span>Post-ICU Recovery</span> in Your Home.
+        </>
+      ),
+      titleHi: (
+        <>
+          घर पर क्रिटिकल केयर एवं <span>आईसीयू-पश्चात रिकवरी</span>।
+        </>
+      ),
+      subtitleEn:
+        'Biomedical engineers pre-calibrate every device for pressure accuracy and 93% oxygen purity before rapid 4-hour metro delivery.',
+      subtitleHi:
+        'बायोमेडिकल इंजीनियर त्वरित 4-घंटे की मेट्रो डिलीवरी से पहले हर डिवाइस को सटीक दबाव और 93% ऑक्सीजन शुद्धता के लिए कैलिब्रेट करते हैं।',
+      primaryCtaTextEn: 'Equipment Assessment',
+      primaryCtaTextHi: 'केयरगिवर मूल्यांकन',
+      primaryCtaLink: '/assessment',
+      secondaryCtaTextEn: 'About Clinical Protocols',
+      secondaryCtaTextHi: 'क्लिनिकल मानकों के बारे में',
+      secondaryCtaLink: '/about',
+    },
+    {
+      pillEn: '100% Escrow Protection & Deposit Guarantee',
+      pillHi: '100% एस्क्रो सुरक्षा और जमा वापसी गारंटी',
+      titleEn: (
+        <>
+          100% Escrow Protection. <span>24-Hour Deposit Refund</span> SLA.
+        </>
+      ),
+      titleHi: (
+        <>
+          100% एस्क्रो सुरक्षा। <span>24 घंटे में डिपॉजिट रिफंड</span> की गारंटी।
+        </>
+      ),
+      subtitleEn:
+        'Zero arbitrary deductions. Deposits are safeguarded in escrow and refunded directly to your bank account upon technician equipment pickup.',
+      subtitleHi:
+        'शून्य अनुचित कटौती। तकनीशियन द्वारा उपकरण पिकअप के 24 घंटे के भीतर सुरक्षा जमा राशि सीधे आपके बैंक खाते में वापस।',
+      primaryCtaTextEn: 'About AarogyaMed',
+      primaryCtaTextHi: 'आरोग्यमेड के बारे में',
+      primaryCtaLink: '/about',
+      secondaryCtaTextEn: 'Experience Hubs',
+      secondaryCtaTextHi: 'अनुभव केंद्र खोजें',
+      secondaryCtaLink: '/hubs',
+    },
+  ];
+
+  const currentSlide = heroSlides[activeSlide];
 
   const getCategoryIcon = (iconName?: string) => {
     switch (iconName) {
@@ -49,35 +136,46 @@ export default function HomePage() {
       {/* 1. Warm Clinical Trust Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.container}>
+          {/* Interactive Hero Banner Switcher */}
+          <div className={styles.heroSliderNav}>
+            <button
+              type="button"
+              className={`${styles.slideTab} ${activeSlide === 0 ? styles.activeSlideTab : ''}`}
+              onClick={() => setActiveSlide(0)}
+            >
+              1. {locale === 'hi' ? 'अस्पताल-ग्रेड खरीद व रेंटल' : 'Hospital Buy & Rent'}
+            </button>
+            <button
+              type="button"
+              className={`${styles.slideTab} ${activeSlide === 1 ? styles.activeSlideTab : ''}`}
+              onClick={() => setActiveSlide(1)}
+            >
+              2. {locale === 'hi' ? 'पोस्ट-आईसीयू रिकवरी' : 'Post-ICU Recovery'}
+            </button>
+            <button
+              type="button"
+              className={`${styles.slideTab} ${activeSlide === 2 ? styles.activeSlideTab : ''}`}
+              onClick={() => setActiveSlide(2)}
+            >
+              3. {locale === 'hi' ? '24-घंटे डिपॉजिट रिफंड' : '24-Hr Deposit SLA'}
+            </button>
+          </div>
+
           <div className={styles.heroGrid}>
             <div className={styles.heroContent}>
               <div className={styles.urgencyPill}>
-                <Clock size={16} /> {t.common.dispatchPill}
+                <Clock size={16} /> {locale === 'hi' ? currentSlide.pillHi : currentSlide.pillEn}
               </div>
-              <h1>
-                {locale === 'hi' ? (
-                  <>
-                    अस्पताल-ग्रेड चिकित्सा उपकरण। <span>खरीदें या किराए पर लें</span> पूर्ण विश्वास के साथ।
-                  </>
-                ) : (
-                  <>
-                    Hospital-Grade Medical Equipment. <span>Buy or Rent</span> with Complete Trust.
-                  </>
-                )}
-              </h1>
-              <p>
-                {locale === 'hi'
-                  ? 'आईसीयू मोटराइज्ड बेड और 10L ऑक्सीजन कंसंट्रेटर से लेकर ऑटो-सीपैप मशीनों तक। रोगाणुरहित कैलिब्रेटेड उपकरण, प्रमाणित तकनीशियनों द्वारा सीधे आपके घर पर स्थापित।'
-                  : 'From ICU motorized beds and 10L oxygen concentrators to auto-CPAP machines. Delivered, sanitized to biomedical standards, and installed directly at your home by certified technicians.'}
-              </p>
+              <h1>{locale === 'hi' ? currentSlide.titleHi : currentSlide.titleEn}</h1>
+              <p>{locale === 'hi' ? currentSlide.subtitleHi : currentSlide.subtitleEn}</p>
 
               <div className={styles.heroCtas}>
-                <Link href="/shop?mode=rent" className={styles.btnRentPrimary}>
-                  <span>{locale === 'hi' ? 'रेंटल योजनाएं देखें' : 'Explore Rental Plans'}</span>
+                <Link href={currentSlide.primaryCtaLink} className={styles.btnRentPrimary}>
+                  <span>{locale === 'hi' ? currentSlide.primaryCtaTextHi : currentSlide.primaryCtaTextEn}</span>
                   <ArrowRight size={18} />
                 </Link>
-                <Link href="/shop?mode=buy" className={styles.btnBuySecondary}>
-                  <span>{t.product.buyOutright}</span>
+                <Link href={currentSlide.secondaryCtaLink} className={styles.btnBuySecondary}>
+                  <span>{locale === 'hi' ? currentSlide.secondaryCtaTextHi : currentSlide.secondaryCtaTextEn}</span>
                 </Link>
               </div>
 
@@ -131,7 +229,7 @@ export default function HomePage() {
           </div>
 
           <div className={styles.categoryGrid}>
-            {INITIAL_MOCK_CATEGORIES.map((cat) => (
+            {categoriesList.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/shop?category=${cat.id}`}
@@ -250,6 +348,39 @@ export default function HomePage() {
               <span>{t.common.viewCatalog}</span>
               <ArrowRight size={18} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 4.5. Clinical Trust & Biomedical Compliance Banner */}
+      <section className={styles.clinicalTrustBannerSection}>
+        <div className={styles.container}>
+          <div className={styles.clinicalTrustBanner}>
+            <div className={styles.bannerContent}>
+              <div className={styles.badge}>
+                <ShieldCheck size={14} /> CDSCO &amp; ISO 13485 Registered
+              </div>
+              <h3>
+                {locale === 'hi'
+                  ? 'भारत के 40,000+ परिवार आरोग्यमेड के क्लिनिकल मानकों पर भरोसा क्यों करते हैं?'
+                  : 'Why 40,000+ Indian Families Trust AarogyaMed Clinical Standards'}
+              </h3>
+              <p>
+                {locale === 'hi'
+                  ? 'अस्पताल-ग्रेड 10-चरणीय ऑटोक्लेव कीटाणुशोधन, बायोमेडिकल इंजीनियरों द्वारा प्रेशर और ऑक्सीजन शुद्धता कैलिब्रेशन, तथा 24-घंटे में 100% सुरक्षा जमा वापसी गारंटी।'
+                  : 'Hospital-grade 10-step autoclave sterilization, digital flow calibration by certified biomedical engineers, and a guaranteed 24-hour refundable deposit SLA.'}
+              </p>
+            </div>
+            <div className={styles.bannerActions}>
+              <Link href="/about" className={styles.btnAbout}>
+                <span>{locale === 'hi' ? 'हमारे क्लिनिकल मानक' : 'Our Clinical Protocols'}</span>
+                <ArrowRight size={16} />
+              </Link>
+              <Link href="/hubs" className={styles.btnHelpline}>
+                <MapPin size={16} />
+                <span>{locale === 'hi' ? 'अनुभव केंद्र खोजें' : 'Experience Centers'}</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

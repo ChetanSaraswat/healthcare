@@ -1,9 +1,12 @@
+import { UserRole } from '@/domain/entities/user.entity';
+
 export interface UserProfile {
   id: string;
+  uuid?: string;
   name: string;
   email: string;
   phone?: string;
-  role: 'customer' | 'admin';
+  role: UserRole;
 }
 
 export interface LoginPayload {
@@ -18,3 +21,4 @@ export interface LoginResponse {
     token: string;
   };
 }
+

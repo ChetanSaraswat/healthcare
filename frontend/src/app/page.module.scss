@@ -446,3 +446,141 @@
     }
   }
 }
+
+.heroSliderNav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+
+  .slideTab {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.4rem 0.875rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    &.activeSlideTab {
+      background: #ffffff;
+      color: #005c55;
+      font-weight: 700;
+      border-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+.clinicalTrustBannerSection {
+  padding: 3.5rem 0 4.5rem;
+  background: #f8fafc;
+}
+
+.clinicalTrustBanner {
+  background: linear-gradient(135deg, #0d5c58 0%, #134e4a 100%);
+  border-radius: 16px;
+  color: #ffffff;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+  box-shadow: 0 10px 25px -5px rgba(13, 92, 88, 0.2);
+
+  @media (max-width: 860px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 2.25rem 1.5rem;
+  }
+
+  .bannerContent {
+    max-width: 680px;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212, 154, 55, 0.2);
+      border: 1px solid rgba(212, 154, 55, 0.4);
+      color: #fde68a;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.875rem;
+    }
+
+    h3 {
+      font-size: 1.875rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 0.75rem;
+      color: #ffffff;
+    }
+
+    p {
+      color: #ccfbf1;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  .bannerActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 220px;
+
+    .btnAbout {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: #ffffff;
+      color: #0d5c58;
+      font-weight: 700;
+      font-size: 0.9375rem;
+      padding: 0.875rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: #f0fdfa;
+        transform: translateY(-1px);
+      }
+    }
+
+    .btnHelpline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+

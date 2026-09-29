@@ -5,4 +5,6 @@ module.exports = {
   hash: require('./hash'),
   otp: require('./otp'),
   razorpayGateway: require('./razorpay'),
+  email: require('./email'),
 };
+

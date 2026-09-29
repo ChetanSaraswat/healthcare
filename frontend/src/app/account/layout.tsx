@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 import { useTranslation } from '@/locales';
 import { UserEntity } from '@/domain/entities/user.entity';
+import { AuthModal } from '@/components/auth/AuthModal';
 import {
   CalendarClock,
   ShoppingBag,
@@ -21,16 +22,104 @@ import {
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { t, locale } = useTranslation();
-  const authUser = useAppSelector((state) => state.auth.user);
+  const { user: authUser, isAuthenticated } = useAppSelector((state) => state.auth);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const orders = useAppSelector((state) => state.orders.orders);
   const addresses = useAppSelector((state) => state.user.addresses);
   const wishlistItems = useAppSelector((state) => state.wishlist?.items || []);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
-  const userName = authUser?.name || 'Sunita Sharma';
-  const userEmail = authUser?.email || 'sunita.sharma@example.com';
-  const userPhone = authUser?.phone || '+91 98765 43210';
+  if (!authUser || !isAuthenticated) {
+    return (
+      <div style={{ maxWidth: 640, margin: '5rem auto 7rem', padding: '0 1.5rem', textAlign: 'center' }}>
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 24,
+            border: '1px solid #dae2fd',
+            padding: '3rem 2rem',
+            boxShadow: '0 12px 36px rgba(19, 27, 46, 0.06)',
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              background: '#eaf8f6',
+              color: '#005c55',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+            }}
+          >
+            <UserCheck size={32} />
+          </div>
+          <h2 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#131b2e', margin: '0 0 0.75rem' }}>
+            {locale === 'hi' ? 'रोगी खाते में प्रवेश आवश्यक है' : 'Patient Authentication Required'}
+          </h2>
+          <p style={{ fontSize: '0.9375rem', color: '#6e7977', maxWidth: 440, margin: '0 auto 2rem', lineHeight: 1.6 }}>
+            {locale === 'hi'
+              ? 'सक्रिय चिकित्सा उपकरण रेंटल, डिलीवरी पते एवं ऑर्डर इतिहास देखने के लिए कृपया साइन इन करें।'
+              : 'Please sign in to access your active medical equipment rentals, order history, and delivery addresses.'}
+          </p>
+
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setAuthModalOpen(true)}
+              style={{
+                background: '#005c55',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 28px',
+                borderRadius: 12,
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                boxShadow: '0 4px 14px rgba(0, 92, 85, 0.25)',
+              }}
+            >
+              <UserCheck size={18} />
+              <span>{locale === 'hi' ? 'साइन इन / नया खाता' : 'Sign In / Register'}</span>
+            </button>
+            <Link
+              href={`/login?redirect=${encodeURIComponent(pathname)}`}
+              style={{
+                background: '#f2f3ff',
+                color: '#131b2e',
+                border: '1px solid #dae2fd',
+                padding: '12px 24px',
+                borderRadius: 12,
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <span>{locale === 'hi' ? 'लॉग इन पृष्ठ' : 'Go to Login Page'}</span>
+            </Link>
+          </div>
+
+          <AuthModal
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const userName = authUser.name;
+  const userEmail = authUser.email;
+  const userPhone = authUser.phone || '+91 98765 43210';
   const initials = UserEntity.getInitials(userName);
+
 
   const navLinks = [
     {

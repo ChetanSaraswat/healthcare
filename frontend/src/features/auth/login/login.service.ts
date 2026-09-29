@@ -10,27 +10,14 @@ export const loginService = async (payload: LoginPayload): Promise<LoginResponse
       }
       return response.data;
     }
-  } catch (err) {
-    // Fallback demo user
+    return response.data;
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.error ||
+      err?.response?.data?.message ||
+      err?.message ||
+      'Invalid email/phone or password';
+    throw new Error(message);
   }
-
-  const mockUser = {
-    user: {
-      id: 'usr-demo-01',
-      name: 'Sunita Sharma',
-      email: payload.email || 'sunita.sharma@example.com',
-      phone: '+91 98765 43210',
-      role: 'customer' as const,
-    },
-    token: 'mock-jwt-token-aarogyamed',
-  };
-
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('aarogyamed_auth_token', mockUser.token);
-  }
-
-  return {
-    success: true,
-    data: mockUser,
-  };
 };
+

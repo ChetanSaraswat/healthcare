@@ -21,11 +21,17 @@ import {
   Users,
   FileText,
 } from 'lucide-react';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { setDemoAdmin } from '@/features/auth/auth.slice';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const { user: authUser, isAuthenticated } = useAppSelector((state) => state.auth);
   const products = useAppSelector((state) => state.products.products);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const categories = useAppSelector((state) => state.categories?.categories || []);
@@ -33,6 +39,127 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const blogPosts = useAppSelector((state) => state.blog?.posts || []);
   const customers = useAppSelector((state) => state.user?.customers || []);
   const staffMembers = useAppSelector((state) => state.staff?.staffMembers || []);
+
+  const isStaffAuthorized =
+    isAuthenticated &&
+    authUser &&
+    ['super_admin', 'operations_staff', 'catalog_editor', 'content_editor'].includes(authUser.role);
+
+  if (!isStaffAuthorized) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #131b2e 0%, #1e293b 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+          color: '#ffffff',
+          fontFamily: 'inherit',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 520,
+            width: '100%',
+            background: '#ffffff',
+            borderRadius: 24,
+            padding: '2.5rem 2rem',
+            textAlign: 'center',
+            color: '#131b2e',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              background: '#fff4eb',
+              color: '#913200',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+            }}
+          >
+            <ShieldCheck size={32} />
+          </div>
+
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-0.02em' }}>
+            Operations Console Access Restricted
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: '0 0 1.75rem', lineHeight: 1.6 }}>
+            The AarogyaMed Clinical Operations Console requires verified staff credentials.
+            {authUser ? ` Currently signed in as "${authUser.name}" (${authUser.role}).` : ' Please sign in with an administrator account to continue.'}
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              type="button"
+              onClick={() => dispatch(setDemoAdmin())}
+              style={{
+                background: '#005c55',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 20px',
+                borderRadius: 12,
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                boxShadow: '0 4px 14px rgba(0, 92, 85, 0.25)',
+              }}
+            >
+              <Sparkles size={16} />
+              <span>Log In as Demo Super Admin (Dr. Rajesh)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAuthModalOpen(true)}
+              style={{
+                background: '#f2f3ff',
+                color: '#131b2e',
+                border: '1px solid #dae2fd',
+                padding: '12px 20px',
+                borderRadius: 12,
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Enter Custom Staff Credentials
+            </button>
+
+            <Link
+              href="/"
+              style={{
+                color: '#6e7977',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                marginTop: 8,
+              }}
+            >
+              ← Return to AarogyaMed Public Storefront
+            </Link>
+          </div>
+
+          <AuthModal
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+            redirectUrl="/admin"
+          />
+        </div>
+      </div>
+    );
+  }
+
 
   // Calculate live translation coverage
   const totalProducts = products.length;

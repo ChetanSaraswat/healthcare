@@ -1,4 +1,5 @@
-const { rentalRepository, productRepository, addressRepository } = require('../repository');
+const { rentalRepository, productRepository, addressRepository, userRepository } = require('../repository');
+const { email } = require('../libs');
 const { BadRequest, NotFound } = require('../libs/error');
 
 class RentalService {
@@ -135,7 +136,7 @@ class RentalService {
 
     const quoteResult = await this.quote(items);
 
-    return await rentalRepository.handleManagedTransaction(async (transaction) => {
+    const createdRental = await rentalRepository.handleManagedTransaction(async (transaction) => {
       const orderData = {
         user_id: userId,
         address_id: address.id,
@@ -158,6 +159,36 @@ class RentalService {
 
       return await rentalRepository.createWithItems(orderData, itemsData, transaction);
     });
+
+    // Asynchronously dispatch rental agreement and sterilization certificate email
+    (async () => {
+      try {
+        const user = userId ? await userRepository.findByPk(userId) : null;
+        const targetEmail = (user && user.email) || (shipping && shipping.email);
+        if (targetEmail) {
+          await email.sendRentalAgreementEmail({
+            to: targetEmail,
+            name: (user && user.name) || (shipping && shipping.name) || 'Valued Patient',
+            rentalNumber: createdRental.id,
+            items: quoteResult.items.map((it) => ({
+              product_name: it.product_name,
+              rate_amount: it.rate_amount,
+              rate_type: it.duration_type,
+            })),
+            startDate,
+            endDate,
+            rentalAmount: quoteResult.total_rental_amount,
+            depositAmount: quoteResult.total_deposit_amount,
+            deliveryAddress: address,
+            transactionId: payment_id || '',
+          });
+        }
+      } catch (mailErr) {
+        console.warn('[RentalService] Rental agreement email dispatch failed:', mailErr.message);
+      }
+    })();
+
+    return createdRental;
   }
 
   async getById(id, userId = null) {
@@ -220,6 +251,26 @@ class RentalService {
       throw new BadRequest(`Cannot schedule return for rental with status '${rental.status}'`);
     }
 
+    // Asynchronously dispatch scheduled return confirmation and 24-hr deposit SLA notice
+    (async () => {
+      try {
+        const user = userId ? await userRepository.findByPk(userId) : null;
+        if (user && user.email) {
+          await email.sendRentalReturnScheduledEmail({
+            to: user.email,
+            name: user.name,
+            rentalNumber: rental.id,
+            returnDate: return_date,
+            returnSlot: return_slot,
+            pickupAddress: rental.address,
+            depositAmount: rental.deposit_amount || 0,
+          });
+        }
+      } catch (mailErr) {
+        console.warn('[RentalService] Scheduled return email dispatch failed:', mailErr.message);
+      }
+    })();
+
     return {
       message: `Return pickup scheduled for ${return_date} (${return_slot === 'morning' ? '9:00 AM - 1:00 PM' : '2:00 PM - 7:00 PM'}). Technician inspection will initiate the 24-hour security deposit refund SLA.`,
       return_date,
@@ -230,3 +281,4 @@ class RentalService {
 }
 
 module.exports = new RentalService();
+

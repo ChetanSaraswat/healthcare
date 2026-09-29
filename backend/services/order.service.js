@@ -1,4 +1,5 @@
-const { orderRepository, productRepository, addressRepository } = require('../repository');
+const { orderRepository, productRepository, addressRepository, userRepository } = require('../repository');
+const { email } = require('../libs');
 const { BadRequest, NotFound } = require('../libs/error');
 
 class OrderService {
@@ -90,7 +91,7 @@ class OrderService {
       });
     }
 
-    return await orderRepository.handleManagedTransaction(async (transaction) => {
+    const createdOrder = await orderRepository.handleManagedTransaction(async (transaction) => {
       const orderData = {
         user_id: userId,
         address_id: address.id,
@@ -107,7 +108,7 @@ class OrderService {
         subtotal: item.subtotal,
       }));
 
-      const createdOrder = await orderRepository.createWithItems(orderData, orderItemsData, transaction);
+      const newOrder = await orderRepository.createWithItems(orderData, orderItemsData, transaction);
 
       // Decrement stock
       for (const item of validatedItems) {
@@ -117,8 +118,36 @@ class OrderService {
         });
       }
 
-      return createdOrder;
+      return newOrder;
     });
+
+    // Asynchronously dispatch order confirmation receipt
+    (async () => {
+      try {
+        const user = userId ? await userRepository.findByPk(userId) : null;
+        const targetEmail = (user && user.email) || (shipping && shipping.email);
+        if (targetEmail) {
+          await email.sendOrderConfirmationEmail({
+            to: targetEmail,
+            name: (user && user.name) || (shipping && shipping.name) || 'Valued Patient',
+            orderNumber: createdOrder.id,
+            items: validatedItems.map((vi) => ({
+              name: vi.product.name,
+              quantity: vi.quantity,
+              price: vi.unit_price,
+            })),
+            totalAmount,
+            deliveryAddress: address,
+            paymentMethod: payment_id ? 'Online Payment' : 'Cash on Delivery (COD)',
+            transactionId: payment_id || '',
+          });
+        }
+      } catch (mailErr) {
+        console.warn('[OrderService] Order confirmation email dispatch failed:', mailErr.message);
+      }
+    })();
+
+    return createdOrder;
   }
 
   async getById(id, userId = null) {

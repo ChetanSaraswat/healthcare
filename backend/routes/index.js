@@ -24,5 +24,6 @@ router.use('/reviews', require('./review.router'));
 router.use('/users', require('./user.router'));
 router.use('/payments', require('./payment.router'));
 router.use('/blog', require('./blog.router'));
+router.use('/email', require('./email.router'));
 
 module.exports = router;

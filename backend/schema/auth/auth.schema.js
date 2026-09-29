@@ -2,16 +2,17 @@ const { z } = require('zod');
 
 exports.registerSchema = z.object({
   body: z.object({
-    name: z.string({ required_error: 'Name is required' }).min(2, 'Name must be at least 2 characters'),
-    email: z.string({ required_error: 'Email is required' }).email('Invalid email address'),
-    phone: z.string().optional(),
+    name: z.string({ required_error: 'Name is required' }).trim().min(2, 'Name must be at least 2 characters'),
+    email: z.string({ required_error: 'Email is required' }).trim().email('Invalid email address'),
+    phone: z.string().trim().optional(),
     password: z.string({ required_error: 'Password is required' }).min(6, 'Password must be at least 6 characters'),
   }),
 });
 
 exports.loginSchema = z.object({
   body: z.object({
-    email: z.string({ required_error: 'Email is required' }).email('Invalid email address'),
+    email: z.string({ required_error: 'Email or phone number is required' }).trim().min(3, 'Email or phone is required'),
     password: z.string({ required_error: 'Password is required' }).min(1, 'Password cannot be empty'),
   }),
 });
+

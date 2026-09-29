@@ -1,8 +1,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const { paymentRepository, orderRepository, rentalRepository, webhookEventRepository } = require('../repository');
-const { razorpayGateway } = require('../libs');
+const { paymentRepository, orderRepository, rentalRepository, webhookEventRepository, userRepository } = require('../repository');
+const { razorpayGateway, email } = require('../libs');
 const { BadRequest, NotFound, Forbidden } = require('../libs/error');
 const { UniqueConstraintError } = require('sequelize');
 
@@ -356,7 +356,7 @@ class PaymentService {
     }
 
     try {
-      return await paymentRepository.handleManagedTransaction(async (transaction) => {
+      const captureResult = await paymentRepository.handleManagedTransaction(async (transaction) => {
         // Find the payment record by gateway order ID
         let payment = await paymentRepository.findByGatewayOrderId(razorpay_order_id, { transaction });
 
@@ -478,6 +478,66 @@ class PaymentService {
           status: 'captured',
         };
       });
+
+      // Asynchronously dispatch transactional confirmation emails upon successful capture
+      if (captureResult && captureResult.status === 'captured' && !captureResult.alreadyCaptured) {
+        (async () => {
+          try {
+            if (captureResult.orderId) {
+              const order = await orderRepository.findOrderDetails(captureResult.orderId);
+              if (order) {
+                const user = order.user_id ? await userRepository.findByPk(order.user_id) : null;
+                const emailTo = (user && user.email) || (order.shipping_address && order.shipping_address.email);
+                if (emailTo) {
+                  await email.sendOrderConfirmationEmail({
+                    to: emailTo,
+                    name: (user && user.name) || 'Valued Patient',
+                    orderNumber: order.id,
+                    items: (order.items || []).map((it) => ({
+                      name: it.product ? it.product.name : 'Medical Equipment',
+                      quantity: it.quantity,
+                      price: it.unit_price,
+                    })),
+                    totalAmount: order.total_amount,
+                    deliveryAddress: order.address,
+                    paymentMethod: payment_method || 'Online Razorpay Gateway',
+                    transactionId: razorpay_payment_id,
+                  });
+                }
+              }
+            }
+
+            if (captureResult.rentalOrderId) {
+              const rental = await rentalRepository.findRentalDetails(captureResult.rentalOrderId);
+              if (rental) {
+                const user = rental.user_id ? await userRepository.findByPk(rental.user_id) : null;
+                if (user && user.email) {
+                  await email.sendRentalAgreementEmail({
+                    to: user.email,
+                    name: user.name,
+                    rentalNumber: rental.id,
+                    items: (rental.items || []).map((it) => ({
+                      product_name: it.product ? it.product.name : 'Rental Device',
+                      rate_amount: it.rate_amount,
+                      rate_type: it.rate_type,
+                    })),
+                    startDate: rental.start_date,
+                    endDate: rental.end_date,
+                    rentalAmount: rental.rental_amount || 0,
+                    depositAmount: rental.deposit_amount || 0,
+                    deliveryAddress: rental.address,
+                    transactionId: razorpay_payment_id,
+                  });
+                }
+              }
+            }
+          } catch (mailErr) {
+            console.warn('[PaymentService] Transactional confirmation email dispatch failed:', mailErr.message);
+          }
+        })();
+      }
+
+      return captureResult;
     } catch (outerErr) {
       if (
         outerErr instanceof UniqueConstraintError ||

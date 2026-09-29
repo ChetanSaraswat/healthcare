@@ -20,7 +20,14 @@ import {
   Globe,
   Stethoscope,
   Heart,
+  LogOut,
+  LayoutDashboard,
+  ShoppingBag,
+  CalendarClock,
 } from 'lucide-react';
+import { AuthModal } from '../auth/AuthModal';
+import { logout } from '@/features/auth/auth.slice';
+import { UserEntity } from '@/domain/entities/user.entity';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -29,10 +36,12 @@ export const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('Bengaluru');
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const cartItemCount = useAppSelector((state) => state.cart.pricing.itemCount);
   const wishlistCount = useAppSelector((state) => state.wishlist?.items?.length || 0);
-  const authUser = useAppSelector((state) => state.auth.user);
+  const { user: authUser, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const cities = [
     'Bengaluru',
@@ -50,6 +59,16 @@ export const Navbar: React.FC = () => {
       router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    setIsUserDropdownOpen(false);
+    router.push('/');
+  };
+
+  const userInitials = authUser?.name ? UserEntity.getInitials(authUser.name) : 'U';
+  const firstName = authUser?.name ? authUser.name.split(' ')[0] : 'User';
+
 
   return (
     <header className={styles.navbarWrapper}>
@@ -232,11 +251,111 @@ export const Navbar: React.FC = () => {
               <span>{locale === 'hi' ? 'इच्छासूची' : 'Wishlist'}</span>
             </Link>
 
-            {/* Account Link */}
-            <Link href="/account" className={styles.actionLink}>
-              <User size={20} />
-              <span>{authUser ? t.common.myAccount : t.common.signIn}</span>
-            </Link>
+            {/* Account / User Menu */}
+            {isAuthenticated && authUser ? (
+              <div className={styles.userDropdownContainer}>
+                <button
+                  type="button"
+                  className={styles.userMenuBtn}
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  title={authUser.name}
+                >
+                  <div className={styles.userAvatar}>{userInitials}</div>
+                  <span className={styles.userNameText}>{firstName}</span>
+                  <ChevronDown size={14} color="#6e7977" />
+                </button>
+
+                {isUserDropdownOpen && (
+                  <div className={styles.userMenuDropdown} onMouseLeave={() => setIsUserDropdownOpen(false)}>
+                    <div className={styles.dropdownHeader}>
+                      <div className={styles.dropdownUserName}>{authUser.name}</div>
+                      <div className={styles.dropdownUserRole}>
+                        {authUser.role === 'super_admin'
+                          ? 'Super Admin'
+                          : authUser.role === 'operations_staff'
+                          ? 'Operations Staff'
+                          : (locale === 'hi' ? 'सत्यापित रोगी / देखभालकर्ता' : 'Verified Patient')}
+                      </div>
+                    </div>
+
+                    <Link
+                      href="/account"
+                      className={styles.dropdownItem}
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <User size={15} />
+                      <span>{locale === 'hi' ? 'खाता सारांश' : 'Account Overview'}</span>
+                    </Link>
+
+                    <Link
+                      href="/account/rentals"
+                      className={styles.dropdownItem}
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <CalendarClock size={15} />
+                      <span>{locale === 'hi' ? 'सक्रिय रेंटल उपकरण' : 'Active Rentals'}</span>
+                    </Link>
+
+                    <Link
+                      href="/account/orders"
+                      className={styles.dropdownItem}
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <ShoppingBag size={15} />
+                      <span>{locale === 'hi' ? 'खरीद के आदेश' : 'Purchase Orders'}</span>
+                    </Link>
+
+                    <Link
+                      href="/account/addresses"
+                      className={styles.dropdownItem}
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <MapPin size={15} />
+                      <span>{locale === 'hi' ? 'वितरण पते' : 'Saved Addresses'}</span>
+                    </Link>
+
+                    <Link
+                      href="/account/wishlist"
+                      className={styles.dropdownItem}
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <Heart size={15} />
+                      <span>{locale === 'hi' ? 'सहेजी गई इच्छासूची' : 'Saved Wishlist'}</span>
+                    </Link>
+
+                    {(authUser.role === 'super_admin' || authUser.role === 'operations_staff') && (
+                      <Link
+                        href="/admin"
+                        className={styles.dropdownItem}
+                        style={{ color: '#005c55', fontWeight: 700 }}
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        <LayoutDashboard size={15} />
+                        <span>Admin Console</span>
+                      </Link>
+                    )}
+
+                    <button
+                      type="button"
+                      className={`${styles.dropdownItem} ${styles.logout}`}
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={15} />
+                      <span>{locale === 'hi' ? 'लॉग आउट करें' : 'Sign Out'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={styles.actionLink}
+                onClick={() => setIsAuthModalOpen(true)}
+              >
+                <User size={20} />
+                <span>{locale === 'hi' ? 'साइन इन' : 'Sign In'}</span>
+              </button>
+            )}
 
             {/* Cart Button with Counter */}
             <Link href="/cart" className={styles.cartBtn}>
@@ -260,6 +379,12 @@ export const Navbar: React.FC = () => {
           <Link href="/blog" className={styles.navItem}>
             {t.common.knowledgeHub}
           </Link>
+          <Link href="/about" className={styles.navItem}>
+            {locale === 'hi' ? 'हमारे बारे में' : 'About Us'}
+          </Link>
+          <Link href="/hubs" className={styles.navItem}>
+            {locale === 'hi' ? 'अनुभव केंद्र' : 'Experience Hubs'}
+          </Link>
           <a
             href="tel:18008892273"
             className={styles.navItem}
@@ -269,6 +394,13 @@ export const Navbar: React.FC = () => {
           </a>
         </div>
       </nav>
+
+      {/* Interactive Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </header>
   );
 };
+

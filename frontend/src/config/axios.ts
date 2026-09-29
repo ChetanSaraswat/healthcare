@@ -40,4 +40,18 @@ axiosInterceptorInstanceClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
+axiosInterceptorInstanceClient.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const url = error.config?.url || '';
+      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
+        localStorage.removeItem('aarogyamed_auth_token');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInterceptorInstanceClient;
+

@@ -24,6 +24,7 @@ import {
   Plus,
   BookmarkCheck,
 } from 'lucide-react';
+import { AuthModal } from '@/components/auth/AuthModal';
 import {
   CHECKOUT_SESSION_KEY,
   DurableCheckoutSession,
@@ -40,6 +41,7 @@ export default function CheckoutPage() {
   const { items, pricing, pincode, serviceableCity } = useAppSelector((state) => state.cart);
   const savedAddresses = useAppSelector((state) => state.user.addresses);
   const authUser = useAppSelector((state) => state.auth.user);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const buyItems = items.filter((i) => i.type === 'buy');
   const rentItems = items.filter((i) => i.type === 'rent');
@@ -52,6 +54,7 @@ export default function CheckoutPage() {
     const defaultAddr = UserEntity.getDefaultAddress(savedAddresses);
     return defaultAddr?.id ?? null;
   });
+
 
   const getInitialFormData = useCallback(() => {
     if (savedAddresses.length > 0 && addressMode === 'saved') {
@@ -70,9 +73,9 @@ export default function CheckoutPage() {
       };
     }
     return {
-      fullName: authUser?.name || 'Sunita Sharma',
-      phone: authUser?.phone || '+91 98765 43210',
-      email: authUser?.email || 'sunita.sharma@example.com',
+      fullName: authUser?.name || '',
+      phone: authUser?.phone || '',
+      email: authUser?.email || '',
       addressLine1: '',
       addressLine2: '',
       city: serviceableCity || '',
@@ -84,6 +87,18 @@ export default function CheckoutPage() {
   }, [savedAddresses, addressMode, selectedSavedAddressId, authUser, serviceableCity, pincode]);
 
   const [formData, setFormData] = useState(getInitialFormData);
+
+  // Sync authUser updates when user logs in via AuthModal
+  useEffect(() => {
+    if (authUser) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || authUser.name,
+        phone: prev.phone || authUser.phone || '',
+        email: prev.email || authUser.email,
+      }));
+    }
+  }, [authUser]);
 
   // When saved address selection changes, auto-fill form
   useEffect(() => {
@@ -101,6 +116,7 @@ export default function CheckoutPage() {
       }
     }
   }, [addressMode, selectedSavedAddressId, savedAddresses]);
+
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const cartFingerprint = computeCartFingerprint(items);
@@ -451,8 +467,73 @@ export default function CheckoutPage() {
               {t.checkout.addressSection}
             </h3>
 
+            {/* Account Status / Sign-in Banner */}
+            {!authUser ? (
+              <div
+                style={{
+                  background: '#eaf8f6',
+                  border: '1px solid #9cf2e8',
+                  borderRadius: 12,
+                  padding: '12px 16px',
+                  marginBottom: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 10,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <BookmarkCheck size={18} color="#005c55" />
+                  <span style={{ fontSize: '0.8125rem', color: '#005c55', fontWeight: 600 }}>
+                    {locale === 'hi'
+                      ? 'सहेजे गए पते स्वतः भरने के लिए अपने खाते में साइन इन करें।'
+                      : 'Have an account? Sign in to use your saved patient delivery addresses.'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAuthModalOpen(true)}
+                  style={{
+                    background: '#005c55',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '6px 14px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {locale === 'hi' ? 'साइन इन करें' : 'Sign In'}
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: '#faf8ff',
+                  border: '1px solid #dae2fd',
+                  borderRadius: 12,
+                  padding: '10px 14px',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.8125rem',
+                  color: '#3e4947',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <ShieldCheck size={16} color="#005c55" />
+                <span>
+                  {locale === 'hi' ? 'सत्यापित रोगी खाता:' : 'Ordering as:'}{' '}
+                  <strong style={{ color: '#131b2e' }}>{authUser.name}</strong> ({authUser.email})
+                </span>
+              </div>
+            )}
+
             {/* Saved Address Picker */}
             {savedAddresses.length > 0 && (
+
               <div style={{ marginBottom: '1.25rem' }}>
                 {/* Mode Toggle */}
                 <div style={{ display: 'flex', gap: 10, marginBottom: '1rem' }}>
@@ -902,6 +983,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Authentication Modal for in-place checkout login/registration */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 }
+

@@ -112,8 +112,10 @@ export const Footer: React.FC = () => {
           <div className={styles.col}>
             <h5>Account &amp; Trust</h5>
             <ul>
+              <li><Link href="/about">About AarogyaMed</Link></li>
               <li><Link href="/account/rentals">Active Rentals Dashboard</Link></li>
               <li><Link href="/cart">Your Healthcare Cart</Link></li>
+              <li><Link href="/assessment">Equipment Assessment Tool</Link></li>
               <li><Link href="/terms/rental">Refundable Deposit Policy</Link></li>
               <li><Link href="/terms/warranty">10-Step Sterilization Protocol</Link></li>
               <li><Link href="/hubs">Serviceable Hubs (40+ Cities)</Link></li>
