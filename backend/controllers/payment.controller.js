@@ -37,8 +37,8 @@ class PaymentController {
 
   async getById(req, res, next) {
     try {
-      const isStaff = req.user && ['super_admin', 'operations_staff'].includes(req.user.role);
-      const userId = isStaff ? null : req.user.id;
+      const isAdmin = req.user && req.user.role === 'super_admin';
+      const userId = isAdmin ? null : req.user.id;
       const payment = await paymentService.getPaymentById(req.params.id, userId);
       res.status(SUCCESS).json({ success: true, data: payment });
     } catch (error) {

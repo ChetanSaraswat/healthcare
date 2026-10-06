@@ -13,8 +13,8 @@ class OrderController {
 
   async getById(req, res, next) {
     try {
-      const isStaff = ['super_admin', 'operations_staff'].includes(req.user.role);
-      const userId = isStaff ? null : req.user.id;
+      const isAdmin = req.user.role === 'super_admin';
+      const userId = isAdmin ? null : req.user.id;
       const order = await orderService.getById(req.params.id, userId);
       res.status(SUCCESS).json({ success: true, data: order });
     } catch (error) {

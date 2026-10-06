@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { errorMiddleware } = require('./middlewares');
 const { checkConnection } = require('./config').dbConnection;
+require('./services/admin-notification.service');
 
 const port = process.env.APP_PORT || 8080;
 const app = express();
@@ -39,12 +40,50 @@ app.use(
   })
 );
 
-// Routes
+// API Documentation (OpenAPI 3.0 / Swagger UI)
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yaml');
+const fs = require('fs');
+const path = require('path');
+
+const openapiYamlPath = path.join(__dirname, 'docs/openapi.yaml');
+let openapiSpec;
+try {
+  const fileContent = fs.readFileSync(openapiYamlPath, 'utf8');
+  openapiSpec = YAML.parse(fileContent);
+} catch (err) {
+  console.warn('[OpenAPI] Failed to parse openapi.yaml:', err.message);
+}
+
+if (openapiSpec) {
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
+    customSiteTitle: 'AarogyaMed API Documentation',
+    customCss: '.swagger-ui .topbar { background-color: #005c55; }',
+  }));
+
+  app.get(['/api/docs.yaml', '/api/docs/openapi.yaml'], (req, res) => {
+    res.setHeader('Content-Type', 'text/yaml');
+    res.sendFile(openapiYamlPath);
+  });
+
+  app.get('/api/docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json(openapiSpec);
+  });
+}
+
+// Routes (Supports both standard root and /api/v1 versioned prefix)
+app.use('/api/v1', require('./routes'));
 app.use('/', require('./routes'));
 
 // Handle 404
 app.use((req, res) => {
-  res.status(404).json({ success: false, error: 'Resource not found' });
+  res.status(404).json({
+    success: false,
+    statusCode: 404,
+    message: `Cannot ${req.method} ${req.originalUrl} - Route not found`,
+    error: `Cannot ${req.method} ${req.originalUrl} - Route not found`,
+  });
 });
 
 // Centralized error handler

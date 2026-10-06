@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <g transform="translate(4, 6)">
+    <!-- Shield / Heart cross emblem -->
+    <rect x="0" y="0" width="48" height="48" rx="14" fill="#005c55"/>
+    <!-- Medical Cross with Caring Curves -->
+    <path d="M24 12v24M12 24h24" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="24" cy="24" r="5" fill="#38BDF8"/>
+    <!-- Gentle reassuring leaf/pulse accent -->
+    <path d="M34 14C36 17 37 21 34 25" stroke="#F97316" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </g>
+  <text x="62" y="32" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-weight="800" font-size="22" fill="#00201d" letter-spacing="-0.5">Aarogya<tspan fill="#005c55">Med</tspan></text>
+  <text x="63" y="47" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-weight="600" font-size="10" fill="#6f7977" letter-spacing="0.8">CARE EQUIPMENT &amp; RENTALS</text>
+</svg>

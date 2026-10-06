@@ -17,7 +17,7 @@ router.get('/:id', (req, res, next) => categoryController.getById(req, res, next
 router.post(
   '/',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(createCategorySchema),
   (req, res, next) => categoryController.create(req, res, next)
 );
@@ -25,7 +25,7 @@ router.post(
 router.patch(
   '/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(updateCategorySchema),
   (req, res, next) => categoryController.update(req, res, next)
 );
@@ -33,7 +33,7 @@ router.patch(
 router.delete(
   '/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => categoryController.delete(req, res, next)
 );
 

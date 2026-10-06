@@ -4,7 +4,7 @@ services:
     container_name: aarogyamed-database
     restart: always
     ports:
-      - "${DB_FORWARD_PORT:-5432}:5432"
+      - "${DB_FORWARD_PORT:-5434}:5432"
     environment:
       - POSTGRES_USER=${DB_USER:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
@@ -12,7 +12,10 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
-      - aarogyamed_network
+      aarogyamed_network:
+        aliases:
+          - database
+          - aarogyamed-database
 
   pgadmin:
     image: dpage/pgadmin4
@@ -36,21 +39,37 @@ services:
       - "${MAIL_FORWARD_PORT:-1026}:1025"
       - "${MAIL_WEB_UI_FORWARD_PORT:-8026}:8025"
     networks:
-      - aarogyamed_network
+      aarogyamed_network:
+        aliases:
+          - mailpit
+          - aarogyamed-mailpit
 
   backend:
     container_name: aarogyamed-backend
     build:
       context: .
       dockerfile: Dockerfile
-      target: base
+      target: dev
+    command: ["npm", "run", "dev"]
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
     ports:
       - "${APP_FORWARD_PORT:-8080}:${APP_PORT:-8080}"
     volumes:
       - .:/app
       - /app/node_modules
     networks:
-      - aarogyamed_network
+      aarogyamed_network:
+        aliases:
+          - backend
+          - aarogyamed-backend
+    depends_on:
+      - database
     restart: on-failure
     tty: true
     stdin_open: true

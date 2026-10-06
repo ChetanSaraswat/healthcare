@@ -1,0 +1,830 @@
+ openapi: 3.0.3
+info:
+  title: AarogyaMed Biomedical & Clinical Equipment Platform API
+  description: >-
+    Comprehensive REST API for AarogyaMed: pan-India medical equipment platform
+    supporting parallel Buy & Rent journeys, clinical education guides, Razorpay
+    payment idempotency, and clinical operations administration.
+  version: 1.0.0
+  contact:
+    name: AarogyaMed Engineering Team
+    email: support@aarogyamed.com
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local Development Server (API v1)
+  - url: http://localhost:8080
+    description: Local Development Server (Root)
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer token required for authenticated patient and administrator endpoints.
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        statusCode:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: 'Validation failed: Product UUID is required'
+        error:
+          type: string
+          example: 'Validation failed: Product UUID is required'
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: items.0.product_uuid
+              message:
+                type: string
+                example: Valid product UUID is required
+      required:
+        - success
+        - statusCode
+        - message
+    Address:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Sunita Sharma
+        phone:
+          type: string
+          example: '+91 98765 43210'
+        email:
+          type: string
+          format: email
+          example: sunita@example.com
+        line1:
+          type: string
+          example: 'Flat 402, Metro Complex'
+        line2:
+          type: string
+          nullable: true
+          example: Near City Hospital
+        city:
+          type: string
+          example: Bengaluru
+        state:
+          type: string
+          example: Karnataka
+        pincode:
+          type: string
+          example: '560001'
+      required:
+        - line1
+        - city
+        - state
+        - pincode
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        uuid:
+          type: string
+          format: uuid
+          example: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+        name:
+          type: string
+          example: Dr. Rajesh Verma
+        email:
+          type: string
+          format: email
+          example: admin@aarogyamed.com
+        phone:
+          type: string
+          example: '+91 98765 43210'
+        role:
+          type: string
+          enum:
+            - customer
+            - super_admin
+          example: super_admin
+        status:
+          type: string
+          enum:
+            - active
+            - suspended
+          example: active
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        uuid:
+          type: string
+          format: uuid
+          example: e4b2d308-4d57-4fcf-847d-f481a541334c
+        name:
+          type: string
+          example: Philips Respironics DreamStation Auto CPAP
+        slug:
+          type: string
+          example: philips-dreamstation-auto-cpap
+        category_id:
+          type: integer
+          example: 1
+        buy_available:
+          type: boolean
+          example: true
+        buy_price:
+          type: number
+          example: 48500
+        rent_available:
+          type: boolean
+          example: true
+        rent_price_daily:
+          type: number
+          example: 250
+        rent_price_weekly:
+          type: number
+          example: 1400
+        rent_price_monthly:
+          type: number
+          example: 4500
+        rent_deposit:
+          type: number
+          example: 10000
+        stock_quantity:
+          type: integer
+          example: 15
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+          example: active
+        images:
+          type: array
+          items:
+            type: string
+        specifications:
+          type: array
+          items:
+            type: object
+    QuoteRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_uuid:
+                type: string
+                format: uuid
+                example: e4b2d308-4d57-4fcf-847d-f481a541334c
+              quantity:
+                type: integer
+                default: 1
+                example: 1
+              duration_type:
+                type: string
+                enum:
+                  - daily
+                  - weekly
+                  - monthly
+                default: daily
+              duration_count:
+                type: integer
+                default: 7
+                example: 7
+            required:
+              - product_uuid
+      required:
+        - items
+    CreateOrderRequest:
+      type: object
+      properties:
+        address_id:
+          type: integer
+          nullable: true
+        shipping_address:
+          $ref: '#/components/schemas/Address'
+        payment_method:
+          type: string
+          example: Razorpay UPI
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_uuid:
+                type: string
+                format: uuid
+                example: e4b2d308-4d57-4fcf-847d-f481a541334c
+              quantity:
+                type: integer
+                example: 1
+              unit_price:
+                type: number
+                example: 48500
+            required:
+              - product_uuid
+              - quantity
+      required:
+        - items
+    CreateRentalRequest:
+      type: object
+      properties:
+        address_id:
+          type: integer
+          nullable: true
+        delivery_address:
+          $ref: '#/components/schemas/Address'
+        start_date:
+          type: string
+          format: date
+          example: '2026-10-01'
+        end_date:
+          type: string
+          format: date
+          example: '2026-10-08'
+        payment_method:
+          type: string
+          example: Cash on Delivery
+        notes:
+          type: string
+          example: Technician installation requested
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_uuid:
+                type: string
+                format: uuid
+                example: e4b2d308-4d57-4fcf-847d-f481a541334c
+              quantity:
+                type: integer
+                example: 1
+              duration_type:
+                type: string
+                enum:
+                  - daily
+                  - weekly
+                  - monthly
+                default: daily
+              duration_count:
+                type: integer
+                default: 7
+                example: 7
+            required:
+              - product_uuid
+              - quantity
+      required:
+        - items
+    RazorpayOrderRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: UUID of the purchase order
+        rentalOrderId:
+          type: string
+          format: uuid
+          description: UUID of the rental agreement order
+        idempotency_key:
+          type: string
+          example: idem_1790234892_abc
+    VerifyPaymentRequest:
+      type: object
+      properties:
+        razorpay_order_id:
+          type: string
+          example: order_Hkd9823hfd
+        razorpay_payment_id:
+          type: string
+          example: pay_Kjs8923fdh
+        razorpay_signature:
+          type: string
+          example: 9b1deb4d3b7d4bad9bdd2b0d7b3dcb6d...
+      required:
+        - razorpay_order_id
+        - razorpay_payment_id
+        - razorpay_signature
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the operational status of the AarogyaMed API server.
+      responses:
+        '200':
+          description: Service is healthy and responding
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: aarogyamed-backend
+                  timestamp:
+                    type: string
+                    format: date-time
+  /auth/register:
+    post:
+      summary: Patient / Customer Registration
+      description: Register a new patient or caregiver account with name, email, phone, and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Sunita Sharma
+                email:
+                  type: string
+                  format: email
+                  example: sunita@example.com
+                phone:
+                  type: string
+                  example: '+91 98765 43210'
+                password:
+                  type: string
+                  minLength: 6
+                  example: CaregiverPass2026!
+              required:
+                - name
+                - email
+                - password
+      responses:
+        '201':
+          description: Account created successfully
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      summary: User & Admin Login
+      description: Authenticate via email or phone with password to receive a signed JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: admin@aarogyamed.com
+                phone:
+                  type: string
+                  example: '+91 98765 43210'
+                password:
+                  type: string
+                  example: AdminPass2026!
+              required:
+                - password
+      responses:
+        '200':
+          description: Authentication successful, returns user and JWT token
+        '401':
+          $ref: '#/components/schemas/ErrorResponse'
+  /auth/me:
+    get:
+      summary: Current Session Profile
+      description: Fetches the authenticated user profile based on the JWT Bearer token.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved
+        '401':
+          $ref: '#/components/schemas/ErrorResponse'
+  /products:
+    get:
+      summary: List Medical Equipment Catalog
+      description: Retrieve catalog products with optional filters for category, condition tag, buy/rent availability, search term, and pagination.
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Category slug or UUID
+        - name: mode
+          in: query
+          schema:
+            type: string
+            enum:
+              - all
+              - buy
+              - rent
+          description: Filter by purchase/rental availability
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Full-text search query
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        '200':
+          description: Catalog products retrieved
+    post:
+      summary: Create Medical Product (Admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+        '401':
+          $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/schemas/ErrorResponse'
+  /products/{id}:
+    get:
+      summary: Get Product Details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Product UUID or slug
+      responses:
+        '200':
+          description: Product retrieved
+        '404':
+          $ref: '#/components/schemas/ErrorResponse'
+  /categories:
+    get:
+      summary: Get Category Taxonomy Tree
+      description: Returns nested categories hierarchy (Respiratory, ICU Care, Mobility, etc.).
+      responses:
+        '200':
+          description: Categories retrieved
+  /orders:
+    post:
+      summary: Place Purchase Order
+      description: Create a hospital-grade equipment purchase order. Validates product stock and computes totals server-side.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created or pending duplicate reused
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /orders/my:
+    get:
+      summary: Customer Purchase Orders
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User purchase orders retrieved
+        '401':
+          $ref: '#/components/schemas/ErrorResponse'
+  /orders/all:
+    get:
+      summary: All Purchase Orders (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Orders retrieved
+        '403':
+          $ref: '#/components/schemas/ErrorResponse'
+  /orders/{id}:
+    get:
+      summary: Get Order Details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Order UUID
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Order retrieved
+        '404':
+          $ref: '#/components/schemas/ErrorResponse'
+  /orders/{id}/status:
+    patch:
+      summary: Update Order Status (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Order UUID
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - pending
+                    - confirmed
+                    - shipped
+                    - delivered
+                    - cancelled
+                payment_status:
+                  type: string
+                  enum:
+                    - pending
+                    - paid
+                    - failed
+                    - refunded
+      responses:
+        '200':
+          description: Order status updated
+  /rentals/quote:
+    post:
+      summary: Calculate Rental Quotation
+      description: Computes rental tier rates, duration multiplier, refundable security deposit, and total upfront payable amount.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '200':
+          description: Rental quote calculation successful
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /rentals:
+    post:
+      summary: Place Rental Order
+      description: Persist a rental contract with refundable security deposit and non-blocking rental agreement email dispatch.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRentalRequest'
+      responses:
+        '201':
+          description: Rental agreement order created
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /rentals/my:
+    get:
+      summary: Customer Active & Past Rentals
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User rentals retrieved
+  /rentals/all:
+    get:
+      summary: All Rental Agreements (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Rentals retrieved
+        '403':
+          $ref: '#/components/schemas/ErrorResponse'
+  /rentals/{id}:
+    get:
+      summary: Get Rental Agreement Details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Rental UUID
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Rental details retrieved
+        '404':
+          $ref: '#/components/schemas/ErrorResponse'
+  /rentals/{id}/extend:
+    post:
+      summary: Extend Active Rental Agreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Rental UUID
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                days:
+                  type: integer
+                  minimum: 1
+                  example: 7
+                notes:
+                  type: string
+                  example: Patient rehabilitation extended by physician
+              required:
+                - days
+      responses:
+        '200':
+          description: Rental extended
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /rentals/{id}/return:
+    post:
+      summary: Schedule Return Pickup (24-Hour Deposit SLA)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Rental UUID
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                return_date:
+                  type: string
+                  format: date
+                  example: '2026-10-15'
+                return_slot:
+                  type: string
+                  enum:
+                    - morning
+                    - evening
+                  example: morning
+                pickup_notes:
+                  type: string
+                  example: Equipment packed in original medical container
+              required:
+                - return_date
+                - return_slot
+      responses:
+        '200':
+          description: Return pickup scheduled
+  /payments/create-order:
+    post:
+      summary: Create Razorpay Order
+      description: Derives the charge strictly server-side from the stored Order or RentalOrder. Never trusts client amount.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RazorpayOrderRequest'
+      responses:
+        '200':
+          description: Razorpay order created
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /payments/verify:
+    post:
+      summary: Verify & Capture Razorpay Payment
+      description: Verifies HMAC SHA-256 signature and captures the payment in database with concurrency locking.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPaymentRequest'
+      responses:
+        '200':
+          description: Payment captured and order confirmed
+        '400':
+          $ref: '#/components/schemas/ErrorResponse'
+  /payments/webhook:
+    post:
+      summary: Razorpay Webhook Handler
+      description: Idempotent background webhook receiver for payment.captured and payment.failed events with signature verification.
+      responses:
+        '200':
+          description: Webhook processed
+  /conditions:
+    get:
+      summary: List Condition Guides
+      description: Retrieve clinical education guides with medical illustrations and systemic disease relationships.
+      responses:
+        '200':
+          description: Condition guides retrieved
+  /conditions/{slug}:
+    get:
+      summary: Get Clinical Condition Guide Details
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          example: sleep-apnea
+      responses:
+        '200':
+          description: Condition guide retrieved
+        '404':
+          $ref: '#/components/schemas/ErrorResponse'
+  /blog:
+    get:
+      summary: List Clinical Articles & Caregiver Guides
+      responses:
+        '200':
+          description: Blog posts retrieved
+  /users/admin/customers:
+    get:
+      summary: Admin Customer Directory
+      description: Directory of all registered patients, caregivers, and clinical accounts with metrics.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Customer list retrieved
+        '403':
+          $ref: '#/components/schemas/ErrorResponse'
+  /users/admin/customers/{id}:
+    get:
+      summary: Patient Care History Modal Data
+      description: Detailed care history including combined purchase orders, rental contracts, and total care expenditure.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User UUID
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Care history retrieved
+        '404':
+          $ref: '#/components/schemas/ErrorResponse'
+  /email/templates:
+    get:
+      summary: List Transactional Email Templates
+      responses:
+        '200':
+          description: Email templates list retrieved

@@ -37,7 +37,7 @@ router.post('/:id/return', authenticate, validate(scheduleReturnSchema), (req, r
 router.get(
   '/all',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   (req, res, next) => rentalController.getAllRentals(req, res, next)
 );
 
@@ -48,7 +48,7 @@ router.get('/:id', authenticate, (req, res, next) =>
 router.patch(
   '/:id/status',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   validate(updateRentalStatusSchema),
   (req, res, next) => rentalController.updateStatus(req, res, next)
 );

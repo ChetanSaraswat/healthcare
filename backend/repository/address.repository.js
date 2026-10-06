@@ -29,11 +29,8 @@ class AddressRepository extends BaseRepository {
     );
   }
 
-  async findUserAddress(userId, addressId, options = {}) {
-    const where = isNaN(Number(addressId))
-      ? { uuid: addressId, user_id: userId }
-      : { id: Number(addressId), user_id: userId };
-
+  async findUserAddress(userId, addressUuid, options = {}) {
+    const where = { uuid: addressUuid, user_id: userId };
     return await this.model.findOne({ where, ...options });
   }
 

@@ -18,7 +18,7 @@ router.get('/my', authenticate, (req, res, next) =>
 router.get(
   '/all',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   (req, res, next) => orderController.getAllOrders(req, res, next)
 );
 
@@ -29,7 +29,7 @@ router.get('/:id', authenticate, (req, res, next) =>
 router.patch(
   '/:id/status',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   validate(updateOrderStatusSchema),
   (req, res, next) => orderController.updateStatus(req, res, next)
 );

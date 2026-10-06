@@ -1,11 +1,12 @@
-const { orderRepository, productRepository, addressRepository, userRepository } = require('../repository');
-const { email } = require('../libs');
+const { orderRepository, addressRepository } = require('../repository');
+const orderValidationService = require('./order-validation.service');
+const { adminNotificationEventBus } = require('../libs/notification');
 const { BadRequest, NotFound } = require('../libs/error');
 
 class OrderService {
   async create(userId, data) {
     const { address_id, payment_id, items } = data;
-    const shipping = data.shipping_address || data.shippingAddress;
+    const shipping = data.shipping_address;
 
     let address = null;
     if (address_id) {
@@ -13,8 +14,8 @@ class OrderService {
     } else if (shipping) {
       address = await addressRepository.findOrCreateAddress(userId, {
         label: 'Home',
-        line1: shipping.addressLine1 || shipping.line1,
-        line2: shipping.addressLine2 || shipping.line2 || null,
+        line1: shipping.line1,
+        line2: shipping.line2 || null,
         city: shipping.city,
         state: shipping.state,
         pincode: shipping.pincode,
@@ -25,72 +26,17 @@ class OrderService {
       throw new BadRequest('Invalid or missing delivery address');
     }
 
-    // SECTION 3: Order-level dedupe check on creation
-    // Check whether an active PENDING order already exists for this user with matching cart contents.
-    // If found and not expired (< 60 minutes), reuse the existing order instead of duplicating.
-    if (userId && items && items.length > 0) {
-      const activePendingOrders = await orderRepository.findActivePendingOrdersByUser(userId, 60);
-      for (const pendingOrder of activePendingOrders) {
-        if (pendingOrder.items && pendingOrder.items.length === items.length) {
-          const pendingItemMap = new Map();
-          for (const it of pendingOrder.items) {
-            pendingItemMap.set(Number(it.product_id), Number(it.quantity));
-          }
-          let allMatch = true;
-          for (const reqItem of items) {
-            const rawPid = reqItem.product_id || reqItem.productId;
-            let numericPid = Number(rawPid);
-            if (isNaN(numericPid)) {
-              const p = await productRepository.findOneInstance({ uuid: rawPid });
-              numericPid = p ? p.id : null;
-            }
-            const reqQty = Number(reqItem.quantity);
-            if (!numericPid || !pendingItemMap.has(numericPid) || pendingItemMap.get(numericPid) !== reqQty) {
-              allMatch = false;
-              break;
-            }
-          }
-          if (allMatch) {
-            return pendingOrder;
-          }
-        }
-      }
+    // 1. Pending order deduplication
+    const existingOrder = await orderRepository.findMatchingPendingOrder(userId, items);
+    if (existingOrder) {
+      return existingOrder;
     }
 
-    // Verify stock and price
-    let totalAmount = 0;
-    const validatedItems = [];
+    // 2. Validate items, availability, stock, and calculate pricing
+    const validatedItems = await orderValidationService.validatePurchaseItems(items);
+    const totalAmount = validatedItems.totalAmount ?? validatedItems.reduce((sum, item) => sum + item.subtotal, 0);
 
-    for (const item of items) {
-      const pid = item.product_id || item.productId;
-      const where = isNaN(Number(pid))
-        ? { uuid: pid, buy_available: true, status: 'active' }
-        : { id: Number(pid), buy_available: true, status: 'active' };
-
-      const product = await productRepository.findOneInstance(where);
-
-      if (!product) {
-        throw new BadRequest(`Product #${pid} is not available for purchase`);
-      }
-
-      if (product.stock_quantity < item.quantity) {
-        throw new BadRequest(
-          `Insufficient stock for '${product.name}'. Only ${product.stock_quantity} units available.`
-        );
-      }
-
-      const unitPrice = parseFloat(product.buy_price) || 0;
-      const subtotal = unitPrice * item.quantity;
-      totalAmount += subtotal;
-
-      validatedItems.push({
-        product,
-        quantity: item.quantity,
-        unit_price: unitPrice,
-        subtotal,
-      });
-    }
-
+    // 3. Create order and decrement stock atomically within transaction
     const createdOrder = await orderRepository.handleManagedTransaction(async (transaction) => {
       const orderData = {
         user_id: userId,
@@ -121,37 +67,29 @@ class OrderService {
       return newOrder;
     });
 
-    // Asynchronously dispatch order confirmation receipt
-    (async () => {
-      try {
-        const user = userId ? await userRepository.findByPk(userId) : null;
-        const targetEmail = (user && user.email) || (shipping && shipping.email);
-        if (targetEmail) {
-          await email.sendOrderConfirmationEmail({
-            to: targetEmail,
-            name: (user && user.name) || (shipping && shipping.name) || 'Valued Patient',
-            orderNumber: createdOrder.id,
-            items: validatedItems.map((vi) => ({
-              name: vi.product.name,
-              quantity: vi.quantity,
-              price: vi.unit_price,
-            })),
-            totalAmount,
-            deliveryAddress: address,
-            paymentMethod: payment_id ? 'Online Payment' : 'Cash on Delivery (COD)',
-            transactionId: payment_id || '',
-          });
-        }
-      } catch (mailErr) {
-        console.warn('[OrderService] Order confirmation email dispatch failed:', mailErr.message);
-      }
-    })();
+    // 4. Emit event for decoupled notification handling (Customer Email, Admin Email, Admin WhatsApp)
+    const rawMethod = (data.payment_method || '').toLowerCase();
+    const isOnlineAttempt =
+      rawMethod.includes('online') ||
+      rawMethod.includes('upi') ||
+      rawMethod.includes('card') ||
+      rawMethod.includes('netbanking') ||
+      rawMethod.includes('razorpay');
+    const isConfirmedTransaction = Boolean(payment_id) || !isOnlineAttempt;
+
+    if (isConfirmedTransaction && createdOrder) {
+      adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
+        orderId: createdOrder.id,
+        paymentId: payment_id || null,
+        paymentMethod: payment_id ? 'Online Payment' : 'Cash on Delivery (COD)',
+      });
+    }
 
     return createdOrder;
   }
 
-  async getById(id, userId = null) {
-    const order = await orderRepository.findOrderDetails(id, userId);
+  async getById(uuid, userId = null) {
+    const order = await orderRepository.findOrderDetails(uuid, userId);
     if (!order) {
       throw new NotFound('Order not found');
     }
@@ -166,8 +104,8 @@ class OrderService {
     return await orderRepository.findAllOrders(filter);
   }
 
-  async updateStatus(id, updateData) {
-    const order = await orderRepository.updateStatus(id, updateData.status);
+  async updateStatus(uuid, updateData) {
+    const order = await orderRepository.updateStatus(uuid, updateData.status);
     if (!order) {
       throw new NotFound('Order not found');
     }

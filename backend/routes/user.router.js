@@ -7,11 +7,6 @@ const {
   updateAddressSchema,
   addressIdParamSchema,
 } = require('../schema/user/address.schema');
-const {
-  createStaffSchema,
-  updateStaffRoleSchema,
-  toggleStaffStatusSchema,
-} = require('../schema/user/staff.schema');
 
 router.get('/profile', authenticate, (req, res, next) =>
   userController.getProfile(req, res, next)
@@ -46,47 +41,15 @@ router.delete(
 router.get(
   '/admin/customers',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   (req, res, next) => userController.getAllCustomers(req, res, next)
 );
 
 router.get(
   '/admin/customers/:id',
   authenticate,
-  authorize('super_admin', 'operations_staff'),
+  authorize('super_admin'),
   (req, res, next) => userController.getCustomerCareHistory(req, res, next)
-);
-
-// Admin Staff & Role-Based Access Control Routes (Strictly super_admin)
-router.get(
-  '/admin/staff',
-  authenticate,
-  authorize('super_admin'),
-  (req, res, next) => userController.getAllStaff(req, res, next)
-);
-
-router.post(
-  '/admin/staff',
-  authenticate,
-  authorize('super_admin'),
-  validate(createStaffSchema),
-  (req, res, next) => userController.createStaff(req, res, next)
-);
-
-router.patch(
-  '/admin/staff/:id/role',
-  authenticate,
-  authorize('super_admin'),
-  validate(updateStaffRoleSchema),
-  (req, res, next) => userController.updateStaffRole(req, res, next)
-);
-
-router.patch(
-  '/admin/staff/:id/status',
-  authenticate,
-  authorize('super_admin'),
-  validate(toggleStaffStatusSchema),
-  (req, res, next) => userController.toggleStaffStatus(req, res, next)
 );
 
 module.exports = router;

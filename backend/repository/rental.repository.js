@@ -13,10 +13,8 @@ class RentalRepository extends BaseRepository {
     super(payload);
   }
 
-  async findRentalDetails(idOrUuid, userId = null) {
-    const where = isNaN(Number(idOrUuid))
-      ? { uuid: idOrUuid }
-      : { id: Number(idOrUuid) };
+  async findRentalDetails(uuid, userId = null, options = {}) {
+    const where = { uuid };
 
     if (userId) {
       where.user_id = userId;
@@ -33,6 +31,23 @@ class RentalRepository extends BaseRepository {
         { model: Address, as: 'address' },
         { model: User, as: 'user', attributes: ['id', 'uuid', 'name', 'email', 'phone'] },
       ],
+      ...options,
+    });
+  }
+
+  async findRentalDetailsById(id, options = {}) {
+    return await this.model.findOne({
+      where: { id },
+      include: [
+        {
+          model: RentalItem,
+          as: 'items',
+          include: [{ model: Product, as: 'product' }],
+        },
+        { model: Address, as: 'address' },
+        { model: User, as: 'user', attributes: ['id', 'uuid', 'name', 'email', 'phone'] },
+      ],
+      ...options,
     });
   }
 
@@ -123,11 +138,12 @@ class RentalRepository extends BaseRepository {
       await RentalItem.bulkCreate(itemsWithOrderId, opt);
     }
 
-    return await this.findRentalDetails(rentalOrder.id, null);
+    const detailed = await this.findRentalDetails(rentalOrder.uuid, null, opt);
+    return detailed || rentalOrder;
   }
 
-  async updateRentalStatus(idOrUuid, { status, deposit_status }, options = {}) {
-    const rental = await this.findRentalDetails(idOrUuid, null);
+  async updateRentalStatus(uuid, { status, deposit_status }, options = {}) {
+    const rental = await this.findRentalDetails(uuid, null, options);
     if (!rental) return null;
 
     const updateData = {};
@@ -138,8 +154,8 @@ class RentalRepository extends BaseRepository {
     return rental;
   }
 
-  async extendRentalDuration(idOrUuid, { newEndDate }, options = {}) {
-    const rental = await this.findRentalDetails(idOrUuid, null);
+  async extendRentalDuration(uuid, { newEndDate }, options = {}) {
+    const rental = await this.findRentalDetails(uuid, null, options);
     if (!rental) return null;
 
     await rental.update({ end_date: newEndDate }, options);

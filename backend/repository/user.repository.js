@@ -63,9 +63,8 @@ class UserRepository extends BaseRepository {
     });
   }
 
-  async findCustomerCareHistory(userId) {
-    const isNumeric = !isNaN(userId) && !isNaN(parseFloat(userId));
-    const where = isNumeric ? { id: userId } : { uuid: userId };
+  async findCustomerCareHistory(userUuid) {
+    const where = { uuid: userUuid };
 
     return await this.model.findOne({
       where,
@@ -98,78 +97,6 @@ class UserRepository extends BaseRepository {
         },
       ],
     });
-  }
-
-  async findAllStaff(options = {}) {
-    const where = {
-      role: { [Op.ne]: 'customer' },
-    };
-    if (options.role) {
-      where.role = options.role;
-    }
-    if (options.search) {
-      const searchPattern = `%${options.search}%`;
-      where[Op.and] = [
-        {
-          [Op.or]: [
-            { name: { [Op.iLike]: searchPattern } },
-            { email: { [Op.iLike]: searchPattern } },
-            { phone: { [Op.iLike]: searchPattern } },
-          ],
-        },
-      ];
-    }
-
-    return await this.model.findAll({
-      where,
-      paranoid: false,
-      attributes: ['id', 'uuid', 'name', 'email', 'phone', 'role', 'created_at', 'updated_at', 'deleted_at'],
-      order: [['created_at', 'DESC']],
-    });
-  }
-
-  async countActiveSuperAdmins() {
-    return await this.model.count({
-      where: {
-        role: 'super_admin',
-        deleted_at: null,
-      },
-      paranoid: true,
-    });
-  }
-
-  async findStaffById(staffId) {
-    const isNumeric = !isNaN(staffId) && !isNaN(parseFloat(staffId));
-    const where = isNumeric ? { id: staffId } : { uuid: staffId };
-    return await this.model.findOne({
-      where,
-      paranoid: false,
-      attributes: ['id', 'uuid', 'name', 'email', 'phone', 'role', 'created_at', 'updated_at', 'deleted_at'],
-    });
-  }
-
-  async updateStaffRole(staffId, role) {
-    const isNumeric = !isNaN(staffId) && !isNaN(parseFloat(staffId));
-    const where = isNumeric ? { id: staffId } : { uuid: staffId };
-    const staff = await this.model.findOne({ where, paranoid: false });
-    if (!staff) return null;
-    staff.role = role;
-    await staff.save();
-    return staff;
-  }
-
-  async setStaffStatus(staffId, isActive) {
-    const isNumeric = !isNaN(staffId) && !isNaN(parseFloat(staffId));
-    const where = isNumeric ? { id: staffId } : { uuid: staffId };
-    const staff = await this.model.findOne({ where, paranoid: false });
-    if (!staff) return null;
-
-    if (isActive) {
-      await staff.restore();
-    } else {
-      await staff.destroy();
-    }
-    return await this.model.findOne({ where, paranoid: false });
   }
 }
 

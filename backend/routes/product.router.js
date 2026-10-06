@@ -20,7 +20,7 @@ router.get('/:slug', (req, res, next) =>
 router.post(
   '/',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(createProductSchema),
   (req, res, next) => productController.create(req, res, next)
 );
@@ -28,14 +28,14 @@ router.post(
 router.patch(
   '/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => productController.update(req, res, next)
 );
 
 router.delete(
   '/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => productController.delete(req, res, next)
 );
 

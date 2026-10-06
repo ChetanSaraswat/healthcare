@@ -14,21 +14,21 @@ const {
 router.get(
   '/admin/all',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => blogController.getAllAdmin(req, res, next)
 );
 
 router.get(
   '/admin/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => blogController.getById(req, res, next)
 );
 
 router.post(
   '/admin',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(createBlogPostSchema),
   (req, res, next) => blogController.create(req, res, next)
 );
@@ -36,7 +36,7 @@ router.post(
 router.put(
   '/admin/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(updateBlogPostSchema),
   (req, res, next) => blogController.update(req, res, next)
 );
@@ -44,7 +44,7 @@ router.put(
 router.patch(
   '/admin/:id/status',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   validate(toggleBlogPostStatusSchema),
   (req, res, next) => blogController.toggleStatus(req, res, next)
 );
@@ -52,7 +52,7 @@ router.patch(
 router.delete(
   '/admin/:id',
   authenticate,
-  authorize('super_admin', 'catalog_editor'),
+  authorize('super_admin'),
   (req, res, next) => blogController.delete(req, res, next)
 );
 

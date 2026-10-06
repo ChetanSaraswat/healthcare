@@ -7,10 +7,8 @@ class OrderRepository extends BaseRepository {
     super(payload);
   }
 
-  async findOrderDetails(idOrUuid, userId = null) {
-    const where = isNaN(Number(idOrUuid))
-      ? { uuid: idOrUuid }
-      : { id: Number(idOrUuid) };
+  async findOrderDetails(uuid, userId = null, options = {}) {
+    const where = { uuid };
 
     if (userId) {
       where.user_id = userId;
@@ -27,6 +25,7 @@ class OrderRepository extends BaseRepository {
         { model: Address, as: 'address' },
         { model: User, as: 'user', attributes: ['id', 'uuid', 'name', 'email', 'phone'] },
       ],
+      ...options,
     });
   }
 
@@ -67,6 +66,61 @@ class OrderRepository extends BaseRepository {
     });
   }
 
+  async findOrderDetailsById(id, options = {}) {
+    return await this.model.findOne({
+      where: { id },
+      include: [
+        {
+          model: OrderItem,
+          as: 'items',
+          include: [{ model: Product, as: 'product' }],
+        },
+        { model: Address, as: 'address' },
+        { model: User, as: 'user', attributes: ['id', 'uuid', 'name', 'email', 'phone'] },
+      ],
+      ...options,
+    });
+  }
+
+  async findMatchingPendingOrder(userId, items, thresholdMinutes = 60) {
+    if (!userId || !items || !Array.isArray(items) || items.length === 0) {
+      return null;
+    }
+
+    const activePendingOrders = await this.findActivePendingOrdersByUser(userId, thresholdMinutes);
+    if (!activePendingOrders || activePendingOrders.length === 0) {
+      return null;
+    }
+
+    for (const pendingOrder of activePendingOrders) {
+      if (pendingOrder.items && pendingOrder.items.length === items.length) {
+        const pendingItemMap = new Map();
+        for (const it of pendingOrder.items) {
+          const qty = Number(it.quantity);
+          if (it.product && it.product.uuid) {
+            pendingItemMap.set(it.product.uuid, qty);
+          }
+        }
+
+        let allMatch = true;
+        for (const reqItem of items) {
+          const productUuid = reqItem.product_uuid;
+          const reqQty = Number(reqItem.quantity);
+          if (!productUuid || !pendingItemMap.has(productUuid) || pendingItemMap.get(productUuid) !== reqQty) {
+            allMatch = false;
+            break;
+          }
+        }
+
+        if (allMatch) {
+          return pendingOrder;
+        }
+      }
+    }
+
+    return null;
+  }
+
   async findAllOrders(filter = {}) {
     const where = {};
     if (filter.status) where.status = filter.status;
@@ -98,11 +152,12 @@ class OrderRepository extends BaseRepository {
       await OrderItem.bulkCreate(itemsWithOrderId, opt);
     }
 
-    return await this.findOrderDetails(order.id, null);
+    const detailed = await this.findOrderDetails(order.uuid, null, opt);
+    return detailed || order;
   }
 
-  async updateStatus(idOrUuid, status, options = {}) {
-    const order = await this.findOrderDetails(idOrUuid, null);
+  async updateStatus(uuid, status, options = {}) {
+    const order = await this.findOrderDetails(uuid, null, options);
     if (!order) return null;
 
     await order.update({ status }, options);

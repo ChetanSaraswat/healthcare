@@ -5,12 +5,10 @@ exports.quoteRentalSchema = z.object({
     items: z
       .array(
         z.object({
-          product_id: z.union([z.number(), z.string()]).optional(),
-          productId: z.union([z.number(), z.string()]).optional(),
+          product_uuid: z.string().uuid('Valid product UUID is required'),
           quantity: z.number().int().positive().default(1),
           duration_type: z.enum(['daily', 'weekly', 'monthly']).optional().default('daily'),
           duration_count: z.number().int().positive().default(1),
-          durationDays: z.number().optional(),
         })
       )
       .min(1, 'At least one rental item is required'),
@@ -26,50 +24,30 @@ exports.createRentalSchema = z.object({
           fullName: z.string().optional(),
           phone: z.string().optional(),
           email: z.string().optional(),
-          addressLine1: z.string({ required_error: 'Address line 1 is required' }),
-          addressLine2: z.string().optional().nullable(),
-          city: z.string({ required_error: 'City is required' }),
-          state: z.string({ required_error: 'State is required' }),
-          pincode: z.string({ required_error: 'Pincode is required' }),
-        })
-        .optional(),
-      deliveryAddress: z
-        .object({
-          fullName: z.string().optional(),
-          phone: z.string().optional(),
-          email: z.string().optional(),
-          addressLine1: z.string({ required_error: 'Address line 1 is required' }),
-          addressLine2: z.string().optional().nullable(),
+          line1: z.string({ required_error: 'Address line 1 is required' }),
+          line2: z.string().optional().nullable(),
           city: z.string({ required_error: 'City is required' }),
           state: z.string({ required_error: 'State is required' }),
           pincode: z.string({ required_error: 'Pincode is required' }),
         })
         .optional(),
       start_date: z.string().optional(),
-      startDate: z.string().optional(),
       end_date: z.string().optional(),
-      endDate: z.string().optional(),
       payment_id: z.string().optional(),
+      payment_method: z.string().optional(),
       notes: z.string().optional(),
       items: z
         .array(
           z.object({
-            product_id: z.union([z.number(), z.string()]).optional(),
-            productId: z.union([z.number(), z.string()]).optional(),
+            product_uuid: z.string().uuid('Valid product UUID is required'),
             quantity: z.number().int().positive().default(1),
             duration_type: z.enum(['daily', 'weekly', 'monthly']).optional().default('daily'),
             duration_count: z.number().int().positive().optional().default(1),
-            durationDays: z.number().optional(),
-            dailyRate: z.number().optional(),
-            securityDeposit: z.number().optional(),
-            rentalCost: z.number().optional(),
-            startDate: z.string().optional(),
-            endDate: z.string().optional(),
           })
         )
         .min(1, 'At least one rental item is required'),
     })
-    .refine((data) => data.address_id || data.delivery_address || data.deliveryAddress, {
+    .refine((data) => data.address_id || data.delivery_address, {
       message: 'Either address_id or delivery_address is required',
     }),
 });

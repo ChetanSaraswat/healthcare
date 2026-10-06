@@ -64,54 +64,6 @@ class UserController {
       next(error);
     }
   }
-
-  async getAllStaff(req, res, next) {
-    try {
-      const staff = await userService.getAllStaff(req.query);
-      res.status(SUCCESS).json({ success: true, data: staff });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async createStaff(req, res, next) {
-    try {
-      const staff = await userService.createStaffMember(req.body);
-      res.status(CREATED).json({
-        success: true,
-        message: 'Staff member created successfully',
-        data: staff,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async updateStaffRole(req, res, next) {
-    try {
-      const staff = await userService.updateStaffRole(req.params.id, req.body.role, req.user);
-      res.status(SUCCESS).json({
-        success: true,
-        message: 'Staff role updated successfully',
-        data: staff,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async toggleStaffStatus(req, res, next) {
-    try {
-      const staff = await userService.toggleStaffStatus(req.params.id, req.body.isActive, req.user);
-      res.status(SUCCESS).json({
-        success: true,
-        message: `Staff member account ${req.body.isActive ? 'activated' : 'suspended'} successfully`,
-        data: staff,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 module.exports = new UserController();

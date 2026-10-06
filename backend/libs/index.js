@@ -6,5 +6,6 @@ module.exports = {
   otp: require('./otp'),
   razorpayGateway: require('./razorpay'),
   email: require('./email'),
+  notification: require('./notification'),
 };
 

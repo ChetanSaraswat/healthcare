@@ -1,3 +1,17 @@
+# Universal Dependencies & Builds
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# Universal Environment & Secrets
+.env
+.env*.local
+*.env
+!.env.example
+
 # OS & Editor
 .DS_Store
 Thumbs.db
@@ -13,12 +27,13 @@ Thumbs.db
 *.rar
 
 # Legacy / unused submodules
-rules_docs/crud-revision/crud-revision-typeorm/
+/rules_docs/crud-revision/crud-revision-typeorm/
 
 # Project-internal docs & assets (not pushed)
-designs/
-docs/
-rules_docs/
-agent.md
-AGENTS.md
-context.md
+/designs/
+/docs/
+/rules_docs/
+/agent.md
+/AGENTS.md
+/context.md
+

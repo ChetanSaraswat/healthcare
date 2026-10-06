@@ -627,6 +627,19 @@ async function sendRentalReturnScheduledEmail({
   });
 }
 
+/**
+ * Sends a transactional admin/owner notification email for new purchases and rentals.
+ */
+async function sendAdminNotificationEmail({ to, subject, html, text }) {
+  const targetEmail = to || process.env.ADMIN_NOTIFICATION_EMAIL || 'care@aarogyamed.com';
+  return sendMail({
+    to: targetEmail,
+    subject,
+    html,
+    text,
+  });
+}
+
 module.exports = {
   getTransporter,
   sendMail,
@@ -634,4 +647,5 @@ module.exports = {
   sendOrderConfirmationEmail,
   sendRentalAgreementEmail,
   sendRentalReturnScheduledEmail,
+  sendAdminNotificationEmail,
 };

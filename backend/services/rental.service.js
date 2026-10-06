@@ -1,5 +1,6 @@
 const { rentalRepository, productRepository, addressRepository, userRepository } = require('../repository');
 const { email } = require('../libs');
+const { adminNotificationEventBus } = require('../libs/notification');
 const { BadRequest, NotFound } = require('../libs/error');
 
 class RentalService {
@@ -26,25 +27,33 @@ class RentalService {
   }
 
   async quote(items) {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      throw new BadRequest('Rental items must be a non-empty array');
+    }
+
     let totalRentalAmount = 0;
     let totalDepositAmount = 0;
     const quotedItems = [];
 
     for (const item of items) {
-      const pid = item.product_id || item.productId;
-      const where = isNaN(Number(pid))
-        ? { uuid: pid, rent_available: true, status: 'active' }
-        : { id: Number(pid), rent_available: true, status: 'active' };
+      const productUuid = item.product_uuid;
+      if (!productUuid) {
+        throw new BadRequest('Product UUID (product_uuid) is required for each rental item');
+      }
 
-      const product = await productRepository.findOne(where);
+      const product = await productRepository.findOne({
+        uuid: productUuid,
+        rent_available: true,
+        status: 'active',
+      });
 
       if (!product) {
-        throw new BadRequest(`Product #${pid} is not available for rental`);
+        throw new BadRequest(`Product #${productUuid} is not available for rental`);
       }
 
       const durationType = item.duration_type || 'daily';
-      const durationCount = item.duration_count || item.durationDays || 7;
-      const quantity = item.quantity || 1;
+      const durationCount = Number(item.duration_count) || 7;
+      const quantity = Number(item.quantity) || 1;
 
       const { rateAmount, itemRentalTotal, itemDepositTotal } = await this.calculateItemCost(
         product,
@@ -58,6 +67,7 @@ class RentalService {
 
       quotedItems.push({
         product_id: product.id,
+        product_uuid: product.uuid,
         product_name: product.name,
         slug: product.slug,
         duration_type: durationType,
@@ -79,7 +89,7 @@ class RentalService {
 
   async createRentalOrder(userId, data) {
     const { address_id, payment_id, items, notes } = data;
-    const delivery = data.delivery_address || data.deliveryAddress;
+    const delivery = data.delivery_address;
 
     let address = null;
     if (address_id) {
@@ -87,8 +97,8 @@ class RentalService {
     } else if (delivery) {
       address = await addressRepository.findOrCreateAddress(userId, {
         label: 'Home',
-        line1: delivery.addressLine1 || delivery.line1,
-        line2: delivery.addressLine2 || delivery.line2 || null,
+        line1: delivery.line1,
+        line2: delivery.line2 || null,
         city: delivery.city,
         state: delivery.state,
         pincode: delivery.pincode,
@@ -99,7 +109,7 @@ class RentalService {
       throw new BadRequest('Invalid or missing delivery address');
     }
 
-    // SECTION 3: Order-level dedupe check on creation
+    // Deduplication check on creation
     // Check whether an active PENDING rental order already exists for this user with matching cart contents.
     // If found and not expired (< 60 minutes), reuse the existing rental order instead of duplicating.
     if (userId && items && items.length > 0) {
@@ -108,18 +118,15 @@ class RentalService {
         if (pendingRental.items && pendingRental.items.length === items.length) {
           const pendingItemMap = new Map();
           for (const it of pendingRental.items) {
-            pendingItemMap.set(Number(it.product_id), Number(it.quantity));
+            if (it.product && it.product.uuid) {
+              pendingItemMap.set(it.product.uuid, Number(it.quantity));
+            }
           }
           let allMatch = true;
           for (const reqItem of items) {
-            const rawPid = reqItem.product_id || reqItem.productId;
-            let numericPid = Number(rawPid);
-            if (isNaN(numericPid)) {
-              const p = await productRepository.findOne({ uuid: rawPid });
-              numericPid = p ? p.id : null;
-            }
+            const reqProductUuid = reqItem.product_uuid;
             const reqQty = Number(reqItem.quantity || 1);
-            if (!numericPid || !pendingItemMap.has(numericPid) || pendingItemMap.get(numericPid) !== reqQty) {
+            if (!reqProductUuid || !pendingItemMap.has(reqProductUuid) || pendingItemMap.get(reqProductUuid) !== reqQty) {
               allMatch = false;
               break;
             }
@@ -131,8 +138,8 @@ class RentalService {
       }
     }
 
-    const startDate = data.start_date || data.startDate || new Date().toISOString().split('T')[0];
-    const endDate = data.end_date || data.endDate || null;
+    const startDate = data.start_date || new Date().toISOString().split('T')[0];
+    const endDate = data.end_date || null;
 
     const quoteResult = await this.quote(items);
 
@@ -163,12 +170,13 @@ class RentalService {
     // Asynchronously dispatch rental agreement and sterilization certificate email
     (async () => {
       try {
+        if (!createdRental) return;
         const user = userId ? await userRepository.findByPk(userId) : null;
-        const targetEmail = (user && user.email) || (shipping && shipping.email);
+        const targetEmail = (user && user.email) || (delivery && delivery.email);
         if (targetEmail) {
           await email.sendRentalAgreementEmail({
             to: targetEmail,
-            name: (user && user.name) || (shipping && shipping.name) || 'Valued Patient',
+            name: (user && user.name) || (delivery && delivery.fullName) || 'Valued Patient',
             rentalNumber: createdRental.id,
             items: quoteResult.items.map((it) => ({
               product_name: it.product_name,
@@ -188,11 +196,29 @@ class RentalService {
       }
     })();
 
+    // Dispatches admin WhatsApp and Email alerts for confirmed rental transactions (COD or pre-paid)
+    const rawMethod = (data.payment_method || '').toLowerCase();
+    const isOnlineAttempt =
+      rawMethod.includes('online') ||
+      rawMethod.includes('upi') ||
+      rawMethod.includes('card') ||
+      rawMethod.includes('netbanking') ||
+      rawMethod.includes('razorpay');
+    const isConfirmedTransaction = Boolean(payment_id) || !isOnlineAttempt;
+
+    if (isConfirmedTransaction && createdRental) {
+      adminNotificationEventBus.emitAsync('transaction.rental.successful', {
+        rentalId: createdRental.id,
+        paymentId: payment_id || null,
+        paymentMethod: payment_id ? 'Online Payment' : 'Cash on Delivery (COD)',
+      });
+    }
+
     return createdRental;
   }
 
-  async getById(id, userId = null) {
-    const rental = await rentalRepository.findRentalDetails(id, userId);
+  async getById(uuid, userId = null) {
+    const rental = await rentalRepository.findRentalDetails(uuid, userId);
     if (!rental) {
       throw new NotFound('Rental order not found');
     }
@@ -207,16 +233,16 @@ class RentalService {
     return await rentalRepository.findAllRentals(filter);
   }
 
-  async updateStatus(id, updateData) {
-    const rental = await rentalRepository.updateRentalStatus(id, updateData);
+  async updateStatus(uuid, updateData) {
+    const rental = await rentalRepository.updateRentalStatus(uuid, updateData);
     if (!rental) {
       throw new NotFound('Rental order not found');
     }
     return rental;
   }
 
-  async extendRental(id, userId, { days, notes }) {
-    const rental = await rentalRepository.findRentalDetails(id, userId);
+  async extendRental(uuid, userId, { days, notes }) {
+    const rental = await rentalRepository.findRentalDetails(uuid, userId);
     if (!rental) {
       throw new NotFound('Rental agreement not found');
     }
@@ -232,7 +258,7 @@ class RentalService {
     const newEndDateObj = new Date(currentEnd.getTime() + days * 24 * 60 * 60 * 1000);
     const newEndDate = newEndDateObj.toISOString().split('T')[0];
 
-    const updatedRental = await rentalRepository.extendRentalDuration(id, { newEndDate });
+    const updatedRental = await rentalRepository.extendRentalDuration(uuid, { newEndDate });
 
     return {
       message: `Rental agreement extended by ${days} days`,
@@ -241,8 +267,8 @@ class RentalService {
     };
   }
 
-  async scheduleReturn(id, userId, { return_date, return_slot, pickup_notes }) {
-    const rental = await rentalRepository.findRentalDetails(id, userId);
+  async scheduleReturn(uuid, userId, { return_date, return_slot, pickup_notes }) {
+    const rental = await rentalRepository.findRentalDetails(uuid, userId);
     if (!rental) {
       throw new NotFound('Rental agreement not found');
     }

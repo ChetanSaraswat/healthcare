@@ -1,0 +1,64 @@
+services:
+  database:
+    image: postgres:16.1-alpine3.18
+    container_name: aarogyamed-database
+    restart: always
+    ports:
+      - "${DB_FORWARD_PORT:-5434}:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_DATABASE:-aarogyamed_db}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      aarogyamed_network:
+        aliases:
+          - database
+          - aarogyamed-database
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: aarogyamed-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAIL_FORWARD_PORT:-1026}:1025"
+      - "${MAIL_WEB_UI_FORWARD_PORT:-8026}:8025"
+    networks:
+      aarogyamed_network:
+        aliases:
+          - mailpit
+          - aarogyamed-mailpit
+
+  backend:
+    container_name: aarogyamed-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=database
+      - DB_PORT=5432
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+    ports:
+      - "${APP_FORWARD_PORT:-8080}:${APP_PORT:-8080}"
+    networks:
+      aarogyamed_network:
+        aliases:
+          - backend
+          - aarogyamed-backend
+    depends_on:
+      - database
+    restart: always
+
+networks:
+  aarogyamed_network:
+    name: aarogyamed-shared-network
+    external: true
+
+volumes:
+  pg_data: {}

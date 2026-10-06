@@ -15,4 +15,5 @@ module.exports = {
   bannerRepository: require('./banner.repository'),
   paymentRepository: require('./payment.repository'),
   webhookEventRepository: require('./webhook-event.repository'),
+  notificationLogRepository: require('./notification-log.repository'),
 };

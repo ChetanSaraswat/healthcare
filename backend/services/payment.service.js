@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const { paymentRepository, orderRepository, rentalRepository, webhookEventRepository, userRepository } = require('../repository');
 const { razorpayGateway, email } = require('../libs');
+const { adminNotificationEventBus } = require('../libs/notification');
 const { BadRequest, NotFound, Forbidden } = require('../libs/error');
 const { UniqueConstraintError } = require('sequelize');
 
@@ -16,7 +17,7 @@ class PaymentService {
    */
   async createRazorpayOrder(userId, data) {
     const { currency = 'INR', orderId, rentalOrderId, notes = {} } = data;
-    const idempotencyKey = data.idempotency_key || data.idempotencyKey || null;
+    const idempotencyKey = data.idempotency_key || null;
 
     // CRITICAL SECURITY ENFORCEMENT (Section 2):
     // NEVER accept or trust an amount field from the client payload.
@@ -33,7 +34,7 @@ class PaymentService {
     let derivedAmount = 0;
 
     if (orderId) {
-      orderInstance = await orderRepository.findByPk(orderId);
+      orderInstance = await orderRepository.findOrderDetails(orderId);
       if (!orderInstance) {
         throw new NotFound(`Order #${orderId} not found`);
       }
@@ -484,7 +485,7 @@ class PaymentService {
         (async () => {
           try {
             if (captureResult.orderId) {
-              const order = await orderRepository.findOrderDetails(captureResult.orderId);
+              const order = await orderRepository.findOrderDetailsById(captureResult.orderId);
               if (order) {
                 const user = order.user_id ? await userRepository.findByPk(order.user_id) : null;
                 const emailTo = (user && user.email) || (order.shipping_address && order.shipping_address.email);
@@ -508,7 +509,7 @@ class PaymentService {
             }
 
             if (captureResult.rentalOrderId) {
-              const rental = await rentalRepository.findRentalDetails(captureResult.rentalOrderId);
+              const rental = await rentalRepository.findRentalDetailsById(captureResult.rentalOrderId);
               if (rental) {
                 const user = rental.user_id ? await userRepository.findByPk(rental.user_id) : null;
                 if (user && user.email) {
@@ -535,6 +536,22 @@ class PaymentService {
             console.warn('[PaymentService] Transactional confirmation email dispatch failed:', mailErr.message);
           }
         })();
+
+        // Asynchronously emit admin transaction alerts (WhatsApp & Email) for confirmed capture
+        if (captureResult.orderId) {
+          adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
+            orderId: captureResult.orderId,
+            paymentId: razorpay_payment_id,
+            paymentMethod: payment_method || 'Online Razorpay Gateway',
+          });
+        }
+        if (captureResult.rentalOrderId) {
+          adminNotificationEventBus.emitAsync('transaction.rental.successful', {
+            rentalId: captureResult.rentalOrderId,
+            paymentId: razorpay_payment_id,
+            paymentMethod: payment_method || 'Online Razorpay Gateway',
+          });
+        }
       }
 
       return captureResult;
@@ -710,6 +727,22 @@ class PaymentService {
               }
             }
           });
+
+          // Asynchronously emit admin transaction alerts (WhatsApp & Email) upon webhook capture
+          if (payment.order_id) {
+            adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
+              orderId: payment.order_id,
+              paymentId: gatewayPaymentId,
+              paymentMethod: (rzpPayment && rzpPayment.method) || 'Online Razorpay Gateway',
+            });
+          }
+          if (payment.rental_order_id) {
+            adminNotificationEventBus.emitAsync('transaction.rental.successful', {
+              rentalId: payment.rental_order_id,
+              paymentId: gatewayPaymentId,
+              paymentMethod: (rzpPayment && rzpPayment.method) || 'Online Razorpay Gateway',
+            });
+          }
         } catch (dbErr) {
           if (
             dbErr instanceof UniqueConstraintError ||

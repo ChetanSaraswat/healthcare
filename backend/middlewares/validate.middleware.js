@@ -16,13 +16,21 @@ exports.validate = (schema) => (req, res, next) => {
     next();
   } catch (error) {
     if (error instanceof ZodError) {
+      const details = error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      }));
+      const formatted = details
+        .map((d) => (d.field ? `${d.field}: ${d.message}` : d.message))
+        .join(', ');
+
       return res.status(BAD_REQUEST).json({
         success: false,
-        error: 'Validation failed',
-        details: error.issues.map((issue) => ({
-          path: issue.path.join('.'),
-          message: issue.message,
-        })),
+        statusCode: BAD_REQUEST,
+        message: `Validation failed: ${formatted}`,
+        error: `Validation failed: ${formatted}`,
+        details,
+        errors: details,
       });
     }
     next(error);

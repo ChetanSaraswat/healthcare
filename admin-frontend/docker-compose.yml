@@ -1,0 +1,29 @@
+services:
+  admin-frontend:
+    container_name: aarogyamed-admin-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: ["npm", "run", "dev"]
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-3001}:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      aarogyamed_network:
+        aliases:
+          - admin-frontend
+          - aarogyamed-admin-frontend
+    restart: on-failure
+    tty: true
+    stdin_open: true
+
+networks:
+  aarogyamed_network:
+    name: aarogyamed-shared-network
+    external: true
