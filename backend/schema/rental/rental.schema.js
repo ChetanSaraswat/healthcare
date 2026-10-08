@@ -5,7 +5,7 @@ exports.quoteRentalSchema = z.object({
     items: z
       .array(
         z.object({
-          product_uuid: z.string().uuid('Valid product UUID is required'),
+          product_uuid: z.string().min(1, 'Valid product UUID or identifier is required'),
           quantity: z.number().int().positive().default(1),
           duration_type: z.enum(['daily', 'weekly', 'monthly']).optional().default('daily'),
           duration_count: z.number().int().positive().default(1),
@@ -39,7 +39,7 @@ exports.createRentalSchema = z.object({
       items: z
         .array(
           z.object({
-            product_uuid: z.string().uuid('Valid product UUID is required'),
+            product_uuid: z.string().min(1, 'Valid product UUID or identifier is required'),
             quantity: z.number().int().positive().default(1),
             duration_type: z.enum(['daily', 'weekly', 'monthly']).optional().default('daily'),
             duration_count: z.number().int().positive().optional().default(1),

@@ -16,11 +16,29 @@ class RentalService {
       rateAmount = parseFloat(product.rent_price_daily) || 0;
     }
 
-    const itemRentalTotal = rateAmount * durationCount * quantity;
+    // Apply progressive tiered discount:
+    // 30+ days: 28% off
+    // 15-29 days: 18% off
+    // 7-14 days: 10% off
+    // 1-6 days: 0% off
+    let discountPercent = 0;
+    const days = Math.max(1, Number(durationCount) || 1);
+    if (days >= 30) {
+      discountPercent = 28;
+    } else if (days >= 15) {
+      discountPercent = 18;
+    } else if (days >= 7) {
+      discountPercent = 10;
+    }
+
+    const effectiveDailyRate = Math.round(rateAmount * (1 - discountPercent / 100));
+    const itemRentalTotal = effectiveDailyRate * days * quantity;
     const itemDepositTotal = (parseFloat(product.rent_deposit) || 0) * quantity;
 
     return {
-      rateAmount,
+      rateAmount: effectiveDailyRate,
+      baseDailyRate: rateAmount,
+      discountPercent,
       itemRentalTotal,
       itemDepositTotal,
     };
@@ -41,14 +59,13 @@ class RentalService {
         throw new BadRequest('Product UUID (product_uuid) is required for each rental item');
       }
 
-      const product = await productRepository.findOne({
-        uuid: productUuid,
+      const product = await productRepository.findByIdentifier(productUuid, {
         rent_available: true,
         status: 'active',
       });
 
       if (!product) {
-        throw new BadRequest(`Product #${productUuid} is not available for rental`);
+        throw new BadRequest(`Product '${productUuid}' is not available for rental`);
       }
 
       const durationType = item.duration_type || 'daily';
@@ -217,20 +234,83 @@ class RentalService {
     return createdRental;
   }
 
+  enrichRentalOrder(rental) {
+    if (!rental) return rental;
+    const raw = rental.toJSON ? rental.toJSON() : JSON.parse(JSON.stringify(rental));
+
+    let durationDays = 7;
+    if (raw.start_date && raw.end_date) {
+      const sStr = String(raw.start_date).split('T')[0];
+      const eStr = String(raw.end_date).split('T')[0];
+      const [sY, sM, sD] = sStr.split('-').map(Number);
+      const [eY, eM, eD] = eStr.split('-').map(Number);
+      if (sY && sM && sD && eY && eM && eD) {
+        const startUtc = Date.UTC(sY, sM - 1, sD);
+        const endUtc = Date.UTC(eY, eM - 1, eD);
+        const diff = Math.round((endUtc - startUtc) / 86400000);
+        if (diff > 0) durationDays = diff;
+      }
+    }
+
+    raw.duration_days = durationDays;
+    raw.durationDays = durationDays;
+
+    let calculatedRentalTotal = 0;
+    if (Array.isArray(raw.items) && raw.items.length > 0) {
+      raw.items = raw.items.map((item) => {
+        const prod = item.product || {};
+        const baseDailyRate = parseFloat(item.rate_amount) || parseFloat(prod.rent_price_daily) || 350;
+        let discountPercent = 0;
+        if (durationDays >= 30) discountPercent = 28;
+        else if (durationDays >= 15) discountPercent = 18;
+        else if (durationDays >= 7) discountPercent = 10;
+
+        const effectiveDailyRate = Math.round(baseDailyRate * (1 - discountPercent / 100));
+        const qty = Number(item.quantity) || 1;
+        const subtotal = effectiveDailyRate * durationDays * qty;
+        calculatedRentalTotal += subtotal;
+
+        return {
+          ...item,
+          duration_days: durationDays,
+          durationDays,
+          base_daily_rate: baseDailyRate,
+          daily_rate: baseDailyRate,
+          effective_daily_rate: effectiveDailyRate,
+          discount_percent: discountPercent,
+          subtotal,
+          rentalCost: subtotal,
+          securityDeposit: (parseFloat(item.deposit_amount) || parseFloat(prod.rent_deposit) || 0) * qty,
+        };
+      });
+    }
+
+    raw.total_rental_fee = calculatedRentalTotal;
+    raw.totalRentalFee = calculatedRentalTotal;
+    raw.total_deposit = parseFloat(raw.deposit_amount) || 0;
+    raw.totalDeposit = parseFloat(raw.deposit_amount) || 0;
+    raw.total_amount = calculatedRentalTotal + raw.total_deposit;
+    raw.totalPaid = raw.total_amount;
+
+    return raw;
+  }
+
   async getById(uuid, userId = null) {
     const rental = await rentalRepository.findRentalDetails(uuid, userId);
     if (!rental) {
       throw new NotFound('Rental order not found');
     }
-    return rental;
+    return this.enrichRentalOrder(rental);
   }
 
   async getUserRentals(userId) {
-    return await rentalRepository.findRentalsByUser(userId);
+    const rentals = await rentalRepository.findRentalsByUser(userId);
+    return rentals.map((r) => this.enrichRentalOrder(r));
   }
 
   async getAllRentals(filter = {}) {
-    return await rentalRepository.findAllRentals(filter);
+    const rentals = await rentalRepository.findAllRentals(filter);
+    return rentals.map((r) => this.enrichRentalOrder(r));
   }
 
   async updateStatus(uuid, updateData) {

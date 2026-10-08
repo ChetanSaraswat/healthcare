@@ -1,7 +1,7 @@
 import { createAppSlice } from '@/store/create-app-slice';
 import { BlogPost } from '@/domain/entities/blog.entity';
 import { listBlogPosts } from './list-posts/list-posts.action';
-import { INITIAL_MOCK_POSTS } from './list-posts/list-posts.service';
+import { STATIC_BLOG_POSTS } from '@/content/blog/posts';
 
 export interface BlogState {
   posts: BlogPost[];
@@ -15,9 +15,9 @@ export interface BlogState {
 }
 
 const initialState: BlogState = {
-  posts: INITIAL_MOCK_POSTS,
+  posts: STATIC_BLOG_POSTS,
   selectedPost: null,
-  total: INITIAL_MOCK_POSTS.length,
+  total: STATIC_BLOG_POSTS.length,
   page: 1,
   limit: 10,
   totalPages: 1,

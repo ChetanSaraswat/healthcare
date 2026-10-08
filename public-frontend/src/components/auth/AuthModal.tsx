@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser } from '@/features/auth/login/login.action';
 import { registerUser } from '@/features/auth/register/register.action';
-import { clearAuthError, setDemoCustomer, setDemoAdmin } from '@/features/auth/auth.slice';
+import { clearAuthError } from '@/features/auth/auth.slice';
 import { useTranslation } from '@/locales';
 import styles from './AuthModal.module.scss';
 import {
@@ -18,10 +18,47 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(3, 'Please enter a valid email address or phone number'),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters'),
+});
+
+const registerSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(100, 'Full name cannot exceed 100 characters'),
+  email: z
+    .string()
+    .trim()
+    .email('Please enter a valid email address'),
+  phone: z
+    .string()
+    .trim()
+    .refine((val) => !val || /^[6-9]\d{9}$/.test(val), {
+      message: 'Mobile number must be a valid 10-digit number (e.g. 9876543210)',
+    })
+    .optional(),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -44,16 +81,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Sign In Form
-  const [loginIdentifier, setLoginIdentifier] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  // Sign In Form via React Hook Form
+  const {
+    register: registerLogin,
+    handleSubmit: handleLoginSubmit,
+    formState: { errors: loginErrors },
+    reset: resetLogin,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onTouched',
+  });
 
-  // Register Form
-  const [registerName, setRegisterName] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPhone, setRegisterPhone] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [localValidationErr, setLocalValidationErr] = useState<string | null>(null);
+  // Register Form via React Hook Form
+  const {
+    register: registerSignUp,
+    handleSubmit: handleRegisterSubmit,
+    formState: { errors: registerErrors },
+    reset: resetSignUp,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onTouched',
+  });
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -62,9 +110,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       dispatch(clearAuthError());
-      setLocalValidationErr(null);
+      resetLogin();
+      resetSignUp();
     }
-  }, [isOpen, activeTab, dispatch]);
+  }, [isOpen, activeTab, dispatch, resetLogin, resetSignUp]);
 
   useEffect(() => {
     if (isAuthenticated && isOpen) {
@@ -77,23 +126,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalValidationErr(null);
-
-    if (!loginIdentifier.trim()) {
-      setLocalValidationErr(locale === 'hi' ? 'कृपया ईमेल या मोबाइल नंबर दर्ज करें' : 'Please enter your email or phone number.');
-      return;
-    }
-    if (!loginPassword) {
-      setLocalValidationErr(locale === 'hi' ? 'कृपया पासवर्ड दर्ज करें' : 'Please enter your password.');
-      return;
-    }
-
+  const onLogin = async (data: LoginFormData) => {
     const result = await dispatch(
       loginUser({
-        email: loginIdentifier.trim(),
-        password: loginPassword,
+        email: data.identifier.trim(),
+        password: data.password,
       })
     );
 
@@ -105,29 +142,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalValidationErr(null);
-
-    if (!registerName.trim()) {
-      setLocalValidationErr(locale === 'hi' ? 'कृपया पूरा नाम दर्ज करें' : 'Full name is required.');
-      return;
-    }
-    if (!registerEmail.trim() || !registerEmail.includes('@')) {
-      setLocalValidationErr(locale === 'hi' ? 'कृपया मान्य ईमेल दर्ज करें' : 'Please enter a valid email address.');
-      return;
-    }
-    if (registerPassword.length < 6) {
-      setLocalValidationErr(locale === 'hi' ? 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए' : 'Password must be at least 6 characters.');
-      return;
-    }
-
+  const onRegister = async (data: RegisterFormData) => {
     const result = await dispatch(
       registerUser({
-        name: registerName.trim(),
-        email: registerEmail.trim(),
-        phone: registerPhone.trim() || undefined,
-        password: registerPassword,
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone?.trim() || undefined,
+        password: data.password,
       })
     );
 
@@ -139,27 +160,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleQuickDemoCustomer = () => {
-    dispatch(setDemoCustomer());
-    onClose();
-    if (redirectUrl) {
-      router.push(redirectUrl);
-    }
-  };
-
-  const handleQuickDemoAdmin = () => {
-    dispatch(setDemoAdmin());
-    onClose();
-    if (redirectUrl) {
-      router.push(redirectUrl);
-    } else {
-      router.push('/admin');
-    }
-  };
-
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
         {/* Close Button */}
         <button
           type="button"
@@ -167,12 +170,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           onClick={onClose}
           aria-label="Close modal"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         {/* Modal Header */}
         <div className={styles.modalHeader}>
-          <div className={styles.badgePill}>
+          <div className={styles.badge}>
             <ShieldCheck size={14} />
             {locale === 'hi' ? 'सुरक्षित बायोमेडिकल रोगी पोर्टल' : 'Clinical & Patient Verified Portal'}
           </div>
@@ -209,18 +212,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Modal Body */}
         <div className={styles.modalBody}>
           {/* Error Banner */}
-          {(localValidationErr || error) && (
+          {error && (
             <div className={styles.errorBanner}>
               <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>{localValidationErr || error}</span>
+              <span>{error}</span>
             </div>
           )}
 
           {activeTab === 'login' ? (
-            <form onSubmit={handleLoginSubmit}>
+            <form onSubmit={handleLoginSubmit(onLogin)} noValidate>
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'ईमेल या मोबाइल नंबर' : 'Email Address or Mobile'}
+                  {locale === 'hi' ? 'ईमेल या मोबाइल नंबर' : 'Email Address or Mobile'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Mail size={16} className={styles.inputIcon} />
@@ -228,21 +231,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     type="text"
                     className={styles.textInput}
                     placeholder="patient@example.com or 9876543210"
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    required
+                    {...registerLogin('identifier')}
+                    style={loginErrors.identifier ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {loginErrors.identifier && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {loginErrors.identifier.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label className={styles.label}>
-                    {locale === 'hi' ? 'पासवर्ड' : 'Password'}
+                    {locale === 'hi' ? 'पासवर्ड' : 'Password'} <span style={{ color: '#ba1a1a' }}>*</span>
                   </label>
-                  <span style={{ fontSize: '0.75rem', color: '#005c55', cursor: 'pointer', fontWeight: 600 }}>
-                    {locale === 'hi' ? 'पासवर्ड भूल गए?' : 'Forgot Password?'}
-                  </span>
                 </div>
                 <div className={styles.inputWrapper}>
                   <Lock size={16} className={styles.inputIcon} />
@@ -250,9 +254,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     type={showPassword ? 'text' : 'password'}
                     className={styles.textInput}
                     placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
+                    {...registerLogin('password')}
+                    style={loginErrors.password ? { borderColor: '#ba1a1a' } : undefined}
                   />
                   <button
                     type="button"
@@ -263,6 +266,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                {loginErrors.password && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {loginErrors.password.message}
+                  </span>
+                )}
               </div>
 
               <button
@@ -277,39 +285,47 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRegisterSubmit}>
+            <form onSubmit={handleRegisterSubmit(onRegister)} noValidate>
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'पूरा नाम' : 'Full Name'}
+                  {locale === 'hi' ? 'पूरा नाम' : 'Full Name'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <User size={16} className={styles.inputIcon} />
                   <input
                     type="text"
                     className={styles.textInput}
-                    placeholder="e.g. Sunita Sharma"
-                    value={registerName}
-                    onChange={(e) => setRegisterName(e.target.value)}
-                    required
+                    placeholder="e.g. Ramesh Patel"
+                    {...registerSignUp('name')}
+                    style={registerErrors.name ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.name && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.name.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'ईमेल पता' : 'Email Address'}
+                  {locale === 'hi' ? 'ईमेल पता' : 'Email Address'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Mail size={16} className={styles.inputIcon} />
                   <input
                     type="email"
                     className={styles.textInput}
-                    placeholder="sunita@example.com"
-                    value={registerEmail}
-                    onChange={(e) => setRegisterEmail(e.target.value)}
-                    required
+                    placeholder="patient@example.com"
+                    {...registerSignUp('email')}
+                    style={registerErrors.email ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.email && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.email.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
@@ -321,16 +337,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <input
                     type="tel"
                     className={styles.textInput}
-                    placeholder="+91 98765 43210"
-                    value={registerPhone}
-                    onChange={(e) => setRegisterPhone(e.target.value)}
+                    placeholder="9876543210"
+                    {...registerSignUp('phone')}
+                    style={registerErrors.phone ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.phone && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.phone.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'पासवर्ड (कम से कम 6 अक्षर)' : 'Create Password (min. 6 characters)'}
+                  {locale === 'hi' ? 'पासवर्ड (कम से कम 6 अक्षर)' : 'Create Password (min. 6 characters)'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Lock size={16} className={styles.inputIcon} />
@@ -338,9 +359,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     type={showPassword ? 'text' : 'password'}
                     className={styles.textInput}
                     placeholder="••••••••"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
+                    {...registerSignUp('password')}
+                    style={registerErrors.password ? { borderColor: '#ba1a1a' } : undefined}
                   />
                   <button
                     type="button"
@@ -351,6 +371,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                {registerErrors.password && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.password.message}
+                  </span>
+                )}
               </div>
 
               <button
@@ -365,36 +390,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </button>
             </form>
           )}
-
-          {/* Quick Demo Pre-fill Box for instant review */}
-          <div className={styles.divider}>
-            <span>{locale === 'hi' ? 'त्वरित डेमो परीक्षण' : 'Quick Demo Access'}</span>
-          </div>
-
-          <div className={styles.demoBox}>
-            <div className={styles.demoTitle}>
-              <Sparkles size={13} color="#005c55" />
-              <span>{locale === 'hi' ? '1-क्लिक टेस्ट क्रेडेंशियल्स' : '1-Click Review Credentials'}</span>
-            </div>
-            <div className={styles.demoButtons}>
-              <button
-                type="button"
-                className={styles.demoBtn}
-                onClick={handleQuickDemoCustomer}
-                title="Log in instantly as Patient Sunita Sharma"
-              >
-                {locale === 'hi' ? 'रोगी डेमो (सुनीता शर्मा)' : 'Patient Demo (Sunita)'}
-              </button>
-              <button
-                type="button"
-                className={styles.demoBtn}
-                onClick={handleQuickDemoAdmin}
-                title="Log in instantly as Super Admin Dr. Rajesh Verma"
-              >
-                {locale === 'hi' ? 'व्यवस्थापक (डॉ. राजेश)' : 'Admin Demo (Dr. Rajesh)'}
-              </button>
-            </div>
-          </div>
 
           <div className={styles.termsText}>
             {locale === 'hi'

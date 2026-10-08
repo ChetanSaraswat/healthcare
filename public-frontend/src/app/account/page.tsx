@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useTranslation } from '@/locales';
 import { UserEntity, AddressEntity } from '@/domain/entities/user.entity';
 import { OrderEntity } from '@/domain/entities/order.entity';
 import { RentalEntity } from '@/domain/entities/rental.entity';
+import { listOrders } from '@/features/orders/list-orders/list-orders.action';
+import { listRentals } from '@/features/rentals/list-rentals/list-rentals.action';
 import {
   CalendarClock,
   ShoppingBag,
@@ -23,11 +25,17 @@ import {
 } from 'lucide-react';
 
 export default function AccountOverviewPage() {
+  const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
   const authUser = useAppSelector((state) => state.auth.user);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const orders = useAppSelector((state) => state.orders.orders);
   const addresses = useAppSelector((state) => state.user.addresses);
+
+  useEffect(() => {
+    dispatch(listOrders());
+    dispatch(listRentals());
+  }, [dispatch]);
 
   const defaultAddress = UserEntity.getDefaultAddress(addresses);
   const totalDepositHeld = rentals
@@ -398,15 +406,15 @@ export default function AccountOverviewPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.875rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0f4f3', paddingBottom: 6 }}>
               <span style={{ color: '#6e7977' }}>{locale === 'hi' ? 'पूरा नाम:' : 'Full Name:'}</span>
-              <strong>{authUser?.name || 'Sunita Sharma'}</strong>
+              <strong>{authUser?.name}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0f4f3', paddingBottom: 6 }}>
               <span style={{ color: '#6e7977' }}>{locale === 'hi' ? 'ईमेल आईडी:' : 'Email ID:'}</span>
-              <strong>{authUser?.email || 'sunita.sharma@example.com'}</strong>
+              <strong>{authUser?.email}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0f4f3', paddingBottom: 6 }}>
               <span style={{ color: '#6e7977' }}>{locale === 'hi' ? 'मोबाइल नंबर:' : 'Mobile Phone:'}</span>
-              <strong>{authUser?.phone || '+91 98765 43210'}</strong>
+              <strong>{authUser?.phone}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 2 }}>
               <span style={{ color: '#6e7977' }}>{locale === 'hi' ? 'पसंदीदा भाषा:' : 'Preferred Language:'}</span>

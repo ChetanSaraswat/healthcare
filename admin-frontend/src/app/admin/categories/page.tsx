@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Category } from '@/domain/entities/category.entity';
+import { listCategories } from '@/features/categories/list-categories/list-categories.action';
+import { listProducts } from '@/features/products/list-products/list-products.action';
 import { addCategory, updateCategory, deleteCategory } from '@/features/categories/categories.slice';
+import { axiosInterceptorInstanceClient } from '@/config/axios';
 import {
   FolderTree,
   PlusCircle,
@@ -22,7 +25,13 @@ import {
 export default function AdminCategoriesPage() {
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories.categories);
+  const loading = useAppSelector((state) => state.categories.loading);
   const products = useAppSelector((state) => state.products.products);
+
+  useEffect(() => {
+    dispatch(listCategories());
+    dispatch(listProducts());
+  }, [dispatch]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
@@ -82,43 +91,70 @@ export default function AdminCategoriesPage() {
     setFormData({ ...formData, name, slug: formData.slug && modalMode === 'edit' ? formData.slug : slug });
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.slug.trim()) return;
 
-    if (modalMode === 'create') {
-      const newCat: Category = {
-        id: `cat-${Date.now()}`,
-        name: formData.name.trim(),
-        slug: formData.slug.trim(),
-        parentId: formData.parentId ? formData.parentId : null,
-        description: formData.description.trim(),
-        displayOrder: Number(formData.displayOrder),
-        isActive: formData.isActive,
-      };
-      dispatch(addCategory(newCat));
-      showToast(`Category "${newCat.name}" successfully created.`);
-    } else if (modalMode === 'edit' && editingCategory) {
-      const updatedCat: Category = {
-        ...editingCategory,
-        name: formData.name.trim(),
-        slug: formData.slug.trim(),
-        parentId: formData.parentId ? formData.parentId : null,
-        description: formData.description.trim(),
-        displayOrder: Number(formData.displayOrder),
-        isActive: formData.isActive,
-      };
-      dispatch(updateCategory(updatedCat));
-      showToast(`Category "${updatedCat.name}" updated successfully.`);
+    try {
+      if (modalMode === 'create') {
+        const payload = {
+          name: formData.name.trim(),
+          slug: formData.slug.trim(),
+          description: formData.description.trim(),
+          parent_id: formData.parentId ? Number(formData.parentId) : null,
+          display_order: Number(formData.displayOrder),
+          is_active: formData.isActive,
+        };
+        const res = await axiosInterceptorInstanceClient.post('/categories', payload);
+        const saved = res.data?.data;
+        const newCat: Category = {
+          id: String(saved?.id || saved?.uuid || `cat-${Date.now()}`),
+          name: formData.name.trim(),
+          slug: formData.slug.trim(),
+          parentId: formData.parentId ? formData.parentId : null,
+          description: formData.description.trim(),
+          displayOrder: Number(formData.displayOrder),
+          isActive: formData.isActive,
+        };
+        dispatch(addCategory(newCat));
+        showToast(`Category "${newCat.name}" successfully created.`);
+      } else if (modalMode === 'edit' && editingCategory) {
+        const payload = {
+          name: formData.name.trim(),
+          slug: formData.slug.trim(),
+          description: formData.description.trim(),
+          parent_id: formData.parentId ? Number(formData.parentId) : null,
+          display_order: Number(formData.displayOrder),
+          is_active: formData.isActive,
+        };
+        await axiosInterceptorInstanceClient.patch(`/categories/${editingCategory.id}`, payload);
+        const updatedCat: Category = {
+          ...editingCategory,
+          name: formData.name.trim(),
+          slug: formData.slug.trim(),
+          parentId: formData.parentId ? formData.parentId : null,
+          description: formData.description.trim(),
+          displayOrder: Number(formData.displayOrder),
+          isActive: formData.isActive,
+        };
+        dispatch(updateCategory(updatedCat));
+        showToast(`Category "${updatedCat.name}" updated successfully.`);
+      }
+      setModalMode(null);
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err?.message || 'Failed to save category');
     }
-
-    setModalMode(null);
   };
 
-  const handleDelete = (cat: Category) => {
+  const handleDelete = async (cat: Category) => {
     if (confirm(`Are you sure you want to delete category "${cat.name}" and any subcategories?`)) {
-      dispatch(deleteCategory(cat.id));
-      showToast(`Category "${cat.name}" deleted.`);
+      try {
+        await axiosInterceptorInstanceClient.delete(`/categories/${cat.id}`);
+        dispatch(deleteCategory(cat.id));
+        showToast(`Category "${cat.name}" deleted.`);
+      } catch (err: any) {
+        alert(err?.response?.data?.message || err?.message || 'Failed to delete category');
+      }
     }
   };
 
@@ -288,7 +324,26 @@ export default function AdminCategoriesPage() {
 
         {/* Categories List View */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {rootCategories.map((root) => {
+          {loading && categories.length === 0 ? (
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[1, 2, 3, 4].map((n) => (
+                <div
+                  key={n}
+                  style={{
+                    height: 56,
+                    background: '#f8fafc',
+                    borderRadius: 10,
+                    border: '1px solid #eaedff',
+                  }}
+                />
+              ))}
+            </div>
+          ) : rootCategories.length === 0 ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#6e7977' }}>
+              No categories found. Create a root category to start organizing inventory.
+            </div>
+          ) : (
+            rootCategories.map((root) => {
             const children = categories.filter((c) => c.parentId === root.id);
             const productCount = getProductCount(root.slug);
 
@@ -455,7 +510,7 @@ export default function AdminCategoriesPage() {
                 ))}
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
 

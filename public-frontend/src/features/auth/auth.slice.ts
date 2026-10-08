@@ -31,40 +31,11 @@ export const authSlice = createAppSlice({
       state.error = null;
       if (typeof window !== 'undefined') {
         localStorage.removeItem('aarogyamed_auth_token');
+        sessionStorage.removeItem('aarogyamed_checkout_session');
       }
     }),
     clearAuthError: create.reducer((state) => {
       state.error = null;
-    }),
-    setDemoCustomer: create.reducer((state) => {
-      state.user = {
-        id: 'usr-demo-01',
-        name: 'Sunita Sharma',
-        email: 'sunita.sharma@example.com',
-        phone: '+91 98765 43210',
-        role: 'customer',
-      };
-      state.token = 'demo-jwt-sunita-sharma';
-      state.isAuthenticated = true;
-      state.error = null;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('aarogyamed_auth_token', state.token);
-      }
-    }),
-    setDemoAdmin: create.reducer((state) => {
-      state.user = {
-        id: 'usr-admin-01',
-        name: 'Dr. Rajesh Verma',
-        email: 'rajesh.verma@aarogyamed.in',
-        phone: '+91 98111 22334',
-        role: 'super_admin',
-      };
-      state.token = 'demo-jwt-admin-rajesh';
-      state.isAuthenticated = true;
-      state.error = null;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('aarogyamed_auth_token', state.token);
-      }
     }),
   }),
   extraReducers: (builder) => {
@@ -133,5 +104,5 @@ export const authSlice = createAppSlice({
   },
 });
 
-export const { logout, clearAuthError, setDemoCustomer, setDemoAdmin } = authSlice.actions;
+export const { logout, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

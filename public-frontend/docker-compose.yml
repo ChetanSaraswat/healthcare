@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
-    command: ["npm", "run", "dev"]
     env_file:
       - .env
     ports:

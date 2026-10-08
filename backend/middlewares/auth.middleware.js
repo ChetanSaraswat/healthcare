@@ -9,9 +9,13 @@ exports.authenticate = (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const secret = process.env.JWT_SECRET || 'aarogyamed_secret_key_default';
+    const secret = process.env.JWT_SECRET;
+    if (!secret && process.env.NODE_ENV === 'production') {
+      throw new Error('Fatal configuration: JWT_SECRET environment variable is missing.');
+    }
+    const effectiveSecret = secret || 'aarogyamed_secret_key_default';
 
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, effectiveSecret);
     req.user = decoded;
     next();
   } catch (error) {

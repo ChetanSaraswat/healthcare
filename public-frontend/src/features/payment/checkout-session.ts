@@ -11,8 +11,8 @@ export const CHECKOUT_SESSION_KEY = 'aarogyamed_checkout_session';
 
 export interface DurableCheckoutSession {
   idempotencyKey: string;
-  buyOrderId?: number;
-  rentalOrderId?: number;
+  buyOrderId?: number | string;
+  rentalOrderId?: number | string;
   cartFingerprint: string;
 }
 
@@ -36,13 +36,24 @@ export function computeCartFingerprint(items: CartItemLike[]): string {
 }
 
 /**
- * Generates a standard cryptographically random UUID or fallback idempotency key
+ * Generates a standard cryptographically random UUID idempotency key
  */
 export function generateIdempotencyKey(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+  return require('crypto').randomUUID();
+}
+
+export function isValidOrderIdentifier(val: any): boolean {
+  if (!val) return false;
+  if (typeof val === 'number' && Number.isInteger(val) && val > 0) return true;
+  if (typeof val === 'string') {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    const isInt = /^\d+$/.test(val);
+    return isUuid || isInt;
+  }
+  return false;
 }
 
 /**
@@ -66,6 +77,12 @@ export function loadCheckoutSession(
       if (stored) {
         const parsed: DurableCheckoutSession = JSON.parse(stored);
         if (parsed && parsed.idempotencyKey && parsed.cartFingerprint === currentFingerprint) {
+          if (parsed.buyOrderId && !isValidOrderIdentifier(parsed.buyOrderId)) {
+            delete parsed.buyOrderId;
+          }
+          if (parsed.rentalOrderId && !isValidOrderIdentifier(parsed.rentalOrderId)) {
+            delete parsed.rentalOrderId;
+          }
           return parsed;
         }
       }
@@ -107,7 +124,14 @@ export function persistCheckoutSession(
 
   if (activeStorage) {
     try {
-      activeStorage.setItem(CHECKOUT_SESSION_KEY, JSON.stringify(session));
+      const cleanSession = { ...session };
+      if (cleanSession.buyOrderId && !isValidOrderIdentifier(cleanSession.buyOrderId)) {
+        delete cleanSession.buyOrderId;
+      }
+      if (cleanSession.rentalOrderId && !isValidOrderIdentifier(cleanSession.rentalOrderId)) {
+        delete cleanSession.rentalOrderId;
+      }
+      activeStorage.setItem(CHECKOUT_SESSION_KEY, JSON.stringify(cleanSession));
     } catch (e) {
       console.warn('[persistCheckoutSession] Could not persist checkout session to sessionStorage:', e);
     }

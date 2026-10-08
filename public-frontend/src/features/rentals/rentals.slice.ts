@@ -4,7 +4,6 @@ import { listRentals } from './list-rentals/list-rentals.action';
 import { requestRental } from './request-rental/request-rental.action';
 import { extendRental } from './extend-rental/extend-rental.action';
 import { scheduleReturn } from './schedule-return/schedule-return.action';
-import { INITIAL_MOCK_RENTALS } from './list-rentals/list-rentals.service';
 
 export interface RentalsState {
   rentals: RentalOrder[];
@@ -16,7 +15,7 @@ export interface RentalsState {
 }
 
 const initialState: RentalsState = {
-  rentals: INITIAL_MOCK_RENTALS,
+  rentals: [],
   selectedRental: null,
   latestPlacedRental: null,
   loading: false,

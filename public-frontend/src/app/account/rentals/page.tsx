@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useTranslation } from '@/locales';
+import { listRentals } from '@/features/rentals/list-rentals/list-rentals.action';
 import { RentalEntity, RentalStatus } from '@/domain/entities/rental.entity';
 import { extendRental } from '@/features/rentals/extend-rental/extend-rental.action';
 import { scheduleReturn } from '@/features/rentals/schedule-return/schedule-return.action';
@@ -26,6 +27,11 @@ export default function AccountRentalsPage() {
   const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
   const rentals = useAppSelector((state) => state.rentals.rentals);
+  const loading = useAppSelector((state) => state.rentals.loading);
+
+  useEffect(() => {
+    dispatch(listRentals());
+  }, [dispatch]);
 
   // Modal states
   const [extensionRental, setExtensionRental] = useState<any | null>(null);
@@ -125,7 +131,26 @@ export default function AccountRentalsPage() {
       </div>
 
       {/* Rentals List */}
-      {rentals.length === 0 ? (
+      {loading && rentals.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                background: '#ffffff',
+                borderRadius: 16,
+                border: '1px solid #dae2fd',
+                padding: '2rem',
+                minHeight: 120,
+                opacity: 0.6,
+              }}
+            >
+              <div style={{ height: 20, width: '30%', background: '#e0e5eb', borderRadius: 4, marginBottom: 12 }} />
+              <div style={{ height: 16, width: '60%', background: '#edf0f5', borderRadius: 4 }} />
+            </div>
+          ))}
+        </div>
+      ) : rentals.length === 0 ? (
         <div
           style={{
             background: '#ffffff',
@@ -253,7 +278,7 @@ export default function AccountRentalsPage() {
                       }}
                     >
                       <img
-                        src={item.productImage}
+                        src={item.productImage || '/images/hospital_bed.png'}
                         alt={item.productName}
                         style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }}
                       />

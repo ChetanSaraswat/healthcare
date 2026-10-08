@@ -43,8 +43,8 @@ class OrderService {
         address_id: address.id,
         total_amount: totalAmount,
         status: 'pending',
-        payment_status: payment_id ? 'paid' : 'pending',
-        payment_id: payment_id || null,
+        payment_status: 'pending',
+        payment_id: null,
       };
 
       const orderItemsData = validatedItems.map((item) => ({
@@ -67,7 +67,8 @@ class OrderService {
       return newOrder;
     });
 
-    // 4. Emit event for decoupled notification handling (Customer Email, Admin Email, Admin WhatsApp)
+    // 4. Emit event for decoupled notification handling ONLY for authentic Cash on Delivery orders
+    // Online payments (Razorpay) are emitted authoritatively by PaymentService upon capture webhook/reconciliation.
     const rawMethod = (data.payment_method || '').toLowerCase();
     const isOnlineAttempt =
       rawMethod.includes('online') ||
@@ -75,13 +76,12 @@ class OrderService {
       rawMethod.includes('card') ||
       rawMethod.includes('netbanking') ||
       rawMethod.includes('razorpay');
-    const isConfirmedTransaction = Boolean(payment_id) || !isOnlineAttempt;
 
-    if (isConfirmedTransaction && createdOrder) {
+    if (!isOnlineAttempt && createdOrder) {
       adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
         orderId: createdOrder.id,
-        paymentId: payment_id || null,
-        paymentMethod: payment_id ? 'Online Payment' : 'Cash on Delivery (COD)',
+        paymentId: null,
+        paymentMethod: 'Cash on Delivery (COD)',
       });
     }
 

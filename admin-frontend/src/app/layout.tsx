@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={plusJakartaSans.variable}>
-      <body style={{ margin: 0, padding: 0, background: '#131b2e', minHeight: '100vh' }}>
+    <html lang="en" className={plusJakartaSans.variable} suppressHydrationWarning>
+      <body style={{ margin: 0, padding: 0, background: '#131b2e', minHeight: '100vh' }} suppressHydrationWarning>
         <StoreProvider>
           {children}
         </StoreProvider>

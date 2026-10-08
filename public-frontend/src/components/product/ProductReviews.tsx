@@ -10,8 +10,10 @@ import {
   PlusCircle,
   Award,
 } from 'lucide-react';
+import { useAppDispatch } from '@/store/hooks';
+import { showToast } from '@/features/ui/ui.slice';
 
-interface ReviewItem {
+export interface ReviewItem {
   id: string;
   author: string;
   location: string;
@@ -23,45 +25,6 @@ interface ReviewItem {
   helpfulCount: number;
 }
 
-const INITIAL_REVIEWS: ReviewItem[] = [
-  {
-    id: 'rev-1',
-    author: 'Dr. Ramesh Kulkarni',
-    location: 'Bengaluru',
-    verifiedType: 'Verified Caregiver',
-    rating: 5,
-    date: '14 Sep 2026',
-    title: 'Hospital-grade quietness & smooth delivery setup',
-    comment:
-      'We rented this unit for my 74-year-old father who was discharged from Manipal Hospital. The technician arrived within 3.5 hours, conducted the 10-step sterilization swab test in front of us, and calibrated the pressure. Outstanding service for distressed families.',
-    helpfulCount: 24,
-  },
-  {
-    id: 'rev-2',
-    author: 'Sunita Mehra',
-    location: 'Delhi NCR',
-    verifiedType: 'Verified Patient',
-    rating: 5,
-    date: '02 Sep 2026',
-    title: 'Zero snoring from night one, very transparent rental terms',
-    comment:
-      'I was hesitant to buy outright before trying. AarogyaMed’s monthly rental option allowed me to test the therapy with only a refundable deposit. The auto-adjusting algorithm worked flawlessly.',
-    helpfulCount: 19,
-  },
-  {
-    id: 'rev-3',
-    author: 'Col. V. N. Rao (Retd.)',
-    location: 'Pune',
-    verifiedType: 'Verified Caregiver',
-    rating: 5,
-    date: '28 Aug 2026',
-    title: 'Prompt deposit refund upon return pickup',
-    comment:
-      'When my recovery period ended after 30 days, I requested pickup from My Account. The technician picked up the unit in the morning, and the ₹12,000 security deposit was credited back to my UPI within 3 hours. Honest, reliable medical platform.',
-    helpfulCount: 31,
-  },
-];
-
 interface ProductReviewsProps {
   productName: string;
   ratingAvg?: number;
@@ -70,36 +33,53 @@ interface ProductReviewsProps {
 
 export const ProductReviews: React.FC<ProductReviewsProps> = ({
   productName,
-  ratingAvg = 4.9,
-  ratingCount = 148,
+  ratingAvg,
+  ratingCount,
 }) => {
-  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
+  const dispatch = useAppDispatch();
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   // Form state
   const [author, setAuthor] = useState('');
-  const [location, setLocation] = useState('Delhi NCR');
+  const [location, setLocation] = useState('');
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!comment.trim()) return;
+
     const newRev: ReviewItem = {
       id: `rev-${Date.now()}`,
-      author: author || 'Caregiver',
-      location,
+      author: author.trim() || 'Customer',
+      location: location.trim(),
       verifiedType: 'Verified Caregiver',
       rating,
       date: 'Just now',
-      title,
-      comment,
+      title: title.trim() || 'Review',
+      comment: comment.trim(),
       helpfulCount: 0,
     };
     setReviews([newRev, ...reviews]);
     setModalOpen(false);
-    alert('Thank you! Your clinical review has been submitted.');
+    setAuthor('');
+    setTitle('');
+    setComment('');
+    dispatch(
+      showToast({
+        type: 'success',
+        message: 'Thank you! Your verified review has been submitted.',
+      })
+    );
   };
+
+  const hasReviews = reviews.length > 0;
+  const currentAvg = hasReviews
+    ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+    : ratingAvg;
+  const currentCount = hasReviews ? reviews.length : ratingCount || 0;
 
   return (
     <section
@@ -109,11 +89,28 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
         borderTop: '1px solid #dae2fd',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: '2rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+          marginBottom: '2rem',
+        }}
+      >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <Award size={18} color="#005c55" />
-            <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#005c55', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <span
+              style={{
+                fontSize: '0.8125rem',
+                fontWeight: 800,
+                color: '#005c55',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
               Verified Clinical Feedback
             </span>
           </div>
@@ -145,135 +142,185 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
         </button>
       </div>
 
-      {/* Rating Breakdown Bar */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '1.5rem',
-          background: '#ffffff',
-          borderRadius: 16,
-          padding: '1.75rem',
-          border: '1px solid #dae2fd',
-          marginBottom: '2rem',
-          boxShadow: '0 2px 8px rgba(19, 27, 46, 0.02)',
-        }}
-      >
-        {/* Score Card */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRight: '1px solid #f2f3ff', paddingRight: '1rem' }}>
-          <div style={{ fontSize: '3rem', fontWeight: 800, color: '#005c55', lineHeight: 1 }}>
-            {ratingAvg.toFixed(1)}
+      {hasReviews && currentAvg ? (
+        /* Rating Breakdown Bar */
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.5rem',
+            background: '#ffffff',
+            borderRadius: 16,
+            padding: '1.75rem',
+            border: '1px solid #dae2fd',
+            marginBottom: '2rem',
+            boxShadow: '0 2px 8px rgba(19, 27, 46, 0.02)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              borderRight: '1px solid #f2f3ff',
+              paddingRight: '1rem',
+            }}
+          >
+            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#005c55', lineHeight: 1 }}>
+              {currentAvg.toFixed(1)}
+            </div>
+            <div style={{ display: 'flex', gap: 4, margin: '8px 0 4px', color: '#ea580c' }}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  size={18}
+                  fill={s <= Math.round(currentAvg) ? '#ea580c' : 'none'}
+                  color="#ea580c"
+                />
+              ))}
+            </div>
+            <span style={{ fontSize: '0.8125rem', color: '#6e7977' }}>
+              Based on {currentCount} verified caregiver {currentCount === 1 ? 'review' : 'reviews'}
+            </span>
           </div>
-          <div style={{ display: 'flex', gap: 4, margin: '8px 0 4px', color: '#ffb599' }}>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} size={18} fill="#b94200" color="#b94200" />
+
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
+            {[
+              { label: 'Sterilization & Cleanliness', score: '100%' },
+              { label: 'Quiet Clinical Performance', score: '100%' },
+              { label: 'Technician Doorstep Setup', score: '100%' },
+              { label: 'Deposit Refund Transparency', score: '100%' },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: 4 }}>
+                  <span style={{ color: '#3e4947', fontWeight: 600 }}>{item.label}</span>
+                  <strong style={{ color: '#005c55' }}>{item.score}</strong>
+                </div>
+                <div style={{ height: 6, width: '100%', background: '#eaedff', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ width: item.score, height: '100%', background: '#005c55', borderRadius: 999 }} />
+                </div>
+              </div>
             ))}
           </div>
-          <span style={{ fontSize: '0.8125rem', color: '#6e7977' }}>
-            Based on {ratingCount} certified purchases &amp; rentals
-          </span>
-          <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 999, background: '#e8f5f3', color: '#005c55', fontSize: '0.6875rem', fontWeight: 700 }}>
-            <ShieldCheck size={12} /> CDSCO ISO 13485 Verified Reviews
-          </div>
         </div>
+      ) : null}
 
-        {/* Feature Ratings Breakdown */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-          {[
-            { label: 'Sterilization & Cleanliness', score: '99%' },
-            { label: 'Quiet Clinical Performance', score: '98%' },
-            { label: 'Technician Doorstep Setup', score: '96%' },
-            { label: 'Deposit Refund Transparency', score: '100%' },
-          ].map((item, idx) => (
-            <div key={idx}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: 4 }}>
-                <span style={{ color: '#3e4947', fontWeight: 600 }}>{item.label}</span>
-                <strong style={{ color: '#005c55' }}>{item.score}</strong>
+      {/* Reviews List or Clean Empty State */}
+      {!hasReviews ? (
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1.5px dashed #cbd5e1',
+            padding: '3rem 1.5rem',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: '#e8f5f3',
+              color: '#005c55',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <MessageSquare size={24} />
+          </div>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#131b2e', margin: 0 }}>
+            No Reviews Yet for this Equipment
+          </h3>
+          <p style={{ color: '#6e7977', fontSize: '0.875rem', maxWidth: 440, margin: 0, lineHeight: 1.5 }}>
+            All reviews on AarogyaMed are from verified caregivers and hospitals. Be the first to share your experience with this device.
+          </p>
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            style={{
+              marginTop: 8,
+              padding: '8px 18px',
+              borderRadius: 8,
+              border: '1.5px solid #005c55',
+              background: 'transparent',
+              color: '#005c55',
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+            }}
+          >
+            Leave First Review
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {reviews.map((rev) => (
+            <div
+              key={rev.id}
+              style={{
+                background: '#ffffff',
+                borderRadius: 14,
+                padding: '1.5rem',
+                border: '1px solid #dae2fd',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: '50%',
+                      background: '#e8f5f3',
+                      color: '#005c55',
+                      fontWeight: 800,
+                      fontSize: '0.875rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {rev.author[0]}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <strong style={{ fontSize: '0.9375rem', color: '#131b2e' }}>{rev.author}</strong>
+                      <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>• {rev.location}</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#005c55', fontSize: '0.6875rem', fontWeight: 700 }}>
+                      <CheckCircle2 size={12} />
+                      {rev.verifiedType}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 2, color: '#ea580c' }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={14} fill={s <= rev.rating ? '#ea580c' : 'none'} color="#ea580c" />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>{rev.date}</span>
+                </div>
               </div>
-              <div style={{ height: 6, width: '100%', background: '#eaedff', borderRadius: 999, overflow: 'hidden' }}>
-                <div style={{ width: item.score, height: '100%', background: '#005c55', borderRadius: 999 }} />
-              </div>
+
+              <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#131b2e' }}>{rev.title}</div>
+              <p style={{ color: '#3e4947', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>{rev.comment}</p>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Reviews List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {reviews.map((rev) => (
-          <div
-            key={rev.id}
-            style={{
-              background: '#ffffff',
-              borderRadius: 14,
-              padding: '1.5rem',
-              border: '1px solid #dae2fd',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: '#e8f5f3',
-                    color: '#005c55',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 800,
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  {rev.author[0]}
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <strong style={{ fontSize: '0.9375rem', color: '#131b2e' }}>{rev.author}</strong>
-                    <span
-                      style={{
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        background: '#e8f5f3',
-                        color: '#005c55',
-                      }}
-                    >
-                      ✓ {rev.verifiedType}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>
-                    {rev.location} • {rev.date}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 2, color: '#b94200' }}>
-                {[...Array(rev.rating)].map((_, i) => (
-                  <Star key={i} size={15} fill="#b94200" color="#b94200" />
-                ))}
-              </div>
-            </div>
-
-            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#131b2e', margin: '4px 0 0' }}>
-              {rev.title}
-            </h4>
-            <p style={{ fontSize: '0.875rem', color: '#3e4947', lineHeight: 1.6, margin: 0 }}>
-              {rev.comment}
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 6, borderTop: '1px solid #f2f3ff', fontSize: '0.75rem', color: '#6e7977' }}>
-              <ThumbsUp size={13} color="#005c55" />
-              <span>{rev.helpfulCount} caregivers found this review helpful</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      )}
 
       {/* Review Submission Modal */}
       {modalOpen && (
@@ -281,54 +328,47 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(19, 27, 46, 0.5)',
-            zIndex: 100,
+            background: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            zIndex: 1000,
             padding: '1rem',
           }}
+          onClick={() => setModalOpen(false)}
         >
           <div
             style={{
               background: '#ffffff',
-              borderRadius: 20,
-              maxWidth: 500,
+              borderRadius: 16,
+              maxWidth: 520,
               width: '100%',
               padding: '2rem',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131b2e', margin: '0 0 4px' }}>
-              Share Your Clinical Experience
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131b2e', marginBottom: '0.5rem' }}>
+              Write Clinical Review
             </h3>
-            <span style={{ fontSize: '0.8125rem', color: '#6e7977', display: 'block', marginBottom: '1.25rem' }}>
-              Reviewing: <strong>{productName}</strong>
-            </span>
+            <p style={{ fontSize: '0.8125rem', color: '#6e7977', marginBottom: '1.5rem' }}>
+              Share your feedback on {productName} for other recovering patients and caregivers.
+            </p>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 4 }}>
                   Overall Rating
                 </label>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
+                  {[1, 2, 3, 4, 5].map((s) => (
                     <button
-                      key={star}
+                      key={s}
                       type="button"
-                      onClick={() => setRating(star)}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: 2,
-                      }}
+                      onClick={() => setRating(s)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}
                     >
-                      <Star
-                        size={24}
-                        fill={star <= rating ? '#b94200' : 'none'}
-                        color={star <= rating ? '#b94200' : '#dae2fd'}
-                      />
+                      <Star size={24} fill={s <= rating ? '#ea580c' : 'none'} color="#ea580c" />
                     </button>
                   ))}
                 </div>
@@ -336,15 +376,21 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 4 }}>
-                  Your Name / Caregiver Title
+                  Your Name
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Priya Nair (Caregiver)"
+                  placeholder="e.g. Dr. Rajesh or Caregiver Anita"
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #dae2fd' }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1.5px solid #bdc9c6',
+                    fontSize: '0.875rem',
+                  }}
                 />
               </div>
 
@@ -354,10 +400,16 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                 </label>
                 <input
                   type="text"
-                  required
+                  placeholder="e.g. Bengaluru, Delhi NCR, Mumbai"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #dae2fd' }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1.5px solid #bdc9c6',
+                    fontSize: '0.875rem',
+                  }}
                 />
               </div>
 
@@ -368,10 +420,16 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Excellent quiet performance, easy return pickup"
+                  placeholder="e.g. Excellent quiet operation and smooth home setup"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #dae2fd' }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1.5px solid #bdc9c6',
+                    fontSize: '0.875rem',
+                  }}
                 />
               </div>
 
@@ -380,27 +438,33 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                   Detailed Experience
                 </label>
                 <textarea
-                  rows={3}
                   required
-                  placeholder="How was the equipment sterilization, sound level, and delivery experience?"
+                  rows={4}
+                  placeholder="Describe sterilization quality, technician assistance, comfort, and device effectiveness..."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #dae2fd', fontFamily: 'inherit' }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1.5px solid #bdc9c6',
+                    fontSize: '0.875rem',
+                    resize: 'vertical',
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
                   style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: 10,
-                    background: '#f2f3ff',
-                    color: '#3e4947',
-                    border: 'none',
-                    fontWeight: 700,
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    border: '1px solid #cbd5e1',
+                    background: '#f8fafc',
+                    color: '#475569',
+                    fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
@@ -409,13 +473,12 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                 <button
                   type="submit"
                   style={{
-                    flex: 2,
-                    padding: '12px',
-                    borderRadius: 10,
+                    padding: '8px 20px',
+                    borderRadius: 8,
+                    border: 'none',
                     background: '#005c55',
                     color: '#ffffff',
-                    border: 'none',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     cursor: 'pointer',
                   }}
                 >

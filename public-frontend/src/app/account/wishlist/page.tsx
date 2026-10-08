@@ -255,7 +255,7 @@ export default function AccountWishlistPage() {
                 {/* Product Image & Badges */}
                 <div style={{ position: 'relative', background: '#f8f9ff', height: 180 }}>
                   <img
-                    src={item.image}
+                    src={item.image || '/images/oxygen_concentrator.png'}
                     alt={item.title}
                     style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '1rem' }}
                   />

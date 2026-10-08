@@ -23,6 +23,7 @@ export interface ProductTranslation {
 
 export interface Product {
   id: string;
+  uuid?: string;
   name: string; // Base English name
   slug: string;
   sku: string;
@@ -126,3 +127,41 @@ export class ProductEntity {
     };
   }
 }
+
+export function mapRawProductToEntity(p: any): Product {
+  const productImages: string[] = Array.isArray(p.images) && p.images.length > 0
+    ? p.images.filter(Boolean)
+    : [];
+  const primaryImg = productImages[0] || '';
+
+  return {
+    id: String(p.id),
+    uuid: p.uuid,
+    name: p.name || '',
+    slug: p.slug,
+    sku: p.sku || '',
+    brand: p.brand || '',
+    categoryId: p.category_id ? String(p.category_id) : '',
+    categoryName: p.category?.name || '',
+    description: p.description || '',
+    primaryImage: primaryImg,
+    images: productImages,
+    buyPrice: parseFloat(p.buy_price) || 0,
+    mrp: parseFloat(p.buy_mrp) || 0,
+    stock: Number(p.stock_quantity) || 0,
+    isAvailableForBuy: Boolean(p.buy_available),
+    isAvailableForRent: Boolean(p.rent_available),
+    rentalDailyRate: parseFloat(p.rent_price_daily) || 0,
+    rentalWeeklyRate: parseFloat(p.rent_price_weekly) || 0,
+    rentalMonthlyRate: parseFloat(p.rent_price_monthly) || 0,
+    rentalSecurityDeposit: parseFloat(p.rent_deposit) || 0,
+    rentalMinDays: Number(p.rent_min_period_days) || 1,
+    specifications: Array.isArray(p.specifications) ? p.specifications : [],
+    warrantyInfo: p.warranty_info || '',
+    conditionTags: Array.isArray(p.tags) ? p.tags.map((t: any) => t.name || t) : [],
+    rating: Number(p.rating) || 0,
+    reviewsCount: Number(p.reviews_count) || 0,
+    translations: p.translations || undefined,
+  };
+}
+

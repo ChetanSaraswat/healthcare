@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
   PackageCheck,
@@ -19,12 +19,22 @@ import {
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { updateRentalStatus } from '@/features/rentals/rentals.slice';
+import { listOrders } from '@/features/orders/list-orders/list-orders.action';
+import { listRentals } from '@/features/rentals/list-rentals/list-rentals.action';
+import { listProducts } from '@/features/products/list-products/list-products.action';
+import { axiosInterceptorInstanceClient } from '@/config/axios';
 
 export default function AdminDashboardPage() {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.products);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const orders = useAppSelector((state) => state.orders.orders);
+
+  useEffect(() => {
+    dispatch(listOrders());
+    dispatch(listRentals());
+    dispatch(listProducts());
+  }, [dispatch]);
 
   // Statistics
   const totalProducts = products.length;
@@ -35,8 +45,13 @@ export default function AdminDashboardPage() {
     .filter((r) => r.status === 'active' || r.status === 'confirmed')
     .reduce((sum, r) => sum + (r.totalDeposit || 0), 0);
 
-  const handleQuickStatusUpdate = (rentalId: string, newStatus: 'confirmed' | 'active') => {
-    dispatch(updateRentalStatus({ id: rentalId, status: newStatus }));
+  const handleQuickStatusUpdate = async (rentalId: string, newStatus: 'confirmed' | 'active') => {
+    try {
+      await axiosInterceptorInstanceClient.patch(`/rentals/${rentalId}/status`, { status: newStatus });
+      dispatch(updateRentalStatus({ id: rentalId, status: newStatus }));
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err?.message || 'Failed to update rental status in database');
+    }
   };
 
   return (
@@ -476,8 +491,7 @@ export default function AdminDashboardPage() {
                 <span>New Product</span>
               </Link>
               <Link
-                href="/hubs"
-                target="_blank"
+                href="/admin/products"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -493,7 +507,7 @@ export default function AdminDashboardPage() {
                 }}
               >
                 <ExternalLink size={15} />
-                <span>View Hubs Map</span>
+                <span>View Catalog</span>
               </Link>
             </div>
           </div>

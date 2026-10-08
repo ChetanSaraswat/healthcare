@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('crypto');
 const { email } = require('../libs');
 
 class EmailController {
@@ -40,7 +41,7 @@ class EmailController {
               pincode: '560103',
             },
             paymentMethod: 'Online Payment (Razorpay)',
-            transactionId: 'pay_test_' + Date.now(),
+            transactionId: crypto.randomUUID(),
           });
           break;
 
@@ -66,7 +67,7 @@ class EmailController {
               state: 'Karnataka',
               pincode: '560103',
             },
-            transactionId: 'pay_test_' + Date.now(),
+            transactionId: crypto.randomUUID(),
           });
           break;
 

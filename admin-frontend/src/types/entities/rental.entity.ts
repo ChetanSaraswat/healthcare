@@ -10,6 +10,7 @@ export interface RentalItem {
   productName: string;
   productImage: string;
   dailyRate: number;
+  effectiveDailyRate?: number;
   durationDays: number;
   securityDeposit: number;
   rentalCost: number;

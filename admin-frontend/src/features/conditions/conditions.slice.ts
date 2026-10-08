@@ -2,7 +2,7 @@ import { createAppSlice } from '@/store/create-app-slice';
 import { Condition } from '@/domain/entities/condition.entity';
 import { listConditions } from './list-conditions/list-conditions.action';
 import { getCondition } from './get-condition/get-condition.action';
-import { INITIAL_MOCK_CONDITIONS } from './list-conditions/list-conditions.service';
+import { STATIC_LEARN_CONDITIONS } from '@/content/learn/conditions';
 
 export interface ConditionsState {
   conditions: Condition[];
@@ -12,7 +12,7 @@ export interface ConditionsState {
 }
 
 const initialState: ConditionsState = {
-  conditions: INITIAL_MOCK_CONDITIONS,
+  conditions: STATIC_LEARN_CONDITIONS,
   selectedCondition: null,
   loading: false,
   error: null,

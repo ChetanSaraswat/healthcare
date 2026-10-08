@@ -50,7 +50,7 @@ export type RootState = ReturnType<typeof rootReducer>;
 const persistConfig = {
   key: 'aarogyamed_root',
   storage,
-  whitelist: ['cart', 'auth', 'ui', 'user', 'wishlist'],
+  whitelist: ['cart', 'auth', 'user', 'wishlist'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

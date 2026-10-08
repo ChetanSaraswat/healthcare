@@ -71,7 +71,7 @@ class OrderExpirationWorker {
 
         for (const payment of pendingPayments) {
           const recon = await paymentService.reconcilePaymentAttempt(payment, { transaction });
-          if (recon.reconciled && recon.status === 'captured') {
+          if (recon.reconciled && recon.status === 'captured' && !recon.latePaymentCancelled) {
             paymentWasCapturedAtGateway = true;
             console.info(`[OrderExpirationWorker] Order #${lockedOrder.id} saved by active reconciliation. Razorpay confirmed capture.`);
             break;

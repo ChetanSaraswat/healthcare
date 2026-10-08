@@ -1,21 +1,9 @@
-import { axiosInterceptorInstanceClient } from '@/config/axios';
-import { Condition } from '@/domain/entities/condition.entity';
 import { GetConditionResponse } from './get-condition.interface';
-import { INITIAL_MOCK_CONDITIONS } from '../list-conditions/list-conditions.service';
+import { getStaticConditionBySlug } from '@/content/learn/conditions';
 
+// Clinical Learn conditions are intentional, permanent frontend static content per Requirement 4 & 5
 export const getConditionService = async (slug: string): Promise<GetConditionResponse> => {
-  try {
-    const response = await axiosInterceptorInstanceClient.get(`/conditions/${slug}`);
-    if (response.data && response.data.data) {
-      return response.data;
-    }
-  } catch (err) {
-    // Fallback to local
-  }
-
-  const found = INITIAL_MOCK_CONDITIONS.find(
-    (c) => c.slug === slug || c.tag === slug || c.id === slug
-  );
+  const found = getStaticConditionBySlug(slug);
 
   if (found) {
     return {

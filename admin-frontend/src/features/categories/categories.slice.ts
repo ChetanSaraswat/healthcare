@@ -1,8 +1,6 @@
 import { createAppSlice } from '@/store/create-app-slice';
 import { Category } from '@/domain/entities/category.entity';
 import { listCategories } from './list-categories/list-categories.action';
-import { INITIAL_MOCK_CATEGORIES } from './list-categories/list-categories.service';
-
 export interface CategoriesState {
   categories: Category[];
   selectedCategory: Category | null;
@@ -11,7 +9,7 @@ export interface CategoriesState {
 }
 
 const initialState: CategoriesState = {
-  categories: INITIAL_MOCK_CATEGORIES,
+  categories: [],
   selectedCategory: null,
   loading: false,
   error: null,

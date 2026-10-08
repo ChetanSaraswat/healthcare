@@ -4,7 +4,6 @@ import { getAddresses } from './get-addresses/get-addresses.action';
 import { addAddress } from './add-address/add-address.action';
 import { updateAddress } from './update-address/update-address.action';
 import { deleteAddress } from './delete-address/delete-address.action';
-import { INITIAL_MOCK_ADDRESSES } from './get-addresses/get-addresses.service';
 
 export interface UserState {
   addresses: Address[];
@@ -15,8 +14,8 @@ export interface UserState {
 }
 
 const initialState: UserState = {
-  addresses: INITIAL_MOCK_ADDRESSES,
-  selectedAddress: INITIAL_MOCK_ADDRESSES[0] || null,
+  addresses: [],
+  selectedAddress: null,
   loading: false,
   submitting: false,
   error: null,

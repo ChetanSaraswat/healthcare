@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useTranslation } from '@/locales';
 import { addToCart } from '@/features/cart/cart.slice';
+import { listOrders } from '@/features/orders/list-orders/list-orders.action';
 import { OrderEntity, OrderStatus } from '@/domain/entities/order.entity';
 import { ClinicalInvoiceModal } from '@/components/invoice/ClinicalInvoiceModal';
 import {
@@ -23,8 +24,13 @@ export default function AccountOrdersPage() {
   const { t, locale } = useTranslation();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.orders.orders);
+  const loading = useAppSelector((state) => state.orders.loading);
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<any | null>(null);
+
+  useEffect(() => {
+    dispatch(listOrders());
+  }, [dispatch]);
 
   const handleReorder = (item: any) => {
     dispatch(
@@ -87,7 +93,26 @@ export default function AccountOrdersPage() {
       </div>
 
       {/* Orders List */}
-      {orders.length === 0 ? (
+      {loading && orders.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                background: '#ffffff',
+                borderRadius: 16,
+                border: '1px solid #dae2fd',
+                padding: '2rem',
+                minHeight: 120,
+                opacity: 0.6,
+              }}
+            >
+              <div style={{ height: 20, width: '30%', background: '#e0e5eb', borderRadius: 4, marginBottom: 12 }} />
+              <div style={{ height: 16, width: '60%', background: '#edf0f5', borderRadius: 4 }} />
+            </div>
+          ))}
+        </div>
+      ) : orders.length === 0 ? (
         <div
           style={{
             background: '#ffffff',
@@ -218,7 +243,7 @@ export default function AccountOrdersPage() {
                       }}
                     >
                       <img
-                        src={item.productImage}
+                        src={item.productImage || '/images/oxygen_concentrator.png'}
                         alt={item.productName}
                         style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }}
                       />

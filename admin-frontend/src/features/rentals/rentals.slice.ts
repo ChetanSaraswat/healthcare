@@ -4,7 +4,7 @@ import { listRentals } from './list-rentals/list-rentals.action';
 import { requestRental } from './request-rental/request-rental.action';
 import { extendRental } from './extend-rental/extend-rental.action';
 import { scheduleReturn } from './schedule-return/schedule-return.action';
-import { INITIAL_MOCK_RENTALS } from './list-rentals/list-rentals.service';
+import { updateRentalStatusAction } from './update-rental-status/update-rental-status.action';
 
 export interface RentalsState {
   rentals: RentalOrder[];
@@ -16,7 +16,7 @@ export interface RentalsState {
 }
 
 const initialState: RentalsState = {
-  rentals: INITIAL_MOCK_RENTALS,
+  rentals: [],
   selectedRental: null,
   latestPlacedRental: null,
   loading: false,
@@ -110,6 +110,27 @@ export const rentalsSlice = createAppSlice({
       .addCase(scheduleReturn.rejected, (state, action) => {
         state.submitting = false;
         state.error = action.payload || 'Failed to schedule return';
+      })
+      // updateRentalStatusAction
+      .addCase(updateRentalStatusAction.pending, (state) => {
+        state.submitting = true;
+        state.error = null;
+      })
+      .addCase(updateRentalStatusAction.fulfilled, (state, action) => {
+        state.submitting = false;
+        const rentalId = action.meta.arg.rentalId;
+        const newStatus = action.meta.arg.status;
+        const target = state.rentals.find((r) => r.id === rentalId);
+        if (target) {
+          target.status = newStatus;
+        }
+        if (state.selectedRental && state.selectedRental.id === rentalId) {
+          state.selectedRental.status = newStatus;
+        }
+      })
+      .addCase(updateRentalStatusAction.rejected, (state, action) => {
+        state.submitting = false;
+        state.error = action.payload || 'Failed to update rental status';
       });
   },
 });

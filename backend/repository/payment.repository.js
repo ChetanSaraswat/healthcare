@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const BaseRepository = require('./base.repository');
 const { Payment, Order, RentalOrder, User } = require('../models');
 
@@ -76,14 +76,40 @@ class PaymentRepository extends BaseRepository {
   }
 
   async findPaymentDetails(id, options = {}) {
-    return await this.findByPk(id, {
-      include: [
-        { model: Order, as: 'order' },
-        { model: RentalOrder, as: 'rentalOrder' },
-        { model: User, as: 'user', attributes: ['id', 'email', 'name', 'phone'] },
-      ],
-      ...options,
-    });
+    if (!id) return null;
+
+    const include = [
+      { model: Order, as: 'order' },
+      { model: RentalOrder, as: 'rentalOrder' },
+      { model: User, as: 'user', attributes: ['id', 'email', 'name', 'phone'] },
+    ];
+
+    let payment = null;
+    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
+      payment = await this.findByPk(Number(id), { include, ...options });
+    } else if (typeof id === 'string') {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      if (isUuid) {
+        payment = await this.findByPk(id, { include, ...options });
+      }
+      if (!payment) {
+        payment = await this.model.findOne({
+          where: {
+            [Op.or]: [
+              { gateway_order_id: id },
+              { gateway_payment_id: id },
+              Sequelize.where(
+                Sequelize.cast(Sequelize.json("notes.browser_payment_id"), 'text'),
+                id
+              ),
+            ],
+          },
+          include,
+          ...options,
+        });
+      }
+    }
+    return payment;
   }
 
   async countAttemptsByOrderId(orderId, options = {}) {
@@ -105,6 +131,49 @@ class PaymentRepository extends BaseRepository {
   async findByGatewayIdempotencyKey(gatewayIdempotencyKey, options = {}) {
     if (!gatewayIdempotencyKey) return null;
     return await this.findOneInstance({ gateway_idempotency_key: gatewayIdempotencyKey }, [], options);
+  }
+
+  async lockForUpdate(id, options = {}) {
+    if (!id) return null;
+    return await this.model.findByPk(id, {
+      ...options,
+      lock: options.transaction ? (options.transaction.LOCK ? options.transaction.LOCK.UPDATE : true) : undefined,
+    });
+  }
+
+  async findByGatewayOrderIdForUpdate(gatewayOrderId, options = {}) {
+    if (!gatewayOrderId) return null;
+    return await this.model.findOne({
+      where: { gateway_order_id: gatewayOrderId },
+      ...options,
+      lock: options.transaction ? (options.transaction.LOCK ? options.transaction.LOCK.UPDATE : true) : undefined,
+    });
+  }
+
+  async markCaptured(id, updateData = {}, options = {}) {
+    return await this.model.update(
+      {
+        status: 'captured',
+        ...updateData,
+      },
+      {
+        where: { id },
+        ...options,
+      }
+    );
+  }
+
+  async markFailed(id, updateData = {}, options = {}) {
+    return await this.model.update(
+      {
+        status: 'failed',
+        ...updateData,
+      },
+      {
+        where: { id },
+        ...options,
+      }
+    );
   }
 }
 

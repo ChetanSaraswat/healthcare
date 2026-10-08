@@ -18,9 +18,9 @@ import {
   IndianRupee,
   Activity,
 } from 'lucide-react';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart } from '@/features/cart/cart.slice';
-import { INITIAL_MOCK_PRODUCTS } from '@/features/products/list-products/list-products.service';
+import { listProducts } from '@/features/products/list-products/list-products.action';
 
 interface QuestionOption {
   id: string;
@@ -34,6 +34,15 @@ interface QuestionOption {
 export default function AssessmentPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const products = useAppSelector((state) => state.products.products);
+  const productsLoading = useAppSelector((state) => state.products.loading);
+
+  React.useEffect(() => {
+    if (products.length === 0) {
+      dispatch(listProducts());
+    }
+  }, [dispatch, products.length]);
+
   const [currentStep, setCurrentStep] = useState<number>(1);
 
   // User selections
@@ -41,13 +50,14 @@ export default function AssessmentPage() {
   const [mobility, setMobility] = useState<string>('bedbound');
   const [duration, setDuration] = useState<string>('short');
 
-  // Recommendation logic
+  // Recommendation logic based on live products
   const getRecommendation = () => {
+    let matchedProduct = null;
     if (condition === 'sleep') {
-      const product = INITIAL_MOCK_PRODUCTS.find((p) => p.slug.includes('cpap')) || INITIAL_MOCK_PRODUCTS[0];
+      matchedProduct = products.find((p) => p.slug.includes('cpap') || p.name.toLowerCase().includes('cpap')) || products[0] || null;
       const isShort = duration === 'short' || duration === 'medium';
       return {
-        product,
+        product: matchedProduct,
         mode: isShort ? ('rent' as const) : ('buy' as const),
         days: duration === 'short' ? 15 : 30,
         rationale:
@@ -57,10 +67,10 @@ export default function AssessmentPage() {
         rentSavings: '₹48,500 upfront savings with refundable deposit',
       };
     } else if (condition === 'oxygen') {
-      const product = INITIAL_MOCK_PRODUCTS.find((p) => p.slug.includes('oxygen')) || INITIAL_MOCK_PRODUCTS[1];
+      matchedProduct = products.find((p) => p.slug.includes('oxygen') || p.name.toLowerCase().includes('oxygen')) || products[1] || products[0] || null;
       const isShort = duration === 'short';
       return {
-        product,
+        product: matchedProduct,
         mode: isShort ? ('rent' as const) : ('buy' as const),
         days: 30,
         rationale:
@@ -68,10 +78,10 @@ export default function AssessmentPage() {
         rentSavings: '₹62,000 capital conserved during recovery phase',
       };
     } else if (condition === 'icu-bed') {
-      const product = INITIAL_MOCK_PRODUCTS.find((p) => p.slug.includes('hospital-bed')) || INITIAL_MOCK_PRODUCTS[2];
+      matchedProduct = products.find((p) => p.slug.includes('bed') || p.name.toLowerCase().includes('bed')) || products[2] || products[0] || null;
       const isShort = duration !== 'long';
       return {
-        product,
+        product: matchedProduct,
         mode: isShort ? ('rent' as const) : ('buy' as const),
         days: duration === 'short' ? 15 : 30,
         rationale:
@@ -79,9 +89,9 @@ export default function AssessmentPage() {
         rentSavings: '₹75,000 saved vs purchasing hospital infrastructure',
       };
     } else {
-      const product = INITIAL_MOCK_PRODUCTS.find((p) => p.slug.includes('wheelchair')) || INITIAL_MOCK_PRODUCTS[3];
+      matchedProduct = products.find((p) => p.slug.includes('wheelchair') || p.name.toLowerCase().includes('wheelchair')) || products[3] || products[0] || null;
       return {
-        product,
+        product: matchedProduct,
         mode: duration === 'short' ? ('rent' as const) : ('buy' as const),
         days: 15,
         rationale:
@@ -94,6 +104,7 @@ export default function AssessmentPage() {
   const rec = getRecommendation();
 
   const handleAddToCart = () => {
+    if (!rec.product) return;
     if (rec.mode === 'buy') {
       dispatch(
         addToCart({
@@ -448,6 +459,21 @@ export default function AssessmentPage() {
 
           {/* STEP 4: Clinical Recommendation Engine Output */}
           {currentStep === 4 && (
+            !rec.product ? (
+              <div
+                style={{
+                  background: '#ffffff',
+                  borderRadius: 20,
+                  padding: '3rem',
+                  textAlign: 'center',
+                  border: '1px solid #dae2fd',
+                }}
+              >
+                <p style={{ color: '#6e7977', fontSize: '1rem' }}>
+                  Synchronizing recommended medical equipment from live catalog...
+                </p>
+              </div>
+            ) : (
             <div
               style={{
                 background: '#ffffff',
@@ -586,7 +612,7 @@ export default function AssessmentPage() {
                 </button>
               </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
   );

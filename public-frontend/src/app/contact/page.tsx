@@ -56,7 +56,7 @@ export default function ContactPage() {
               We Are Here to Support Your Family
             </h1>
             <p style={{ fontSize: '1rem', color: '#6e7977', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>
-              Whether you need rapid 4-hour emergency hospital bed dispatch, CPAP calibration assistance, or wish to schedule a physical demo trial at our experience centers.
+              Whether you need rapid 4-hour emergency hospital bed dispatch, CPAP titration and pressure calibration assistance, or post-operative home care guidance.
             </p>
           </div>
 
@@ -155,7 +155,7 @@ export default function ContactPage() {
                 </a>
               </div>
 
-              {/* Experience Centers Card */}
+              {/* Delivery & Dispatch SLA Card */}
               <div
                 style={{
                   background: '#ffffff',
@@ -165,16 +165,16 @@ export default function ContactPage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <MapPin size={20} color="#006398" />
+                  <Truck size={20} color="#006398" />
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
-                    Experience Studios Across 40+ Metros
+                    Pan-India Home Delivery &amp; Setup
                   </h3>
                 </div>
                 <p style={{ fontSize: '0.8125rem', color: '#6e7977', margin: '0 0 12px', lineHeight: 1.5 }}>
-                  Visit our physical biomedical studios in Bengaluru, Delhi NCR, and Mumbai to evaluate equipment in person.
+                  Doorstep delivery and certified technician installation across all serviceable pincodes in India.
                 </p>
                 <Link
-                  href="/hubs"
+                  href="/shop"
                   style={{
                     fontSize: '0.8125rem',
                     fontWeight: 700,
@@ -182,7 +182,7 @@ export default function ContactPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  Find Nearby Studio Location &rarr;
+                  Browse Medical Equipment Catalog &rarr;
                 </Link>
               </div>
             </div>

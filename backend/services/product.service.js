@@ -1,15 +1,10 @@
 const { productRepository } = require('../repository');
 const { NotFound, Conflict } = require('../libs/error');
+const { slugify } = require('../libs/utils');
 
 class ProductService {
   slugify(text) {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '')
-      .replace(/--+/g, '-');
+    return slugify(text);
   }
 
   resolveLocalized(plainProduct, locale = 'en') {

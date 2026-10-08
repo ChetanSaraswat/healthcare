@@ -11,7 +11,7 @@ export const PincodeChecker: React.FC = () => {
   const isServiceable = useAppSelector((state) => state.cart.isPincodeServiceable);
   const serviceableCity = useAppSelector((state) => state.cart.serviceableCity);
 
-  const [inputVal, setInputVal] = useState(currentPincode || '110001');
+  const [inputVal, setInputVal] = useState(currentPincode || '');
 
   const handleCheck = (e: React.FormEvent) => {
     e.preventDefault();

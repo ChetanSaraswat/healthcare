@@ -80,23 +80,74 @@ export function extractApiErrorMessage(error: any, fallback = 'An unexpected err
   return fallback;
 }
 
+let lastErrorToast = {
+  message: '',
+  timestamp: 0,
+};
+
+function triggerErrorSnackbar(message: string) {
+  if (typeof window === 'undefined') return;
+  const now = Date.now();
+  if (lastErrorToast.message === message && now - lastErrorToast.timestamp < 1500) {
+    return; // Deduplicate repeated snackbars
+  }
+  lastErrorToast = { message, timestamp: now };
+  
+  window.dispatchEvent(
+    new CustomEvent('aarogyamed:toast', {
+      detail: { type: 'error', message, duration: 4500 },
+    })
+  );
+}
+
 axiosInterceptorInstanceClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const extractedMessage = extractApiErrorMessage(error);
-    if (extractedMessage) {
-      error.message = extractedMessage;
-    }
+    const status = error.response?.status;
+    const url = error.config?.url || '';
+    const isSilentCheck = url.includes('/auth/me') && status === 401;
 
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      const url = error.config?.url || '';
-      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
+    let userFacingMessage = extractApiErrorMessage(error, '');
+
+    if (status === 400 && !userFacingMessage) {
+      userFacingMessage = 'Invalid request parameters. Please verify the entered data.';
+    } else if (status === 401) {
+      if (typeof window !== 'undefined' && !url.includes('/auth/login') && !url.includes('/auth/register')) {
         localStorage.removeItem('aarogyamed_auth_token');
       }
+      if (!isSilentCheck && !userFacingMessage) {
+        userFacingMessage = 'Your session has expired or credentials are invalid. Please sign in.';
+      }
+    } else if (status === 403) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'Access denied. You do not have permission to perform this clinical action.';
+      }
+    } else if (status === 404) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'The requested medical resource or record was not found.';
+      }
+    } else if (status === 409) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'A conflicting record already exists in the system.';
+      }
+    } else if (status === 422) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'Validation failed. Please verify required fields and formats.';
+      }
+    } else if (status === 429) {
+      userFacingMessage = 'Too many requests. Please wait a moment before trying again.';
+    } else if (status && status >= 500) {
+      userFacingMessage = 'Clinical service encountered an unexpected error. Our biomedical team has been notified.';
+    } else if (!error.response && (error.message === 'Network Error' || error.code === 'ERR_NETWORK')) {
+      userFacingMessage = 'Unable to connect to AarogyaMed clinical server. Please check your network connection.';
     }
 
-    if (error.response?.status === 403) {
-      console.warn('[AarogyaMed Client] 403 Forbidden:', extractedMessage);
+    if (!isSilentCheck && userFacingMessage) {
+      triggerErrorSnackbar(userFacingMessage);
+    }
+
+    if (userFacingMessage) {
+      error.message = userFacingMessage;
     }
 
     return Promise.reject(error);

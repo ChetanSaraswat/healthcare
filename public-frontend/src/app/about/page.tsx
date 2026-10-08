@@ -46,13 +46,13 @@ export default function AboutPage() {
             </h1>
             <p className={styles.heroSubtitle}>
               {locale === 'hi'
-                ? 'भारत का प्रमुख प्रमाणित चिकित्सा उपकरण मंच। अस्पताल-ग्रेड परिशुद्धता, पारदर्शी रेंटल मूल्य निर्धारण, और 40,000+ परिवारों के लिए समर्पित क्लिनिकल सहायता।'
-                : "India's premier certified medical equipment ecosystem. Hospital-grade precision, transparent rental ethics, and round-the-clock biomedical engineering support for over 40,000 recovering families."}
+                ? 'भारत का प्रमुख प्रमाणित चिकित्सा उपकरण मंच। अस्पताल-ग्रेड परिशुद्धता, पारदर्शी रेंटल मूल्य निर्धारण, और 40+ परिवारों के लिए समर्पित क्लिनिकल सहायता।'
+                : "India's premier certified medical equipment ecosystem. Hospital-grade precision, transparent rental ethics, and round-the-clock biomedical engineering support for over 40 recovering families."}
             </p>
 
             <div className={styles.metricsGrid}>
               <div className={styles.metricCard}>
-                <div className={styles.metricNum}>40,000+</div>
+                <div className={styles.metricNum}>40+</div>
                 <div className={styles.metricLabel}>
                   {locale === 'hi' ? 'समर्थित परिवार' : 'Families Supported'}
                 </div>
@@ -123,7 +123,7 @@ export default function AboutPage() {
                   "A patient recovering at home deserves equipment as sterile and reliable as the finest tertiary ICU in the country. That is the non-negotiable benchmark we uphold every day."
                 </p>
                 <div className={styles.author}>
-                  — Dr. Rajesh Verma, Chief Biomedical Director
+                  — AarogyaMed Biomedical Engineering Division
                 </div>
               </div>
             </div>
@@ -196,72 +196,26 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 4. Clinical Leadership */}
-      <section className={styles.leadershipSection}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <div className={styles.sectionPretitle}>
-              {locale === 'hi' ? 'क्लिनिकल सलाहकार एवं नेतृत्व' : 'Clinical & Biomedical Leadership'}
-            </div>
-            <h2 className={styles.sectionHeading}>
-              {locale === 'hi' ? 'चिकित्सा विशेषज्ञों द्वारा निर्देशित' : 'Guided by Medical & Engineering Specialists'}
-            </h2>
-            <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.6 }}>
-              Our operations are spearheaded by seasoned medical device engineers, geriatric clinicians, and patient advocacy leaders.
-            </p>
-          </div>
-
-          <div className={styles.teamGrid}>
-            <div className={styles.teamCard}>
-              <div className={styles.avatarCircle}>RV</div>
-              <h4>Dr. Rajesh Verma</h4>
-              <div className={styles.role}>Chief Biomedical Director &amp; Operations Lead</div>
-              <p className={styles.bio}>
-                Former Senior Biomedical Consultant at premier multi-specialty hospitals with 18+ years of expertise in ICU ventilation, clinical calibration, and medical device compliance.
-              </p>
-            </div>
-
-            <div className={styles.teamCard}>
-              <div className={styles.avatarCircle}>PN</div>
-              <h4>Dr. Priya Nambiar</h4>
-              <div className={styles.role}>Head of Clinical Hygiene &amp; Sterilization</div>
-              <p className={styles.bio}>
-                Infection Control Specialist certified in ISO 13485 quality management systems, supervising our proprietary 10-step sterilization and bacterial filtration protocol.
-              </p>
-            </div>
-
-            <div className={styles.teamCard}>
-              <div className={styles.avatarCircle}>SS</div>
-              <h4>Sunita Sharma</h4>
-              <div className={styles.role}>Patient &amp; Caregiver Advocacy Director</div>
-              <p className={styles.bio}>
-                Geriatric care coordinator with a passion for dignified patient home transitions, championing transparent rental agreements and empathetic caregiver guidance across India.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Experience Hubs & Emergency Callout */}
+      {/* 4. Clinical Helpline & Assessment Callout */}
       <section className={styles.container}>
         <div className={styles.hubsCallout}>
           <div className={styles.hubsText}>
             <h3>
               {locale === 'hi'
-                ? 'अपने शहर में हमारे अनुभव केंद्र पर आएं'
-                : 'Experience Hospital-Grade Machinery in Person'}
+                ? 'क्लिनिकल मार्गदर्शन और तत्काल सहायता'
+                : 'Need Biomedical Guidance or Equipment Advice?'}
             </h3>
             <p>
               {locale === 'hi'
-                ? 'बेंगलुरु, दिल्ली एनसीआर, मुंबई, हैदराबाद, चेन्नई, कोलकाता और पुणे में हमारे केंद्रों पर लाइव डेमो देखें और विशेषज्ञ तकनीशियनों से परामर्श लें।'
-                : 'Visit an AarogyaMed Experience Center across 40+ Indian cities to trial ICU motorized beds, test CPAP mask seals, and evaluate oxygen purity before bringing equipment home.'}
+                ? 'हमारे बायोमेडिकल विशेषज्ञ और क्लिनिकल सलाहकार उचित उपकरण चयन, वारंटी विवरण और तत्काल डिलीवरी समन्वय में आपकी सहायता के लिए 24/7 उपलब्ध हैं।'
+                : 'Our certified biomedical technicians and clinical care specialists are available 24/7 to guide you through equipment sizing, doctor prescriptions, and doorstep deployment.'}
             </p>
           </div>
 
           <div className={styles.hubsActions}>
-            <Link href="/hubs" className={styles.btnHubs}>
-              <MapPin size={18} />
-              <span>{locale === 'hi' ? 'निकटतम केंद्र खोजें' : 'Locate Experience Hub'}</span>
+            <Link href="/contact" className={styles.btnHubs}>
+              <PhoneCall size={18} />
+              <span>{locale === 'hi' ? '24/7 क्लिनिकल हेल्पलाइन' : 'Contact Clinical Team'}</span>
             </Link>
             <Link href="/assessment" className={styles.btnContact}>
               <HeartPulse size={18} />

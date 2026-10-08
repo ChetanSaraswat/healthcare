@@ -1,13 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   removeFromCart,
   updateQuantity,
-  updateRentalDuration,
 } from '@/features/cart/cart.slice';
 import { addItem } from '@/features/wishlist/wishlist.slice';
 import { RentalPricingCalculator } from '@/domain/services/rental-pricing.calculator';
@@ -29,7 +28,66 @@ export const MixedCartView: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
+  const [isMounted, setIsMounted] = useState(false);
   const { items, pricing } = useAppSelector((state) => state.cart);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Hydration state / skeleton loader prevents hydration mismatch and empty cart blink
+  if (!isMounted) {
+    return (
+      <div className={styles.cartContainer} style={{ padding: '3.5rem 1.5rem', minHeight: '60vh' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div
+            style={{
+              height: 36,
+              width: 320,
+              background: '#e2e8f0',
+              borderRadius: 8,
+              marginBottom: 28,
+              animation: 'pulse 1.5s infinite',
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(320px, 1fr)', gap: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    height: 180,
+                    background: '#ffffff',
+                    borderRadius: 16,
+                    border: '1px solid #e2e8f0',
+                    padding: '1.5rem',
+                    display: 'flex',
+                    gap: 20,
+                  }}
+                >
+                  <div style={{ width: 120, height: 120, background: '#f1f5f9', borderRadius: 12 }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ height: 22, width: '70%', background: '#f1f5f9', borderRadius: 6 }} />
+                    <div style={{ height: 18, width: '40%', background: '#f1f5f9', borderRadius: 6 }} />
+                    <div style={{ height: 32, width: '50%', background: '#f1f5f9', borderRadius: 6, marginTop: 'auto' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                height: 380,
+                background: '#ffffff',
+                borderRadius: 20,
+                border: '1px solid #e2e8f0',
+                padding: '2rem',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const buyItems = items.filter((item) => item.type === 'buy');
   const rentItems = items.filter((item) => item.type === 'rent');
@@ -102,7 +160,7 @@ export const MixedCartView: React.FC = () => {
                 {buyItems.map((item) => (
                   <div key={item.id} className={styles.cartCard}>
                     <div className={styles.thumbBox}>
-                      <img src={item.image} alt={item.name} />
+                      <img src={item.image || '/images/oxygen_concentrator.png'} alt={item.name} />
                     </div>
 
                     <div className={styles.cardDetails}>
@@ -114,12 +172,22 @@ export const MixedCartView: React.FC = () => {
                       </span>
 
                       <div className={styles.cardBottom}>
+                        {/* Quantity Controls - disabled minus button when qty === 1 */}
                         <div className={styles.qtyBox}>
                           <button
                             type="button"
-                            onClick={() =>
-                              dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }))
-                            }
+                            disabled={item.quantity <= 1}
+                            onClick={() => {
+                              if (item.quantity > 1) {
+                                dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
+                              }
+                            }}
+                            style={{
+                              opacity: item.quantity <= 1 ? 0.35 : 1,
+                              cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer',
+                            }}
+                            title={item.quantity <= 1 ? 'Cannot decrease below 1 (use Remove Item)' : 'Decrease quantity'}
+                            aria-label="Decrease quantity"
                           >
                             -
                           </button>
@@ -129,6 +197,7 @@ export const MixedCartView: React.FC = () => {
                             onClick={() =>
                               dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))
                             }
+                            aria-label="Increase quantity"
                           >
                             +
                           </button>
@@ -206,7 +275,7 @@ export const MixedCartView: React.FC = () => {
                   return (
                     <div key={item.id} className={styles.cartCard}>
                       <div className={styles.thumbBox}>
-                        <img src={item.image} alt={item.name} />
+                        <img src={item.image || '/images/oxygen_concentrator.png'} alt={item.name} />
                       </div>
 
                       <div className={styles.cardDetails}>
@@ -219,25 +288,14 @@ export const MixedCartView: React.FC = () => {
                             : 'Rental • 10-Step Autoclave & UV-C Sanitized'}
                         </span>
 
-                        {/* Rental Duration Selector */}
-                        <div className={styles.durationSelector}>
-                          <span className={styles.durationLabel}>{t.product.rentalPeriod}</span>
-                          {[7, 15, 30].map((days) => (
-                            <button
-                              key={days}
-                              type="button"
-                              className={`${styles.durationPill} ${
-                                item.rentalDays === days ? styles.activeDuration : ''
-                              }`}
-                              onClick={() =>
-                                dispatch(
-                                  updateRentalDuration({ id: item.id, durationDays: days })
-                                )
-                              }
-                            >
-                              {days} {t.product.days} {days === 30 ? (locale === 'hi' ? '(28% छूट)' : '(28% Off)') : ''}
-                            </button>
-                          ))}
+                        {/* Requested Rental Duration */}
+                        <div className={styles.requestedDurationBox}>
+                          <span className={styles.requestedDurationLabel}>
+                            {locale === 'hi' ? 'अनुरोधित अवधि:' : 'Requested Days:'}
+                          </span>
+                          <span className={styles.requestedDurationBadge}>
+                            {item.rentalDays} {locale === 'hi' ? 'दिन' : item.rentalDays === 1 ? 'Day' : 'Days'}
+                          </span>
                         </div>
 
                         {/* Deposit Callout */}
@@ -251,14 +309,24 @@ export const MixedCartView: React.FC = () => {
                         </div>
 
                         <div className={styles.cardBottom}>
+                          {/* Quantity Controls - disabled minus button when qty === 1 */}
                           <div className={styles.qtyBox}>
                             <button
                               type="button"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuantity({ id: item.id, quantity: item.quantity - 1 })
-                                )
-                              }
+                              disabled={item.quantity <= 1}
+                              onClick={() => {
+                                if (item.quantity > 1) {
+                                  dispatch(
+                                    updateQuantity({ id: item.id, quantity: item.quantity - 1 })
+                                  );
+                                }
+                              }}
+                              style={{
+                                opacity: item.quantity <= 1 ? 0.35 : 1,
+                                cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer',
+                              }}
+                              title={item.quantity <= 1 ? 'Cannot decrease below 1 (use Remove Item)' : 'Decrease quantity'}
+                              aria-label="Decrease rental quantity"
                             >
                               -
                             </button>
@@ -270,6 +338,7 @@ export const MixedCartView: React.FC = () => {
                                   updateQuantity({ id: item.id, quantity: item.quantity + 1 })
                                 )
                               }
+                              aria-label="Increase rental quantity"
                             >
                               +
                             </button>

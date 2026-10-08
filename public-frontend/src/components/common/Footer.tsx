@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useAppDispatch } from '@/store/hooks';
+import { showToast } from '@/features/ui/ui.slice';
 import styles from './Footer.module.scss';
 import {
   ShieldCheck,
@@ -13,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const dispatch = useAppDispatch();
   return (
     <footer className={styles.footerWrapper}>
       <div className={styles.container}>
@@ -74,13 +77,28 @@ export const Footer: React.FC = () => {
               India’s dedicated clinical medical equipment platform for families and caregivers.
               Providing equal access to hospital-grade equipment through verified purchase and flexible rental plans.
             </p>
-            <a href="tel:18008892273" className={styles.helplinePill}>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                  navigator.clipboard.writeText('1800-889-2273');
+                  dispatch(
+                    showToast({
+                      type: 'info',
+                      message: '📞 24/7 Caregiver Support Helpline (1800-889-2273) copied to clipboard!',
+                    })
+                  );
+                }
+              }}
+              className={styles.helplinePill}
+              style={{ border: 'none', cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
+            >
               <PhoneCall size={20} color="#9cf2e8" />
               <div>
                 <div className={styles.hlLabel}>24/7 Caregiver Support Helpline</div>
                 <div className={styles.hlNumber}>1800-889-2273 (Toll Free)</div>
               </div>
-            </a>
+            </button>
           </div>
 
           {/* Equipment Categories */}
@@ -116,10 +134,10 @@ export const Footer: React.FC = () => {
               <li><Link href="/account/rentals">Active Rentals Dashboard</Link></li>
               <li><Link href="/cart">Your Healthcare Cart</Link></li>
               <li><Link href="/assessment">Equipment Assessment Tool</Link></li>
-              <li><Link href="/terms/rental">Refundable Deposit Policy</Link></li>
-              <li><Link href="/terms/warranty">10-Step Sterilization Protocol</Link></li>
-              <li><Link href="/hubs">Serviceable Hubs (40+ Cities)</Link></li>
-              <li><Link href="/contact">Caregiver Support / Contact</Link></li>
+              <li><Link href="/policies/rental-policy">Refundable Deposit SLA</Link></li>
+              <li><Link href="/policies/refund-policy">Cancellation &amp; Refund Policy</Link></li>
+              <li><Link href="/policies/terms">Terms &amp; Conditions</Link></li>
+              <li><Link href="/policies/privacy">Privacy &amp; Health Data Policy</Link></li>
             </ul>
           </div>
         </div>
@@ -130,9 +148,10 @@ export const Footer: React.FC = () => {
             &copy; {new Date().getFullYear()} AarogyaMed Healthcare Systems Pvt. Ltd. All rights reserved.
           </div>
           <div>
-            <Link href="/terms/privacy">Privacy Policy</Link>
-            <Link href="/terms/rental">Terms of Rental</Link>
-            <Link href="/terms/warranty">Biomedical Standards</Link>
+            <Link href="/policies/privacy">Privacy Policy</Link>
+            <Link href="/policies/terms">Terms of Service</Link>
+            <Link href="/policies/rental-policy">Rental Agreement</Link>
+            <Link href="/policies/refund-policy">Refund SLA</Link>
           </div>
         </div>
       </div>

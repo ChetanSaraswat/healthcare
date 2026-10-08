@@ -1,15 +1,10 @@
 const { categoryRepository } = require('../repository');
 const { NotFound, Conflict, BadRequest } = require('../libs/error');
+const { slugify } = require('../libs/utils');
 
 class CategoryService {
   slugify(text) {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '')
-      .replace(/--+/g, '-');
+    return slugify(text);
   }
 
   async getTree() {

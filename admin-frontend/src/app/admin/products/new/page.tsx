@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -13,15 +13,20 @@ import {
   IndianRupee,
   ShieldCheck,
   Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { LanguageTabs } from '@/components/admin/LanguageTabs';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addProduct } from '@/features/products/products.slice';
+import { listCategories } from '@/features/categories/list-categories/list-categories.action';
+import { axiosInterceptorInstanceClient } from '@/config/axios';
 import { Product } from '@/domain/entities/product.entity';
 
 export default function NewProductAdminPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const categories = useAppSelector((state) => state.categories.categories);
+  const [submitting, setSubmitting] = useState(false);
 
   // Active language tab in admin
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'hi'>('en');
@@ -29,7 +34,20 @@ export default function NewProductAdminPage() {
   // Base product fields (Language-agnostic)
   const [brand, setBrand] = useState('');
   const [slug, setSlug] = useState('');
-  const [categoryId, setCategoryId] = useState('cat-respiratory');
+  const [categoryId, setCategoryId] = useState('');
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      dispatch(listCategories());
+    }
+  }, [dispatch, categories.length]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !categoryId) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categories, categoryId]);
+
   const [buyPrice, setBuyPrice] = useState<number>(45000);
   const [rentDailyRate, setRentDailyRate] = useState<number>(350);
   const [securityDeposit, setSecurityDeposit] = useState<number>(10000);
@@ -90,7 +108,7 @@ export default function NewProductAdminPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameEn.trim()) {
       alert('Please enter a product name in English.');
@@ -109,55 +127,74 @@ export default function NewProductAdminPage() {
       .map((t) => t.trim())
       .filter(Boolean);
 
-    const newProd: Product = {
-      id: `prod-${Date.now()}`,
-      name: nameEn,
-      slug: generatedSlug,
-      sku: generatedSlug.toUpperCase(),
-      brand: brand || 'AarogyaMed Clinical',
-      categoryId,
-      description: descEn,
-      primaryImage: imageUrl,
-      images: [imageUrl],
-      buyPrice: Number(buyPrice),
-      mrp: Math.round(Number(buyPrice) * 1.15),
-      stock: Number(stock),
-      isAvailableForBuy: true,
-      isAvailableForRent: true,
-      rentalDailyRate: Number(rentDailyRate),
-      rentalMonthlyRate: Number(rentDailyRate) * 25,
-      rentalSecurityDeposit: Number(securityDeposit),
-      rentalMinDays: 7,
-      specifications: specsEn,
-      warrantyInfo: warrantyEn,
-      conditionTags: tags,
-      rating: 5.0,
-      reviewsCount: 1,
-      translations: {
-        en: {
-          locale: 'en',
-          name: nameEn,
-          description: descEn,
-          specifications: specsEn,
-          warrantyInfo: warrantyEn,
-        },
-        ...(hasHindiTranslation
-          ? {
-              hi: {
-                locale: 'hi',
-                name: nameHi,
-                description: descHi,
-                specifications: specsHi,
-                warrantyInfo: warrantyHi,
-              },
-            }
-          : {}),
-      },
-    };
+    setSubmitting(true);
+    try {
+      const selectedCat = categories.find((c) => c.id === categoryId || c.slug === categoryId);
+      const parsedCatId = Number(categoryId) || (selectedCat?.id ? Number(selectedCat.id) : 1);
+      const validCatId = !isNaN(parsedCatId) && parsedCatId > 0 ? parsedCatId : 1;
 
-    dispatch(addProduct(newProd));
-    alert('Equipment successfully added to the AarogyaMed medical catalog!');
-    router.push('/admin/products');
+      const backendPayload = {
+        name: nameEn,
+        slug: generatedSlug,
+        category_id: validCatId,
+        brand: brand || 'AarogyaMed Clinical',
+        description: descEn,
+        images: [imageUrl],
+        specifications: specsEn,
+        buy_price: Number(buyPrice),
+        buy_mrp: Math.round(Number(buyPrice) * 1.15),
+        buy_available: true,
+        rent_price_daily: Number(rentDailyRate),
+        rent_price_weekly: Number(rentDailyRate) * 6,
+        rent_price_monthly: Number(rentDailyRate) * 25,
+        rent_deposit: Number(securityDeposit),
+        rent_min_period_days: 1,
+        rent_available: true,
+        stock_quantity: Number(stock),
+        warranty_info: warrantyEn,
+        status: 'active',
+      };
+
+      const response = await axiosInterceptorInstanceClient.post('/products', backendPayload);
+      const saved = response.data?.data;
+
+      const newProd: Product = {
+        id: String(saved?.uuid || saved?.id || `prod-${Date.now()}`),
+        uuid: saved?.uuid,
+        name: nameEn,
+        slug: generatedSlug,
+        sku: generatedSlug.toUpperCase(),
+        brand: brand || 'AarogyaMed Clinical',
+        categoryId: String(validCatId),
+        categoryName: selectedCat?.name || 'Medical Equipment',
+        description: descEn,
+        primaryImage: imageUrl,
+        images: [imageUrl],
+        buyPrice: Number(buyPrice),
+        mrp: Math.round(Number(buyPrice) * 1.15),
+        stock: Number(stock),
+        isAvailableForBuy: true,
+        isAvailableForRent: true,
+        rentalDailyRate: Number(rentDailyRate),
+        rentalMonthlyRate: Number(rentDailyRate) * 25,
+        rentalSecurityDeposit: Number(securityDeposit),
+        rentalMinDays: 1,
+        specifications: specsEn,
+        warrantyInfo: warrantyEn,
+        conditionTags: tags,
+        rating: 5.0,
+        reviewsCount: 1,
+      };
+
+      dispatch(addProduct(newProd));
+      alert('Equipment successfully created and persisted to database!');
+      router.push('/admin/products');
+    } catch (err: any) {
+      console.error('[NewProductAdminPage] Submit error:', err);
+      alert(err?.response?.data?.message || err?.message || 'Failed to create product in backend database');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -435,9 +472,15 @@ export default function NewProductAdminPage() {
                     background: '#ffffff',
                   }}
                 >
-                  <option value="cat-respiratory">Respiratory Care</option>
-                  <option value="cat-mobility">Mobility Aids</option>
-                  <option value="cat-homecare">Home Care &amp; ICU Beds</option>
+                  {categories.length === 0 ? (
+                    <option value="">Loading categories...</option>
+                  ) : (
+                    categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
             </div>
@@ -577,25 +620,36 @@ export default function NewProductAdminPage() {
             <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #f2f3ff' }}>
               <button
                 type="submit"
+                disabled={submitting}
                 style={{
                   width: '100%',
                   padding: '14px',
                   borderRadius: 12,
-                  background: 'linear-gradient(135deg, #005c55 0%, #004b46 100%)',
+                  background: submitting ? '#94a3b8' : 'linear-gradient(135deg, #005c55 0%, #004b46 100%)',
                   color: '#ffffff',
                   fontSize: '0.9375rem',
                   fontWeight: 800,
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: submitting ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                  boxShadow: '0 4px 12px rgba(0,92,85,0.3)',
+                  boxShadow: submitting ? 'none' : '0 4px 12px rgba(0,92,85,0.3)',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <Save size={18} />
-                <span>Save Equipment to Catalog</span>
+                {submitting ? (
+                  <>
+                    <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span>Saving Equipment to Database...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={18} />
+                    <span>Save Equipment to Catalog</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

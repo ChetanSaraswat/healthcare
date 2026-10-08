@@ -12,19 +12,10 @@ export const verifyPaymentService = async (
     if (response.data && response.data.data) {
       return response.data;
     }
+    return response.data;
   } catch (err: any) {
-    console.warn('[verifyPaymentService] API signature verification fallback:', err?.message);
+    console.error('[verifyPaymentService] API signature verification error:', err?.message);
+    throw err;
   }
-
-  // Graceful fallback for offline / mock testing
-  return {
-    success: true,
-    data: {
-      verified: true,
-      paymentId: payload.razorpay_payment_id || `pay_${Date.now()}`,
-      orderId: payload.order_id || null,
-      rentalOrderId: payload.rental_order_id || null,
-      status: 'captured',
-    },
-  };
 };
+

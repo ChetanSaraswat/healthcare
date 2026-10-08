@@ -41,6 +41,13 @@ router.get(
   (req, res, next) => rentalController.getAllRentals(req, res, next)
 );
 
+router.get(
+  '/',
+  authenticate,
+  authorize('super_admin'),
+  (req, res, next) => rentalController.getAllRentals(req, res, next)
+);
+
 router.get('/:id', authenticate, (req, res, next) =>
   rentalController.getById(req, res, next)
 );

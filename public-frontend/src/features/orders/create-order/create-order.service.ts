@@ -4,59 +4,6 @@ import { CreateOrderPayload, CreateOrderResponse } from './create-order.interfac
 export const createOrderService = async (
   payload: CreateOrderPayload
 ): Promise<CreateOrderResponse> => {
-  try {
-    const response = await axiosInterceptorInstanceClient.post('/orders', payload);
-    if (response.data && response.data.data) {
-      return response.data;
-    }
-  } catch (err) {
-    // Fallback simulation
-  }
-
-  const orderId = `ORD-${Date.now().toString().slice(-6)}`;
-  const subtotal = payload.items.reduce(
-    (acc, i) => acc + (i.total_price || (i.unit_price || 0) * i.quantity),
-    0
-  );
-  const shippingFee = subtotal > 2000 ? 0 : 150;
-  const tax = Math.round(subtotal * 0.12);
-  const total = subtotal + shippingFee;
-
-  return {
-    success: true,
-    data: {
-      id: orderId,
-      orderNumber: `ARM-BUY-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      shippingAddress: {
-        fullName: payload.shipping_address.fullName || 'Valued Patient',
-        phone: payload.shipping_address.phone || '',
-        email: payload.shipping_address.email || '',
-        addressLine1: payload.shipping_address.line1,
-        addressLine2: payload.shipping_address.line2 || undefined,
-        city: payload.shipping_address.city,
-        state: payload.shipping_address.state,
-        pincode: payload.shipping_address.pincode,
-      },
-      items: payload.items.map((i, idx) => ({
-        id: `item-${idx + 1}`,
-        orderId,
-        productId: i.product_uuid,
-        productName: i.productName || 'Medical Equipment',
-        productImage: i.productImage || '',
-        unitPrice: i.unit_price || 0,
-        quantity: i.quantity,
-        totalPrice: i.total_price || (i.unit_price || 0) * i.quantity,
-      })),
-      subtotal,
-      shippingFee,
-      tax,
-      total,
-      paymentStatus: 'paid',
-      paymentMethod: payload.payment_method || 'Razorpay UPI',
-      status: 'processing',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    message: 'Medical equipment order placed successfully.',
-  };
+  const response = await axiosInterceptorInstanceClient.post('/orders', payload);
+  return response.data;
 };

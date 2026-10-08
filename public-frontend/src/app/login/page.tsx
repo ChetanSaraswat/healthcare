@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser } from '@/features/auth/login/login.action';
 import { registerUser } from '@/features/auth/register/register.action';
-import { clearAuthError, setDemoCustomer, setDemoAdmin } from '@/features/auth/auth.slice';
+import { clearAuthError } from '@/features/auth/auth.slice';
 import { useTranslation } from '@/locales';
 import styles from './login.module.scss';
 import {
@@ -18,13 +18,50 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   CheckCircle2,
   Clock,
   Truck,
   RotateCcw,
 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(3, 'Please enter a valid email address or phone number'),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters'),
+});
+
+const registerSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(100, 'Full name cannot exceed 100 characters'),
+  email: z
+    .string()
+    .trim()
+    .email('Please enter a valid email address'),
+  phone: z
+    .string()
+    .trim()
+    .refine((val) => !val || /^[6-9]\d{9}$/.test(val), {
+      message: 'Mobile number must be a valid 10-digit number (e.g. 9876543210)',
+    })
+    .optional(),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 function LoginContent() {
   const router = useRouter();
@@ -39,21 +76,31 @@ function LoginContent() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Login Form
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    register: registerLogin,
+    handleSubmit: handleLoginSubmit,
+    formState: { errors: loginErrors },
+    reset: resetLogin,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onTouched',
+  });
 
-  // Register Form
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [validationErr, setValidationErr] = useState<string | null>(null);
+  const {
+    register: registerSignUp,
+    handleSubmit: handleRegisterSubmit,
+    formState: { errors: registerErrors },
+    reset: resetSignUp,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onTouched',
+  });
 
   useEffect(() => {
     dispatch(clearAuthError());
-    setValidationErr(null);
-  }, [activeTab, dispatch]);
+    resetLogin();
+    resetSignUp();
+  }, [activeTab, dispatch, resetLogin, resetSignUp]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -61,23 +108,11 @@ function LoginContent() {
     }
   }, [isAuthenticated, redirectUrl, router]);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationErr(null);
-
-    if (!identifier.trim()) {
-      setValidationErr(locale === 'hi' ? 'कृपया ईमेल या मोबाइल नंबर दर्ज करें' : 'Please enter your email or mobile number.');
-      return;
-    }
-    if (!password) {
-      setValidationErr(locale === 'hi' ? 'कृपया पासवर्ड दर्ज करें' : 'Please enter your password.');
-      return;
-    }
-
+  const onLogin = async (data: LoginFormData) => {
     const result = await dispatch(
       loginUser({
-        email: identifier.trim(),
-        password,
+        email: data.identifier.trim(),
+        password: data.password,
       })
     );
 
@@ -86,29 +121,13 @@ function LoginContent() {
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationErr(null);
-
-    if (!name.trim()) {
-      setValidationErr(locale === 'hi' ? 'कृपया पूरा नाम दर्ज करें' : 'Full name is required.');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setValidationErr(locale === 'hi' ? 'कृपया मान्य ईमेल दर्ज करें' : 'Please enter a valid email address.');
-      return;
-    }
-    if (registerPassword.length < 6) {
-      setValidationErr(locale === 'hi' ? 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए' : 'Password must be at least 6 characters.');
-      return;
-    }
-
+  const onRegister = async (data: RegisterFormData) => {
     const result = await dispatch(
       registerUser({
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim() || undefined,
-        password: registerPassword,
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone?.trim() || undefined,
+        password: data.password,
       })
     );
 
@@ -117,101 +136,81 @@ function LoginContent() {
     }
   };
 
-  const handleQuickDemoCustomer = () => {
-    dispatch(setDemoCustomer());
-    router.push(redirectUrl);
-  };
-
-  const handleQuickDemoAdmin = () => {
-    dispatch(setDemoAdmin());
-    router.push('/admin');
-  };
-
   return (
-    <div className={styles.pageContainer}>
-      <div className={styles.authCard}>
-        {/* Left Trust Sidebar */}
-        <div className={styles.trustSidebar}>
-          <div className={styles.trustHeader}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <img
-                src="/images/logo.svg"
-                alt="AarogyaMed"
-                width={190}
-                height={48}
-                className={styles.logoImg}
-              />
-            </Link>
-            <h2>
-              {locale === 'hi'
-                ? 'विश्वासनीय चिकित्सा उपकरण प्लेटफॉर्म'
-                : 'Hospital-Grade Equipment. Buy & Rent on Equal Footing.'}
-            </h2>
-            <p>
-              {locale === 'hi'
-                ? 'अस्पताल-स्तरीय स्वच्छता, प्रमाणित उपकरण और त्वरित होम डिलीवरी।'
-                : 'CDSCO compliant, 10-step sterilized, and backed by biomedical technician home onboarding.'}
-            </p>
-          </div>
-
-          <div className={styles.trustFeatures}>
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <ShieldCheck size={18} />
-              </div>
-              <div>
-                <div className={styles.featureTitle}>
-                  {locale === 'hi' ? '10-चरणीय ऑटोक्लेव नसबंदी' : '10-Step Autoclave Sterilization'}
-                </div>
-                <div className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'प्रत्येक रेंटल से पहले अस्पताल-स्तरीय विसंक्रमण एवं सीलबंद पैकेजिंग।'
-                    : 'Every rental device is biologically cleaned and sealed in hospital-grade wrap.'}
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <RotateCcw size={18} />
-              </div>
-              <div>
-                <div className={styles.featureTitle}>
-                  {locale === 'hi' ? '24 घंटे में जमा वापसी SLA' : '24-Hour Deposit Refund SLA'}
-                </div>
-                <div className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'उपकरण वापसी एवं निरीक्षण के 24 घंटे के भीतर सुरक्षा जमा सीधे बैंक में।'
-                    : 'Security deposit released back to your bank account within 24h of return inspection.'}
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <Truck size={18} />
-              </div>
-              <div>
-                <div className={styles.featureTitle}>
-                  {locale === 'hi' ? 'अखिल भारतीय सेवा' : 'Pan-India Delivery & Onboarding'}
-                </div>
-                <div className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'ऑक्सीजन कंसंट्रेटर और आईसीयू बेड हेतु घर पर निःशुल्क इंस्टॉलेशन।'
-                    : 'Expert bedside installation and patient caregiver training across tier 1 & 2 cities.'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.trustFooter}>
+    <div className={styles.loginContainer}>
+      {/* Left Column: Brand & Trust Badges */}
+      <div className={styles.heroColumn}>
+        <div className={styles.heroContent}>
+          <div className={styles.brandBadge}>
             <ShieldCheck size={16} />
-            <span>CDSCO Class B/C Verified · ISO 13485 Biomedical Compliance</span>
+            <span>CDSCO Registered • ISO 13485 Certified</span>
+          </div>
+          <h1 className={styles.heroTitle}>
+            {locale === 'hi'
+              ? 'अस्पताल-स्तरीय चिकित्सा देखभाल सीधे आपके घर पर'
+              : 'Hospital-Grade Clinical Equipment Delivered to Your Home'}
+          </h1>
+          <p className={styles.heroSubtitle}>
+            {locale === 'hi'
+              ? 'सत्यापित ऑक्सीजन कंसंट्रेटर, आईसीयू बेड, बाईपैप और मोबिलिटी उपकरण रेंटल व खरीद। 4 घंटे में बायोमेडिकल स्थापना।'
+              : 'Rent or buy calibrated ICU beds, oxygen concentrators, BiPAP machines, and wheelchairs with rapid 4-hour sanitized dispatch.'}
+          </p>
+
+          <div className={styles.featuresList}>
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>
+                <Clock size={20} />
+              </div>
+              <div>
+                <h4 className={styles.featureTitle}>
+                  {locale === 'hi' ? '4 घंटे की आपातकालीन स्थापना' : '4-Hour Emergency Dispatch'}
+                </h4>
+                <p className={styles.featureDesc}>
+                  {locale === 'hi'
+                    ? 'सभी प्रमुख मेट्रो क्षेत्रों में प्रशिक्षित बायोमेडिकल इंजीनियरों द्वारा।'
+                    : 'Deployed with factory calibration certificates across all metro hubs.'}
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>
+                <Truck size={20} />
+              </div>
+              <div>
+                <h4 className={styles.featureTitle}>
+                  {locale === 'hi' ? 'निःशुल्क डिलीवरी और स्टरलाइज़ेशन' : 'Free Delivery & Sterilization'}
+                </h4>
+                <p className={styles.featureDesc}>
+                  {locale === 'hi'
+                    ? 'हर यूनिट डिलीवरी से पहले अस्पताल-ग्रेड ऑटोक्लेविंग से गुजरती है।'
+                    : 'Every unit passes a multi-point biological safety inspection.'}
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>
+                <RotateCcw size={20} />
+              </div>
+              <div>
+                <h4 className={styles.featureTitle}>
+                  {locale === 'hi' ? 'लचीला रेंटल एवं 100% वापसी' : 'Flexible Rental & Security Return'}
+                </h4>
+                <p className={styles.featureDesc}>
+                  {locale === 'hi'
+                    ? 'बिना किसी परेशानी के अवधि बढ़ाएं। वापसी पर तुरंत सिक्योरिटी रिफंड।'
+                    : 'Extend rental days seamlessly; instant deposit refund upon return.'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Form Section */}
-        <div className={styles.formSection}>
+      {/* Right Column: Auth Form */}
+      <div className={styles.formColumn}>
+        <div className={styles.formCard}>
           <div className={styles.tabBar}>
             <button
               type="button"
@@ -229,31 +228,31 @@ function LoginContent() {
             </button>
           </div>
 
-          <div className={styles.formHeader}>
-            <h1>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>
               {activeTab === 'login'
-                ? (locale === 'hi' ? 'खाते में प्रवेश करें' : 'Sign in to your account')
-                : (locale === 'hi' ? 'रोगी / देखभालकर्ता पंजीकरण' : 'Create Patient Account')}
-            </h1>
-            <p>
+                ? (locale === 'hi' ? 'अपने खाते में साइन इन करें' : 'Sign In to Patient Portal')
+                : (locale === 'hi' ? 'नया रोगी खाता बनाएं' : 'Create Caregiver Account')}
+            </h2>
+            <p className={styles.cardSubtitle}>
               {activeTab === 'login'
-                ? (locale === 'hi' ? 'अपने ऑर्डर, सक्रिय रेंटल एवं पते देखने हेतु' : 'Access your purchases, rental contracts, and saved delivery addresses.')
-                : (locale === 'hi' ? 'अस्पताल-स्तरीय उपकरणों की खरीद एवं रेंटल हेतु' : 'Sign up to rent or purchase hospital-grade medical devices.')}
+                ? (locale === 'hi' ? 'अपने ऑर्डर और रेंटल ट्रैक करने के लिए क्रेडेंशियल्स दर्ज करें' : 'Enter your registered email or phone to access rentals & orders.')
+                : (locale === 'hi' ? 'त्वरित चेकआउट और रेंटल प्रबंधन के लिए साइन अप करें' : 'Sign up for express delivery, order tracking & custom rental plans.')}
             </p>
           </div>
 
-          {(validationErr || error) && (
+          {error && (
             <div className={styles.errorBanner}>
               <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>{validationErr || error}</span>
+              <span>{error}</span>
             </div>
           )}
 
           {activeTab === 'login' ? (
-            <form onSubmit={handleLoginSubmit}>
+            <form onSubmit={handleLoginSubmit(onLogin)} noValidate>
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'ईमेल या मोबाइल नंबर' : 'Email Address or Mobile'}
+                  {locale === 'hi' ? 'ईमेल या मोबाइल नंबर' : 'Email Address or Mobile'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Mail size={16} className={styles.inputIcon} />
@@ -261,21 +260,22 @@ function LoginContent() {
                     type="text"
                     className={styles.textInput}
                     placeholder="patient@example.com or 9876543210"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
+                    {...registerLogin('identifier')}
+                    style={loginErrors.identifier ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {loginErrors.identifier && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {loginErrors.identifier.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label className={styles.label}>
-                    {locale === 'hi' ? 'पासवर्ड' : 'Password'}
+                    {locale === 'hi' ? 'पासवर्ड' : 'Password'} <span style={{ color: '#ba1a1a' }}>*</span>
                   </label>
-                  <span style={{ fontSize: '0.75rem', color: '#005c55', cursor: 'pointer', fontWeight: 600 }}>
-                    {locale === 'hi' ? 'पासवर्ड भूल गए?' : 'Forgot Password?'}
-                  </span>
                 </div>
                 <div className={styles.inputWrapper}>
                   <Lock size={16} className={styles.inputIcon} />
@@ -283,9 +283,8 @@ function LoginContent() {
                     type={showPassword ? 'text' : 'password'}
                     className={styles.textInput}
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    {...registerLogin('password')}
+                    style={loginErrors.password ? { borderColor: '#ba1a1a' } : undefined}
                   />
                   <button
                     type="button"
@@ -296,6 +295,11 @@ function LoginContent() {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                {loginErrors.password && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {loginErrors.password.message}
+                  </span>
+                )}
               </div>
 
               <button
@@ -304,45 +308,53 @@ function LoginContent() {
                 disabled={loading}
               >
                 {loading
-                  ? (locale === 'hi' ? 'सत्यापन किया जा रहा है...' : 'Verifying Session...')
+                  ? (locale === 'hi' ? 'सत्यापन हो रहा है...' : 'Verifying Session...')
                   : (locale === 'hi' ? 'लॉग इन करें' : 'Sign In')}
                 <ArrowRight size={16} />
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRegisterSubmit}>
+            <form onSubmit={handleRegisterSubmit(onRegister)} noValidate>
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'पूरा नाम' : 'Full Name'}
+                  {locale === 'hi' ? 'पूरा नाम' : 'Full Name'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <User size={16} className={styles.inputIcon} />
                   <input
                     type="text"
                     className={styles.textInput}
-                    placeholder="e.g. Sunita Sharma"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
+                    placeholder="e.g. Ramesh Patel"
+                    {...registerSignUp('name')}
+                    style={registerErrors.name ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.name && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.name.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'ईमेल पता' : 'Email Address'}
+                  {locale === 'hi' ? 'ईमेल पता' : 'Email Address'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Mail size={16} className={styles.inputIcon} />
                   <input
                     type="email"
                     className={styles.textInput}
-                    placeholder="sunita@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
+                    placeholder="patient@example.com"
+                    {...registerSignUp('email')}
+                    style={registerErrors.email ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.email && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.email.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
@@ -354,16 +366,21 @@ function LoginContent() {
                   <input
                     type="tel"
                     className={styles.textInput}
-                    placeholder="+91 98765 43210"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="9876543210"
+                    {...registerSignUp('phone')}
+                    style={registerErrors.phone ? { borderColor: '#ba1a1a' } : undefined}
                   />
                 </div>
+                {registerErrors.phone && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.phone.message}
+                  </span>
+                )}
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {locale === 'hi' ? 'पासवर्ड (कम से कम 6 अक्षर)' : 'Create Password (min. 6 characters)'}
+                  {locale === 'hi' ? 'पासवर्ड (कम से कम 6 अक्षर)' : 'Create Password (min. 6 characters)'} <span style={{ color: '#ba1a1a' }}>*</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <Lock size={16} className={styles.inputIcon} />
@@ -371,9 +388,8 @@ function LoginContent() {
                     type={showPassword ? 'text' : 'password'}
                     className={styles.textInput}
                     placeholder="••••••••"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
+                    {...registerSignUp('password')}
+                    style={registerErrors.password ? { borderColor: '#ba1a1a' } : undefined}
                   />
                   <button
                     type="button"
@@ -384,6 +400,11 @@ function LoginContent() {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                {registerErrors.password && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {registerErrors.password.message}
+                  </span>
+                )}
               </div>
 
               <button
@@ -399,30 +420,10 @@ function LoginContent() {
             </form>
           )}
 
-          {/* Quick Demo Credentials */}
-          <div className={styles.demoBox}>
-            <div className={styles.demoTitle}>
-              <Sparkles size={13} color="#005c55" />
-              <span>{locale === 'hi' ? '1-क्लिक परीक्षण क्रेडेंशियल्स' : '1-Click Review Credentials'}</span>
-            </div>
-            <div className={styles.demoButtons}>
-              <button
-                type="button"
-                className={styles.demoBtn}
-                onClick={handleQuickDemoCustomer}
-                title="Log in instantly as Patient Sunita Sharma"
-              >
-                {locale === 'hi' ? 'रोगी डेमो (सुनीता शर्मा)' : 'Patient Demo (Sunita)'}
-              </button>
-              <button
-                type="button"
-                className={styles.demoBtn}
-                onClick={handleQuickDemoAdmin}
-                title="Log in instantly as Super Admin Dr. Rajesh Verma"
-              >
-                {locale === 'hi' ? 'व्यवस्थापक (डॉ. राजेश)' : 'Admin Demo (Dr. Rajesh)'}
-              </button>
-            </div>
+          <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#6e7977' }}>
+            {locale === 'hi'
+              ? 'साइन इन करके आप आरोग्यमेड के रेंटल एवं वारंटी नियमों से सहमत होते हैं।'
+              : 'By signing in, you agree to AarogyaMed Biomedical Terms of Rental & CDSCO Privacy Policy.'}
           </div>
         </div>
       </div>

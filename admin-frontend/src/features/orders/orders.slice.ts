@@ -2,7 +2,6 @@ import { createAppSlice } from '@/store/create-app-slice';
 import { Order } from '@/domain/entities/order.entity';
 import { listOrders } from './list-orders/list-orders.action';
 import { createOrder } from './create-order/create-order.action';
-import { INITIAL_MOCK_ORDERS } from './list-orders/list-orders.service';
 
 export interface OrdersState {
   orders: Order[];
@@ -14,7 +13,7 @@ export interface OrdersState {
 }
 
 const initialState: OrdersState = {
-  orders: INITIAL_MOCK_ORDERS,
+  orders: [],
   selectedOrder: null,
   latestPlacedOrder: null,
   loading: false,

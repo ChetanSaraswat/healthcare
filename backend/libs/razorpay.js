@@ -22,7 +22,7 @@ class RazorpayGateway {
     this.mockOrdersByReceipt = new Map();
 
     this.client = null;
-    if (RazorpaySDK && this.keyId && this.keySecret && !this.keyId.startsWith('rzp_test_mock')) {
+    if (RazorpaySDK && this.keyId && this.keySecret && !this.keyId.startsWith('rzp_test_mock') && process.env.NODE_ENV !== 'test') {
       try {
         this.client = new RazorpaySDK({
           key_id: this.keyId,
@@ -74,7 +74,7 @@ class RazorpayGateway {
     // Deriving receipt deterministically from gateway_idempotency_key (UUID is 36 chars, fitting perfectly).
     const deterministicReceipt = gatewayKey
       ? String(gatewayKey).substring(0, 40)
-      : (receipt ? String(receipt).substring(0, 40) : `aarogya_${Date.now()}`);
+      : (receipt ? String(receipt).substring(0, 40) : crypto.randomUUID().substring(0, 40));
 
     // Sandbox / Mock gateway idempotency check:
     // If the server retries orders.create with the same receipt or gateway key, return the existing order
@@ -127,8 +127,8 @@ class RazorpayGateway {
       }
     }
 
-    // Sandbox / Test fallback order
-    const mockOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    // Sandbox / Test fallback order using standard UUID
+    const mockOrderId = `order_${crypto.randomUUID().replace(/-/g, '').substring(0, 14)}`;
     const mockOrder = {
       id: mockOrderId,
       entity: 'order',
@@ -180,7 +180,7 @@ class RazorpayGateway {
       amount_paid: 0,
       amount_due: 10000,
       currency: 'INR',
-      receipt: `aarogya_${orderId}`,
+      receipt: String(orderId).substring(0, 40),
       status: 'created',
       attempts: 0,
       notes: {},

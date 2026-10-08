@@ -22,6 +22,13 @@ router.get(
   (req, res, next) => orderController.getAllOrders(req, res, next)
 );
 
+router.get(
+  '/',
+  authenticate,
+  authorize('super_admin'),
+  (req, res, next) => orderController.getAllOrders(req, res, next)
+);
+
 router.get('/:id', authenticate, (req, res, next) =>
   orderController.getById(req, res, next)
 );

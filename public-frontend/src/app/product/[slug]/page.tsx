@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { notFound } from 'next/navigation';
-import { INITIAL_MOCK_PRODUCTS } from '@/features/products/list-products/list-products.service';
+import { useRouter, useSearchParams, notFound } from 'next/navigation';
+import { getProduct } from '@/features/products/get-product/get-product.action';
 import { ProductEntity } from '@/domain/entities/product.entity';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart } from '@/features/cart/cart.slice';
@@ -29,6 +28,7 @@ import {
   Info,
   Clock,
   Heart,
+  AlertCircle,
 } from 'lucide-react';
 
 interface ProductPageProps {
@@ -40,30 +40,116 @@ interface ProductPageProps {
 export default function ProductDetailPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
 
-  const product = INITIAL_MOCK_PRODUCTS.find(
-    (p) => p.slug === resolvedParams.slug || p.id === resolvedParams.slug
-  );
+  const reduxProducts = useAppSelector((state) => state.products.products);
+  const selectedProduct = useAppSelector((state) => state.products.selectedProduct);
+  const productsLoading = useAppSelector((state) => state.products.loading);
 
-  if (!product) {
-    notFound();
-  }
+  const product =
+    reduxProducts.find(
+      (p) => p.slug === resolvedParams.slug || p.id === resolvedParams.slug
+    ) ||
+    (selectedProduct &&
+    (selectedProduct.slug === resolvedParams.slug || selectedProduct.id === resolvedParams.slug)
+      ? selectedProduct
+      : null);
 
-  const localized = ProductEntity.getLocalized(product, locale);
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
-  // Dual Buy vs Rent Mode State
-  const [activeMode, setActiveMode] = useState<'buy' | 'rent'>('buy');
+  useEffect(() => {
+    if (!product && !hasAttemptedFetch && !productsLoading) {
+      setHasAttemptedFetch(true);
+      dispatch(getProduct(resolvedParams.slug));
+    }
+  }, [product, hasAttemptedFetch, productsLoading, dispatch, resolvedParams.slug]);
+
+  const initialMode = searchParams.get('mode') === 'rent' ? 'rent' : 'buy';
+  const [activeMode, setActiveMode] = useState<'buy' | 'rent'>(initialMode);
   const [quantity, setQuantity] = useState(1);
-  const [rentalDays, setRentalDays] = useState(product?.rentalMinDays || 7);
-  const [selectedImage, setSelectedImage] = useState(product?.primaryImage || '');
+  const [rentalDays, setRentalDays] = useState(7);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [inputValue, setInputValue] = useState<string>('7');
+
+  useEffect(() => {
+    if (product) {
+      const initialImg = product.primaryImage || product.images?.[0] || '/images/oxygen_concentrator.png';
+      setSelectedImage(initialImg);
+      const minDays = product.rentalMinDays || 1;
+      setRentalDays(minDays);
+      setInputValue(String(minDays));
+    }
+  }, [product?.id, product?.primaryImage]);
+
+  useEffect(() => {
+    const requested = searchParams.get('mode');
+    if (requested === 'rent' || requested === 'buy') {
+      setActiveMode(requested);
+    }
+  }, [searchParams]);
 
   const isWishlisted = useAppSelector((state) =>
     product ? WishlistEntity.isInWishlist(state.wishlist?.items || [], product.id) : false
   );
 
-  // Rental Pricing Calculation
+
+
+  if (productsLoading || (!product && !hasAttemptedFetch)) {
+    return (
+      <div style={{ maxWidth: 1280, margin: '2rem auto 5rem', padding: '0 1.5rem' }}>
+        <div style={{ height: 20, width: 220, background: '#e0e5eb', borderRadius: 4, marginBottom: '2rem' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '3rem' }}>
+          <div style={{ height: 440, background: '#f2f3ff', borderRadius: 20 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ height: 32, width: '80%', background: '#e0e5eb', borderRadius: 6 }} />
+            <div style={{ height: 20, width: '40%', background: '#e0e5eb', borderRadius: 4 }} />
+            <div style={{ height: 120, background: '#edf0f5', borderRadius: 16 }} />
+            <div style={{ height: 50, background: '#005c55', opacity: 0.3, borderRadius: 9999 }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div style={{ maxWidth: 800, margin: '4rem auto', padding: '0 1.5rem', textAlign: 'center' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#ffdad6', color: '#ba1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+          <AlertCircle size={32} />
+        </div>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e', marginBottom: '0.75rem' }}>
+          {locale === 'hi' ? 'चिकित्सा उपकरण नहीं मिला' : 'Medical Equipment Not Found'}
+        </h1>
+        <p style={{ color: '#6e7977', fontSize: '1rem', marginBottom: '2rem' }}>
+          {locale === 'hi'
+            ? 'अनुरोधित उत्पाद डेटाबेस में उपलब्ध नहीं है या हटा दिया गया है।'
+            : 'The requested equipment record does not exist in our active clinical catalog.'}
+        </p>
+        <Link
+          href="/shop"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: '#005c55',
+            color: '#ffffff',
+            padding: '12px 28px',
+            borderRadius: 9999,
+            fontWeight: 700,
+            textDecoration: 'none',
+          }}
+        >
+          <ShoppingBag size={18} />
+          <span>{locale === 'hi' ? 'कैटलॉग पर वापस जाएं' : 'Back to Equipment Catalog'}</span>
+        </Link>
+      </div>
+    );
+  }
+
+  const localized = ProductEntity.getLocalized(product, locale);
+
   const rentalCalculation = RentalPricingCalculator.calculate({
     dailyRate: product.rentalDailyRate,
     durationDays: rentalDays,
@@ -77,6 +163,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       : 0;
 
   const handleAddToCart = () => {
+    if (!product) return;
     if (activeMode === 'buy') {
       dispatch(
         addToCart({
@@ -174,16 +261,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               marginBottom: '1rem',
             }}
           >
-            <img
-              src={selectedImage}
-              alt={localized.name}
-              style={{
-                width: '100%',
-                height: 440,
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
+            {(() => {
+              const activeImg = selectedImage || product.primaryImage || product.images?.[0] || '/images/oxygen_concentrator.png';
+              return activeImg ? (
+                <img
+                  src={activeImg}
+                  alt={localized.name}
+                  style={{
+                    width: '100%',
+                    height: 440,
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              ) : null;
+            })()}
             <div
               style={{
                 position: 'absolute',
@@ -226,9 +318,9 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
 
           {/* Thumbnail Gallery */}
-          {product.images && product.images.length > 1 && (
+          {product.images && product.images.filter(Boolean).length > 1 && (
             <div style={{ display: 'flex', gap: 12, marginBottom: '2.5rem' }}>
-              {product.images.map((img, idx) => (
+              {product.images.filter(Boolean).map((img, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -238,7 +330,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     height: 72,
                     borderRadius: 10,
                     overflow: 'hidden',
-                    border: selectedImage === img ? '2px solid #005c55' : '1px solid #dae2fd',
+                    border: (selectedImage || product.primaryImage) === img ? '2px solid #005c55' : '1px solid #dae2fd',
                     padding: 0,
                     background: 'none',
                     cursor: 'pointer',
@@ -333,14 +425,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               {localized.name}
             </h1>
 
-            {/* Rating */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.875rem', color: '#6e7977' }}>
-              <div style={{ display: 'flex', color: '#ea580c' }}>
-                <Star size={16} fill="#ea580c" />
+            {/* Rating - Only display if authentic verified reviews exist */}
+            {product.reviewsCount && product.reviewsCount > 0 ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.875rem', color: '#6e7977' }}>
+                <div style={{ display: 'flex', color: '#ea580c' }}>
+                  <Star size={16} fill="#ea580c" />
+                </div>
+                <strong style={{ color: '#131b2e' }}>{product.rating}</strong>
+                <span>({product.reviewsCount} {t.product.verifiedReviews})</span>
               </div>
-              <strong style={{ color: '#131b2e' }}>{product.rating || 4.9}</strong>
-              <span>({product.reviewsCount || 85} {t.product.verifiedReviews})</span>
-            </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.8125rem', color: '#005c55', fontWeight: 600 }}>
+                <ShieldCheck size={16} />
+                <span>{locale === 'hi' ? 'सीधे अधिकृत बायोमेडिकल सप्लायर से सत्यापित' : 'AarogyaMed Verified Biomedical Equipment'}</span>
+              </div>
+            )}
 
             {/* Segmented Buy vs Rent Toggle Switch */}
             <BuyRentToggle
@@ -382,9 +481,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <CheckCircle2 size={16} color="#005c55" />
                     <span>
-                      {locale === 'hi'
-                        ? `${product.warrantyMonths || 24} महीने की व्यापक ओईएम वारंटी`
-                        : `${product.warrantyMonths || 24} Months Comprehensive OEM Warranty`}
+                      {product.warrantyInfo || (product.warrantyMonths ? `${product.warrantyMonths} ${locale === 'hi' ? 'महीने की व्यापक ओईएम वारंटी' : 'Months Comprehensive OEM Warranty'}` : (locale === 'hi' ? 'ओईएम वारंटी शामिल' : 'OEM Warranty Included'))}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -409,7 +506,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   )}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#6e7977', marginBottom: 14 }}>
-                  {locale === 'hi' ? `न्यूनतम रेंटल अवधि: ${product.rentalMinDays || 7} दिन` : `Minimum rental period: ${product.rentalMinDays || 7} days`}
+                  {locale === 'hi' ? `न्यूनतम रेंटल अवधि: ${product.rentalMinDays || 1} दिन` : `Minimum rental period: ${product.rentalMinDays || 1} days`}
                 </div>
 
                 {/* Duration Buttons */}
@@ -417,7 +514,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
                     {t.product.rentalPeriod}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 10 }}>
                     {[7, 15, 30].map((days) => (
                       <button
                         key={days}
@@ -438,6 +535,46 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                         {days} {t.product.days}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Custom Rental Days Input */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', padding: '8px 12px', borderRadius: 8, border: '1px solid #ffd8c8' }}>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#131b2e' }}>
+                      {locale === 'hi' ? `कस्टम रेंटल दिन (न्यूनतम ${product.rentalMinDays || 1}):` : `Custom Rental Days (Min ${product.rentalMinDays || 1}):`}
+                    </span>
+
+                    <input
+                      type="number"
+                      min={product.rentalMinDays || 1}
+                      max={180}
+                      value={inputValue}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        setInputValue(raw); // always reflect what the user typed
+
+                        const val = parseInt(raw, 10);
+                        if (!isNaN(val)) {
+                          setRentalDays(val); // keep rentalDays as number, unclamped while typing
+                        }
+                      }}
+                      onBlur={() => {
+                        const min = product.rentalMinDays || 1;
+                        const clamped = Math.min(180, Math.max(min, rentalDays || min));
+                        setRentalDays(clamped);
+                        setInputValue(String(clamped));
+                      }}
+                      style={{
+                        width: 65,
+                        padding: '4px 8px',
+                        borderRadius: 6,
+                        border: '1.5px solid #ea580c',
+                        fontSize: '0.875rem',
+                        fontWeight: 700,
+                        color: '#ea580c',
+                        textAlign: 'center',
+                      }}
+                    />
+                    <span style={{ fontSize: '0.8125rem', color: '#6e7977' }}>{t.product.days}</span>
                   </div>
                 </div>
 
@@ -485,6 +622,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               >
                 <button
                   type="button"
+                  disabled={quantity <= 1}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   style={{
                     background: 'none',
@@ -492,9 +630,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     padding: '8px 14px',
                     fontSize: '1.125rem',
                     fontWeight: 700,
-                    cursor: 'pointer',
-                    color: '#005c55',
+                    cursor: quantity <= 1 ? 'not-allowed' : 'pointer',
+                    color: quantity <= 1 ? '#cbd5e1' : '#005c55',
                   }}
+                  title={quantity <= 1 ? 'Minimum quantity is 1' : 'Decrease quantity'}
+                  aria-label="Decrease quantity"
                 >
                   -
                 </button>
@@ -511,6 +651,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     cursor: 'pointer',
                     color: '#005c55',
                   }}
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -562,8 +703,8 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                       ? 'इच्छासूची से हटाएं'
                       : 'Remove from Wishlist'
                     : locale === 'hi'
-                    ? 'इच्छासूची में सहेजें'
-                    : 'Save to Wishlist'
+                      ? 'इच्छासूची में सहेजें'
+                      : 'Save to Wishlist'
                 }
                 style={{
                   width: 52,

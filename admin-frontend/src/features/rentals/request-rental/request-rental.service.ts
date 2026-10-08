@@ -13,7 +13,7 @@ export const requestRentalService = async (
     // Return structured simulated rental order for immediate confirmation and demo
   }
 
-  const rentalOrderId = `RNT-${Date.now().toString().slice(-6)}`;
+  const rentalOrderId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : '00000000-0000-0000-0000-000000000000';
   const totalRentalFee = payload.items.reduce((acc, i) => acc + (i.rentalCost || (i.dailyRate || 0) * (i.duration_count || 7) * i.quantity), 0);
   const totalDeposit = payload.items.reduce((acc, i) => acc + (i.securityDeposit || 0), 0);
 
@@ -21,9 +21,9 @@ export const requestRentalService = async (
     success: true,
     data: {
       id: rentalOrderId,
-      rentalOrderNumber: `ARM-RNT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      rentalOrderNumber: `ARM-RNT-${new Date().getFullYear()}-${typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID().substring(0, 8).toUpperCase() : '00000000'}`,
       deliveryAddress: {
-        fullName: payload.delivery_address.fullName || 'Valued Patient',
+        fullName: payload.delivery_address.fullName || '',
         phone: payload.delivery_address.phone || '',
         email: payload.delivery_address.email || '',
         addressLine1: payload.delivery_address.line1,
@@ -36,10 +36,10 @@ export const requestRentalService = async (
         id: `item-${idx + 1}`,
         rentalOrderId,
         productId: item.product_uuid,
-        productName: item.productName || 'Rental Device',
+        productName: item.productName || '',
         productImage: item.productImage || '',
         dailyRate: item.dailyRate || 0,
-        durationDays: item.duration_count || 7,
+        durationDays: Number(item.duration_count || 1),
         securityDeposit: item.securityDeposit || 0,
         rentalCost: item.rentalCost || 0,
         startDate: item.start_date || new Date().toISOString().split('T')[0],

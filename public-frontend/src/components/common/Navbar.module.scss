@@ -7,69 +7,7 @@
   box-shadow: 0 2px 12px rgba(0, 92, 85, 0.08);
 }
 
-.topBar {
-  background: linear-gradient(135deg, #005c55 0%, #004741 100%);
-  color: #ffffff;
-  font-size: 0.8125rem;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-  .container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .leftPill {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    .badge {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-weight: 600;
-      font-size: 0.75rem;
-      letter-spacing: 0.02em;
-    }
-
-    .supportText {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-weight: 500;
-
-      strong {
-        color: #9cf2e8;
-      }
-    }
-  }
-
-  .rightLinks {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-
-    a {
-      color: rgba(255, 255, 255, 0.85);
-      text-decoration: none;
-      transition: color 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-
-      &:hover {
-        color: #ffffff;
-      }
-    }
-  }
-}
 
 .mainNav {
   background: #ffffff;
@@ -132,21 +70,25 @@
 
     .searchBtn {
       position: absolute;
-      right: 4px;
-      top: 4px;
-      bottom: 4px;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
       background: #005c55;
       color: #ffffff;
       border: none;
-      border-radius: 9999px;
-      padding: 0 1.25rem;
-      font-size: 0.875rem;
-      font-weight: 600;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
+      padding: 0;
 
       &:hover {
         background: #004741;
+        transform: translateY(-50%) scale(1.05);
       }
     }
   }
@@ -428,10 +370,7 @@
   }
 }
 
-@media (max-width: 900px) {
-  .topBar {
-    display: none;
-  }
+@media (max-width: 1024px) {
   .mainNav .container {
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -440,5 +379,15 @@
     order: 3;
     max-width: 100%;
     width: 100%;
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .mainNav .brandLogo img {
+    height: 36px;
+  }
+  .navActions {
+    gap: 0.75rem;
   }
 }

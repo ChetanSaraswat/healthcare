@@ -80,3 +80,15 @@ exports.errorHandler = (error) => {
   return INTERNAL_SERVER_ERROR;
 };
 
+exports.slugify = (text) => {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+

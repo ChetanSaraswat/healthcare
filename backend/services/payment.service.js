@@ -17,7 +17,7 @@ class PaymentService {
    */
   async createRazorpayOrder(userId, data) {
     const { currency = 'INR', orderId, rentalOrderId, notes = {} } = data;
-    const idempotencyKey = data.idempotency_key || null;
+    const idempotencyKey = data.idempotency_key || data.idempotencyKey || crypto.randomUUID();
 
     // CRITICAL SECURITY ENFORCEMENT (Section 2):
     // NEVER accept or trust an amount field from the client payload.
@@ -209,7 +209,7 @@ class PaymentService {
       : await paymentRepository.countAttemptsByRentalOrderId(verifiedRentalOrderId);
 
     if (existingAttemptsCount >= 5) {
-      throw new BadRequest('Too many payment attempts for this order. Please contact support or start a new order.');
+      throw new BadRequest('Maximum payment attempt limit reached for this order. Please contact support or start a new order.');
     }
     const nextAttemptNo = existingAttemptsCount + 1;
 
@@ -217,12 +217,12 @@ class PaymentService {
     const gatewayIdempotencyKey = crypto.randomUUID();
 
     const amountInPaise = Math.round(derivedAmount * 100);
-    const receipt = `aarogya_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const deterministicReceipt = gatewayIdempotencyKey.substring(0, 40);
 
     const rzpOrder = await razorpayGateway.createOrder({
       amount: amountInPaise,
       currency,
-      receipt,
+      receipt: deterministicReceipt,
       gateway_idempotency_key: gatewayIdempotencyKey,
       notes: {
         userId: userId ? String(userId) : 'guest',
@@ -250,7 +250,7 @@ class PaymentService {
         gateway_idempotency_key: gatewayIdempotencyKey,
         idempotency_key: idempotencyKey,
         notes: {
-          receipt,
+          receipt: deterministicReceipt,
           razorpay_order_raw: rzpOrder,
         },
       });
@@ -285,7 +285,7 @@ class PaymentService {
       amountInInr: derivedAmount,
       currency: rzpOrder.currency,
       paymentRecordId: payment.id,
-      receipt,
+      receipt: deterministicReceipt,
       status: 'pending',
       idempotencyKey,
       attemptNo: nextAttemptNo,
@@ -311,41 +311,52 @@ class PaymentService {
       payment_method,
     } = data;
 
-    // SECTION 5: Confirmation-attempt cap (per attempt)
-    // Track and increment confirmation attempts on every verify call for this Attempt, regardless of outcome.
+    // 1. Locate existing Payment Attempt record
     const existingAttempt = razorpay_order_id
       ? await paymentRepository.findByGatewayOrderId(razorpay_order_id)
       : null;
 
-    if (existingAttempt) {
-      if (existingAttempt.confirmation_attempts >= 5) {
-        console.warn('[EXCESSIVE_CONFIRMATION_ATTEMPTS] Confirmation limit reached:', {
-          order_id: existingAttempt.order_id || existingAttempt.rental_order_id,
-          attempt_id: existingAttempt.id,
-          gateway_order_id: razorpay_order_id,
-          user_id: userId,
-          confirmation_attempts: existingAttempt.confirmation_attempts,
-        });
-        throw new BadRequest('Payment confirmation limit exceeded for this attempt. Please initiate a new payment attempt or contact support.');
-      }
-
-      await existingAttempt.increment('confirmation_attempts', { by: 1 });
-      await existingAttempt.reload();
-
-      if (existingAttempt.confirmation_attempts > 5) {
-        console.warn('[EXCESSIVE_CONFIRMATION_ATTEMPTS] Confirmation limit exceeded on current call:', {
-          order_id: existingAttempt.order_id || existingAttempt.rental_order_id,
-          attempt_id: existingAttempt.id,
-          gateway_order_id: razorpay_order_id,
-          user_id: userId,
-          confirmation_attempts: existingAttempt.confirmation_attempts,
-        });
-        throw new BadRequest('Payment confirmation limit exceeded for this attempt. Please initiate a new payment attempt or contact support.');
-      }
+    if (!existingAttempt) {
+      throw new NotFound('Payment attempt record not found for this gateway order');
     }
 
-    // SECTION 6: Untrusted Client Boundary.
-    // Client-side payload is NEVER trusted without valid HMAC-SHA256 signature verification.
+    // 2. Validate ownership if user is authenticated
+    if (existingAttempt.user_id && userId && existingAttempt.user_id !== userId) {
+      throw new Forbidden('Unauthorized access to specified payment attempt');
+    }
+
+    // 3. Validate gateway order ID matches
+    if (existingAttempt.gateway_order_id !== razorpay_order_id) {
+      throw new BadRequest('Gateway order ID does not match the payment attempt');
+    }
+
+    // 4. Enforce Confirmation-Attempt Cap (max 5 per attempt)
+    if (existingAttempt.confirmation_attempts >= 5) {
+      console.warn('[EXCESSIVE_CONFIRMATION_ATTEMPTS] Confirmation limit reached:', {
+        order_id: existingAttempt.order_id || existingAttempt.rental_order_id,
+        attempt_id: existingAttempt.id,
+        gateway_order_id: razorpay_order_id,
+        user_id: userId,
+        confirmation_attempts: existingAttempt.confirmation_attempts,
+      });
+      throw new BadRequest('Maximum confirmation attempt limit reached for this attempt. Please initiate a new payment attempt or contact support.');
+    }
+
+    await existingAttempt.increment('confirmation_attempts', { by: 1 });
+    await existingAttempt.reload();
+
+    if (existingAttempt.confirmation_attempts > 5) {
+      console.warn('[EXCESSIVE_CONFIRMATION_ATTEMPTS] Confirmation limit exceeded on current call:', {
+        order_id: existingAttempt.order_id || existingAttempt.rental_order_id,
+        attempt_id: existingAttempt.id,
+        gateway_order_id: razorpay_order_id,
+        user_id: userId,
+        confirmation_attempts: existingAttempt.confirmation_attempts,
+      });
+      throw new BadRequest('Maximum confirmation attempt limit reached for this attempt. Please initiate a new payment attempt or contact support.');
+    }
+
+    // 5. Cryptographic HMAC SHA-256 Signature Verification
     const isValid = razorpayGateway.verifyPaymentSignature({
       razorpay_order_id,
       razorpay_payment_id,
@@ -356,225 +367,299 @@ class PaymentService {
       throw new BadRequest('Cryptographic signature verification failed. Payment cannot be validated.');
     }
 
-    try {
-      const captureResult = await paymentRepository.handleManagedTransaction(async (transaction) => {
-        // Find the payment record by gateway order ID
-        let payment = await paymentRepository.findByGatewayOrderId(razorpay_order_id, { transaction });
+    // 6. Record browser callback receipt metadata & gateway payment ID
+    await existingAttempt.update({
+      gateway_payment_id: existingAttempt.gateway_payment_id || razorpay_payment_id,
+      payment_method: payment_method || existingAttempt.payment_method || 'razorpay',
+      notes: {
+        ...(existingAttempt.notes || {}),
+        browser_callback_received: true,
+        browser_callback_at: new Date().toISOString(),
+        browser_payment_id: razorpay_payment_id,
+        payment_method: payment_method || 'razorpay',
+      },
+    });
 
-        // If already captured, idempotently return success
-        if (payment && payment.status === 'captured') {
-          return {
-            success: true,
-            verified: true,
-            paymentId: payment.gateway_payment_id || razorpay_payment_id,
-            orderId: payment.order_id || order_id || null,
-            rentalOrderId: payment.rental_order_id || rental_order_id || null,
+    // 7. Authoritatively capture payment and finalize order status (Salon-style instant confirmation)
+    if (existingAttempt.status !== 'captured') {
+      await this.finalizeCapturedPayment({
+        paymentRecord: existingAttempt,
+        gatewayPaymentId: razorpay_payment_id,
+        gatewayOrderId: razorpay_order_id,
+        paymentMethod: payment_method || 'razorpay',
+        source: 'verify_callback',
+      });
+      await existingAttempt.reload();
+    }
+
+    return {
+      success: true,
+      status: 'captured',
+      paymentId: existingAttempt.gateway_payment_id || razorpay_payment_id,
+      orderId: existingAttempt.order_id || order_id || null,
+      rentalOrderId: existingAttempt.rental_order_id || rental_order_id || null,
+      message: 'Payment verified and captured successfully',
+    };
+  }
+
+  /**
+   * Single Authoritative Finalization Function.
+   * This is the ONLY application-level function permitted to perform the state transitions:
+   *   payment.status: pending -> captured
+   *   order.status: pending -> paid
+   *   rental.status: pending -> confirmed (deposit_status: held)
+   *
+   * Both POST /webhook and PaymentReconciliationWorker must invoke this exact function.
+   *
+   * @param {Object} params
+   * @param {Object|number} params.paymentRecord - Payment model instance or id
+   * @param {string} params.gatewayPaymentId - Razorpay payment ID (pay_xxx)
+   * @param {string} params.gatewayOrderId - Razorpay order ID (order_xxx)
+   * @param {number} [params.amountInPaise] - Gateway captured amount in paise
+   * @param {string} [params.currency] - Gateway currency (e.g. 'INR')
+   * @param {string} [params.paymentMethod] - Gateway payment method (e.g. 'upi', 'card')
+   * @param {string} params.source - Authoritative source ('webhook' | 'reconciliation')
+   * @param {Object} [params.options] - Optional options with transaction
+   * @returns {Promise<{ finalized: boolean, alreadyCaptured: boolean, mismatch?: boolean, reason?: string, payment: Object }>}
+   */
+  async finalizeCapturedPayment({
+    paymentId,
+    paymentRecord,
+    gatewayPayment,
+    gatewayPaymentId,
+    gatewayOrderId,
+    amountInPaise,
+    currency,
+    paymentMethod,
+    source,
+    triggerSource,
+    options = {},
+  }) {
+    const targetPaymentId = paymentId || (paymentRecord && typeof paymentRecord === 'object' ? paymentRecord.id : paymentRecord);
+    const effectiveGatewayPaymentId = gatewayPaymentId || (gatewayPayment && gatewayPayment.id);
+    const effectiveGatewayOrderId = gatewayOrderId || (gatewayPayment && gatewayPayment.order_id);
+    const effectiveAmountInPaise = amountInPaise !== undefined && amountInPaise !== null
+      ? Number(amountInPaise)
+      : (gatewayPayment && gatewayPayment.amount !== undefined ? Number(gatewayPayment.amount) : undefined);
+    const effectiveCurrency = (currency || (gatewayPayment && gatewayPayment.currency) || 'INR').toUpperCase();
+    const effectivePaymentMethod = paymentMethod || (gatewayPayment && (gatewayPayment.method || gatewayPayment.payment_method)) || 'razorpay';
+    const effectiveSource = source || triggerSource || 'webhook';
+
+    const executeInTransaction = async (transaction) => {
+      // 1. Lock payment record for update to prevent concurrent double-processing
+      const lockedPayment = await paymentRepository.lockForUpdate(targetPaymentId, { transaction });
+      if (!lockedPayment) {
+        throw new NotFound(`Payment record #${targetPaymentId} not found for finalization`);
+      }
+
+      // 2. Check if already captured
+      if (lockedPayment.status === 'captured') {
+        return {
+          finalized: false,
+          alreadyCaptured: true,
+          payment: lockedPayment,
+        };
+      }
+
+      // 3. Independent Payload Validation against stored database invariants
+      const expectedAmountInPaise = Math.round(Number(lockedPayment.amount) * 100);
+      const reportedAmountInPaise = effectiveAmountInPaise !== undefined ? effectiveAmountInPaise : expectedAmountInPaise;
+      const storedCurrency = (lockedPayment.currency || 'INR').toUpperCase();
+
+      const amountMatches = expectedAmountInPaise === reportedAmountInPaise;
+      const currencyMatches = storedCurrency === effectiveCurrency;
+      const orderMatches = !effectiveGatewayOrderId || lockedPayment.gateway_order_id === effectiveGatewayOrderId;
+
+      if (!amountMatches || !currencyMatches || !orderMatches) {
+        const mismatchReason = !amountMatches
+          ? 'AMOUNT_MISMATCH'
+          : (!currencyMatches ? 'CURRENCY_MISMATCH' : 'ORDER_ID_MISMATCH');
+
+        console.error(`[AUTHORITATIVE_PAYMENT_MISMATCH] Source: ${effectiveSource}. Invariant check failed:`, {
+          payment_id: lockedPayment.id,
+          expected_amount_paise: expectedAmountInPaise,
+          reported_amount_paise: reportedAmountInPaise,
+          expected_currency: storedCurrency,
+          reported_currency: effectiveCurrency,
+          expected_gateway_order_id: lockedPayment.gateway_order_id,
+          reported_gateway_order_id: effectiveGatewayOrderId,
+          mismatchReason,
+        });
+
+        await lockedPayment.update(
+          {
+            notes: {
+              ...(lockedPayment.notes || {}),
+              flagged_anomaly: `WEBHOOK_${mismatchReason}`,
+              flagged_at: new Date().toISOString(),
+              reported_amount_paise: reportedAmountInPaise,
+              reported_currency: effectiveCurrency,
+              finalization_source: effectiveSource,
+            },
+          },
+          { transaction }
+        );
+
+        return {
+          finalized: false,
+          alreadyCaptured: false,
+          mismatch: true,
+          reason: `WEBHOOK_${mismatchReason}`,
+          payment: lockedPayment,
+        };
+      }
+
+      // 4. Atomic state transition
+      try {
+        await lockedPayment.update(
+          {
             status: 'captured',
-            alreadyCaptured: true,
+            gateway_payment_id: effectiveGatewayPaymentId,
+            payment_method: effectivePaymentMethod,
+            notes: {
+              ...(lockedPayment.notes || {}),
+              finalized_at: new Date().toISOString(),
+              finalized_by: effectiveSource,
+            },
+          },
+          { transaction }
+        );
+
+        let isCancelledOrder = false;
+        if (lockedPayment.order_id) {
+          const order = await orderRepository.findByPk(lockedPayment.order_id, {
+            transaction,
+            lock: transaction.LOCK ? transaction.LOCK.UPDATE : true,
+          });
+          if (order) {
+            if (order.status === 'cancelled') {
+              isCancelledOrder = true;
+            } else if (order.status !== 'paid') {
+              await order.update(
+                { status: 'paid', payment_id: effectiveGatewayPaymentId },
+                { transaction }
+              );
+            }
+          }
+        }
+
+        if (lockedPayment.rental_order_id) {
+          const rental = await rentalRepository.findByPk(lockedPayment.rental_order_id, {
+            transaction,
+            lock: transaction.LOCK ? transaction.LOCK.UPDATE : true,
+          });
+          if (rental) {
+            if (rental.status === 'cancelled') {
+              isCancelledOrder = true;
+            } else if (rental.status !== 'confirmed') {
+              await rental.update(
+                { status: 'confirmed', payment_id: effectiveGatewayPaymentId, deposit_status: 'held' },
+                { transaction }
+              );
+            }
+          }
+        }
+
+        if (isCancelledOrder) {
+          await lockedPayment.update(
+            {
+              notes: {
+                ...(lockedPayment.notes || {}),
+                flagged_anomaly: 'LATE_PAYMENT_ON_CANCELLED_ORDER',
+                requires_manual_review_or_refund: true,
+                finalized_at: new Date().toISOString(),
+                finalized_by: effectiveSource,
+              },
+            },
+            { transaction }
+          );
+
+          return {
+            finalized: false,
+            alreadyCaptured: false,
+            latePaymentCancelled: true,
+            payment: lockedPayment,
           };
         }
 
-        // Check if order already has another captured payment attempt
-        const targetOrderId = order_id || (payment && payment.order_id);
-        const targetRentalId = rental_order_id || (payment && payment.rental_order_id);
-
-        if (targetOrderId) {
-          const existingCaptured = await paymentRepository.findCapturedByOrderId(targetOrderId, { transaction });
-          if (existingCaptured && existingCaptured.id !== (payment && payment.id)) {
-            return {
-              success: true,
-              verified: true,
-              paymentId: existingCaptured.gateway_payment_id,
-              orderId: targetOrderId,
-              rentalOrderId: targetRentalId,
-              status: 'captured',
-              alreadyCaptured: true,
-            };
-          }
-        }
-
-        try {
-          if (payment) {
-            await payment.update(
-              {
-                gateway_payment_id: razorpay_payment_id,
-                gateway_signature: razorpay_signature,
-                status: 'captured',
-                payment_method: payment_method || 'razorpay',
-              },
-              { transaction }
-            );
-          } else {
-            payment = await paymentRepository.create(
-              {
-                user_id: userId || null,
-                order_id: order_id || null,
-                rental_order_id: rental_order_id || null,
-                gateway: 'razorpay',
-                gateway_order_id: razorpay_order_id,
-                gateway_payment_id: razorpay_payment_id,
-                gateway_signature: razorpay_signature,
-                amount: 0,
-                status: 'captured',
-                payment_method: payment_method || 'razorpay',
-              },
-              { transaction }
-            );
-          }
-        } catch (err) {
-          // SECTION 8: Database-level Protection under Concurrency.
-          // If a concurrent verify/webhook request already marked this order captured,
-          // the partial unique constraint (unique_captured_order_payment) triggers.
-          // Catch it gracefully and treat as already captured.
-          if (err instanceof UniqueConstraintError || (err.name && err.name.includes('UniqueConstraint'))) {
-            console.warn('[PaymentService] Concurrent capture detected via DB constraint. Handled gracefully.');
-            return {
-              success: true,
-              verified: true,
-              paymentId: razorpay_payment_id,
-              orderId: targetOrderId || null,
-              rentalOrderId: targetRentalId || null,
-              status: 'captured',
-              alreadyCaptured: true,
-            };
-          }
-          throw err;
-        }
-
-        // Update purchase order if present
-        if (targetOrderId) {
-          const order = await orderRepository.findByPk(targetOrderId, { transaction });
-          if (order && order.status !== 'paid') {
-            await order.update(
-              {
-                status: 'paid',
-                payment_id: razorpay_payment_id,
-              },
-              { transaction }
-            );
-          }
-        }
-
-        // Update rental order if present
-        if (targetRentalId) {
-          const rental = await rentalRepository.findByPk(targetRentalId, { transaction });
-          if (rental && rental.status !== 'confirmed') {
-            await rental.update(
-              {
-                status: 'confirmed',
-                payment_id: razorpay_payment_id,
-                deposit_status: 'held',
-              },
-              { transaction }
-            );
-          }
-        }
-
         return {
-          success: true,
-          verified: true,
-          paymentId: razorpay_payment_id,
-          orderId: targetOrderId || null,
-          rentalOrderId: targetRentalId || null,
-          status: 'captured',
+          finalized: true,
+          alreadyCaptured: false,
+          payment: lockedPayment,
         };
-      });
+      } catch (err) {
+        if (
+          err instanceof UniqueConstraintError ||
+          (err.name && err.name.includes('UniqueConstraint')) ||
+          (err.parent && err.parent.code === '23505')
+        ) {
+          console.warn('[finalizeCapturedPayment] Concurrent capture collision caught via DB partial unique index.');
+          return {
+            finalized: false,
+            alreadyCaptured: true,
+            payment: lockedPayment,
+          };
+        }
+        throw err;
+      }
+    };
 
-      // Asynchronously dispatch transactional confirmation emails upon successful capture
-      if (captureResult && captureResult.status === 'captured' && !captureResult.alreadyCaptured) {
+    let result;
+    if (options.transaction) {
+      result = await executeInTransaction(options.transaction);
+    } else {
+      result = await paymentRepository.handleManagedTransaction(executeInTransaction);
+    }
+
+    // 5. Post-Commit Fulfillment & Notifications (executed ONLY once upon genuine authoritative finalization)
+    if (result.finalized) {
+      const p = result.payment;
+      if (p.order_id) {
+        adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
+          orderId: p.order_id,
+          paymentId: effectiveGatewayPaymentId,
+          paymentMethod: effectivePaymentMethod,
+        });
+
         (async () => {
           try {
-            if (captureResult.orderId) {
-              const order = await orderRepository.findOrderDetailsById(captureResult.orderId);
-              if (order) {
-                const user = order.user_id ? await userRepository.findByPk(order.user_id) : null;
-                const emailTo = (user && user.email) || (order.shipping_address && order.shipping_address.email);
-                if (emailTo) {
-                  await email.sendOrderConfirmationEmail({
-                    to: emailTo,
-                    name: (user && user.name) || 'Valued Patient',
-                    orderNumber: order.id,
-                    items: (order.items || []).map((it) => ({
-                      name: it.product ? it.product.name : 'Medical Equipment',
-                      quantity: it.quantity,
-                      price: it.unit_price,
-                    })),
-                    totalAmount: order.total_amount,
-                    deliveryAddress: order.address,
-                    paymentMethod: payment_method || 'Online Razorpay Gateway',
-                    transactionId: razorpay_payment_id,
-                  });
-                }
-              }
-            }
-
-            if (captureResult.rentalOrderId) {
-              const rental = await rentalRepository.findRentalDetailsById(captureResult.rentalOrderId);
-              if (rental) {
-                const user = rental.user_id ? await userRepository.findByPk(rental.user_id) : null;
-                if (user && user.email) {
-                  await email.sendRentalAgreementEmail({
-                    to: user.email,
-                    name: user.name,
-                    rentalNumber: rental.id,
-                    items: (rental.items || []).map((it) => ({
-                      product_name: it.product ? it.product.name : 'Rental Device',
-                      rate_amount: it.rate_amount,
-                      rate_type: it.rate_type,
-                    })),
-                    startDate: rental.start_date,
-                    endDate: rental.end_date,
-                    rentalAmount: rental.rental_amount || 0,
-                    depositAmount: rental.deposit_amount || 0,
-                    deliveryAddress: rental.address,
-                    transactionId: razorpay_payment_id,
-                  });
-                }
+            const order = await orderRepository.findOrderDetailsById(p.order_id);
+            if (order) {
+              const user = order.user_id ? await userRepository.findByPk(order.user_id) : null;
+              const emailTo = (user && user.email) || (order.shipping_address && order.shipping_address.email);
+              if (emailTo) {
+                await email.sendOrderConfirmationEmail({
+                  to: emailTo,
+                  name: (user && user.name) || 'Valued Patient',
+                  orderNumber: order.id,
+                  items: (order.items || []).map((it) => ({
+                    name: it.product ? it.product.name : 'Medical Equipment',
+                    quantity: it.quantity,
+                    price: it.unit_price,
+                  })),
+                  totalAmount: order.total_amount,
+                  deliveryAddress: order.address,
+                  paymentMethod: effectivePaymentMethod || 'Online Razorpay Gateway',
+                  transactionId: effectiveGatewayPaymentId,
+                });
               }
             }
           } catch (mailErr) {
-            console.warn('[PaymentService] Transactional confirmation email dispatch failed:', mailErr.message);
+            console.error('[finalizeCapturedPayment] Order confirmation email dispatch failed:', mailErr.message);
           }
         })();
-
-        // Asynchronously emit admin transaction alerts (WhatsApp & Email) for confirmed capture
-        if (captureResult.orderId) {
-          adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
-            orderId: captureResult.orderId,
-            paymentId: razorpay_payment_id,
-            paymentMethod: payment_method || 'Online Razorpay Gateway',
-          });
-        }
-        if (captureResult.rentalOrderId) {
-          adminNotificationEventBus.emitAsync('transaction.rental.successful', {
-            rentalId: captureResult.rentalOrderId,
-            paymentId: razorpay_payment_id,
-            paymentMethod: payment_method || 'Online Razorpay Gateway',
-          });
-        }
       }
 
-      return captureResult;
-    } catch (outerErr) {
-      if (
-        outerErr instanceof UniqueConstraintError ||
-        (outerErr.name && outerErr.name.includes('UniqueConstraint')) ||
-        outerErr.name === 'SequelizeTimeoutError' ||
-        (outerErr.message && outerErr.message.includes('database is locked'))
-      ) {
-        console.warn('[PaymentService] Concurrent transaction lock/constraint resolved. Handled gracefully.');
-        return {
-          success: true,
-          verified: true,
-          paymentId: razorpay_payment_id,
-          orderId: order_id || null,
-          rentalOrderId: rental_order_id || null,
-          status: 'captured',
-          alreadyCaptured: true,
-        };
+      if (p.rental_order_id) {
+        adminNotificationEventBus.emitAsync('transaction.rental.successful', {
+          rentalId: p.rental_order_id,
+          paymentId: effectiveGatewayPaymentId,
+          paymentMethod: effectivePaymentMethod,
+        });
       }
-      throw outerErr;
     }
+
+    return result;
   }
 
   /**
@@ -606,7 +691,7 @@ class PaymentService {
     const gatewayEventId =
       eventPayload.id ||
       eventPayload.event_id ||
-      (gatewayPaymentId ? `${event}_${gatewayPaymentId}` : `evt_${Date.now()}`);
+      (gatewayPaymentId ? `${event}_${gatewayPaymentId}` : `evt_${crypto.randomUUID()}`);
 
     const existingAuditLog = await webhookEventRepository.findByGatewayEventId(gatewayEventId);
     if (existingAuditLog) {
@@ -638,7 +723,10 @@ class PaymentService {
     }
 
     if (event === 'payment.captured' || event === 'order.paid') {
-      const payment = await paymentRepository.findByGatewayOrderId(gatewayOrderId);
+      let payment = await paymentRepository.findByGatewayOrderId(gatewayOrderId);
+      if (!payment && gatewayPaymentId) {
+        payment = await paymentRepository.findByGatewayPaymentId(gatewayPaymentId);
+      }
 
       if (payment && payment.status === 'captured') {
         await this._recordWebhookAudit(gatewayEventId, event, eventPayload, new Date());
@@ -655,122 +743,34 @@ class PaymentService {
       }
 
       if (payment) {
-        // SECTION 7: Webhook Payload Re-Validation (Defense in Depth)
-        // Compare reported amount and currency against stored Attempt record in DB
-        const expectedAmountInPaise = Math.round(Number(payment.amount) * 100);
-        const reportedAmountInPaise = Number(rzpPayment.amount);
-        const reportedCurrency = (rzpPayment.currency || 'INR').toUpperCase();
-        const storedCurrency = (payment.currency || 'INR').toUpperCase();
+        // Authoritative single-point capture transition
+        const finalizationResult = await this.finalizeCapturedPayment({
+          paymentRecord: payment,
+          gatewayPayment: rzpPayment,
+          triggerSource: 'webhook',
+        });
 
-        const amountMatches = expectedAmountInPaise === reportedAmountInPaise;
-        const currencyMatches = storedCurrency === reportedCurrency;
-        const orderMatches = !gatewayOrderId || payment.gateway_order_id === gatewayOrderId;
+        await this._recordWebhookAudit(gatewayEventId, event, eventPayload, new Date());
 
-        if (!amountMatches || !currencyMatches || !orderMatches) {
-          console.error('[WEBHOOK_AMOUNT_MISMATCH] Webhook payload does not match stored attempt record!', {
-            payment_id: payment.id,
-            order_id: payment.order_id || payment.rental_order_id,
-            gateway_order_id: gatewayOrderId,
-            expected_amount_paise: expectedAmountInPaise,
-            reported_amount_paise: reportedAmountInPaise,
-            expected_currency: storedCurrency,
-            reported_currency: reportedCurrency,
-          });
-
-          // Flag payment for manual review, DO NOT mark captured
-          await payment.update({
-            notes: {
-              ...(payment.notes || {}),
-              flagged_anomaly: 'WEBHOOK_AMOUNT_MISMATCH',
-              flagged_at: new Date().toISOString(),
-              reported_amount_paise: reportedAmountInPaise,
-              reported_currency: reportedCurrency,
-            },
-          });
-
-          await this._recordWebhookAudit(gatewayEventId, event, eventPayload, new Date());
-
+        if (finalizationResult.mismatch) {
           return {
             received: true,
             ignored: true,
             flagged: true,
-            reason: 'WEBHOOK_AMOUNT_MISMATCH: Reported amount/currency does not match stored attempt record',
+            reason: finalizationResult.reason,
             orderId: gatewayOrderId,
+            paymentId: gatewayPaymentId,
           };
         }
 
-        try {
-          await paymentRepository.handleManagedTransaction(async (transaction) => {
-            await payment.update(
-              {
-                status: 'captured',
-                gateway_payment_id: gatewayPaymentId,
-                payment_method: rzpPayment.method || 'razorpay',
-              },
-              { transaction }
-            );
-
-            if (payment.order_id) {
-              const order = await orderRepository.findByPk(payment.order_id, { transaction });
-              if (order && order.status !== 'paid') {
-                await order.update({ status: 'paid', payment_id: gatewayPaymentId }, { transaction });
-              }
-            }
-
-            if (payment.rental_order_id) {
-              const rental = await rentalRepository.findByPk(payment.rental_order_id, { transaction });
-              if (rental && rental.status !== 'confirmed') {
-                await rental.update(
-                  { status: 'confirmed', payment_id: gatewayPaymentId, deposit_status: 'held' },
-                  { transaction }
-                );
-              }
-            }
-          });
-
-          // Asynchronously emit admin transaction alerts (WhatsApp & Email) upon webhook capture
-          if (payment.order_id) {
-            adminNotificationEventBus.emitAsync('transaction.purchase.successful', {
-              orderId: payment.order_id,
-              paymentId: gatewayPaymentId,
-              paymentMethod: (rzpPayment && rzpPayment.method) || 'Online Razorpay Gateway',
-            });
-          }
-          if (payment.rental_order_id) {
-            adminNotificationEventBus.emitAsync('transaction.rental.successful', {
-              rentalId: payment.rental_order_id,
-              paymentId: gatewayPaymentId,
-              paymentMethod: (rzpPayment && rzpPayment.method) || 'Online Razorpay Gateway',
-            });
-          }
-        } catch (dbErr) {
-          if (
-            dbErr instanceof UniqueConstraintError ||
-            (dbErr.name && dbErr.name.includes('UniqueConstraint')) ||
-            (dbErr.parent && dbErr.parent.code === '23505') ||
-            dbErr.name === 'SequelizeTimeoutError'
-          ) {
-            console.warn('[handleWebhook] Payment captured concurrently. Gracefully handled as already captured.');
-            const capturedRecord = payment.order_id
-              ? await paymentRepository.findCapturedByOrderId(payment.order_id)
-              : (payment.rental_order_id
-                  ? await paymentRepository.findCapturedByRentalOrderId(payment.rental_order_id)
-                  : await paymentRepository.findByGatewayOrderId(gatewayOrderId));
-
-            await this._recordWebhookAudit(gatewayEventId, event, eventPayload, new Date());
-
-            return {
-              received: true,
-              processed: event,
-              duplicate: true,
-              alreadyCaptured: true,
-              payment: capturedRecord,
-              paymentRecord: capturedRecord,
-              reason: 'Payment captured concurrently by competing verify/webhook request',
-            };
-          }
-          throw dbErr;
-        }
+        return {
+          received: true,
+          processed: event,
+          finalized: finalizationResult.finalized,
+          alreadyCaptured: finalizationResult.alreadyCaptured,
+          payment: finalizationResult.payment,
+          paymentRecord: finalizationResult.payment,
+        };
       } else {
         // Payment row not found by gateway_order_id: check if already captured
         const byPaymentId = await paymentRepository.findByGatewayPaymentId(gatewayPaymentId);
@@ -788,7 +788,10 @@ class PaymentService {
         }
       }
     } else if (event === 'payment.failed') {
-      const payment = await paymentRepository.findByGatewayOrderId(gatewayOrderId);
+      let payment = await paymentRepository.findByGatewayOrderId(gatewayOrderId);
+      if (!payment && gatewayPaymentId) {
+        payment = await paymentRepository.findByGatewayPaymentId(gatewayPaymentId);
+      }
       // Only set to failed if NOT already captured
       if (payment && payment.status !== 'captured') {
         await payment.update({
@@ -847,7 +850,7 @@ class PaymentService {
     }
 
     if (paymentRecord.status === 'captured') {
-      return { reconciled: true, status: 'captured' };
+      return { reconciled: true, status: 'captured', alreadyCaptured: true };
     }
 
     try {
@@ -862,58 +865,38 @@ class PaymentService {
       const failedPaymentEntity = paymentItems.find((p) => p.status === 'failed');
 
       if (isPaidAtGateway || capturedPaymentEntity) {
-        const paymentEntity = capturedPaymentEntity || paymentItems[0];
-        const paymentId = paymentEntity ? paymentEntity.id : `pay_recon_${paymentRecord.gateway_order_id}`;
-        const paymentMethod = (paymentEntity && paymentEntity.method) || 'razorpay';
-
-        // Ensure we have a model instance with .update()
-        let paymentModel = typeof paymentRecord.update === 'function'
-          ? paymentRecord
-          : await paymentRepository.findByPk(paymentRecord.id, options.transaction ? { transaction: options.transaction } : {});
-
-        const executeReconciliation = async (transaction) => {
-          try {
-            await paymentModel.update(
-              {
-                status: 'captured',
-                gateway_payment_id: paymentId,
-                payment_method: paymentMethod,
-              },
-              { transaction }
-            );
-          } catch (conErr) {
-            if (conErr instanceof UniqueConstraintError || (conErr.name && conErr.name.includes('UniqueConstraint'))) {
-              console.warn('[Reconcile] Concurrent capture detected via DB constraint. Handled gracefully.');
-              return;
-            }
-            throw conErr;
-          }
-
-          if (paymentModel.order_id) {
-            const order = await orderRepository.findByPk(paymentModel.order_id, { transaction });
-            if (order && order.status !== 'paid') {
-              await order.update({ status: 'paid', payment_id: paymentId }, { transaction });
-            }
-          }
-
-          if (paymentModel.rental_order_id) {
-            const rental = await rentalRepository.findByPk(paymentModel.rental_order_id, { transaction });
-            if (rental && rental.status !== 'confirmed') {
-              await rental.update(
-                { status: 'confirmed', payment_id: paymentId, deposit_status: 'held' },
-                { transaction }
-              );
-            }
-          }
+        const paymentEntity = capturedPaymentEntity || paymentItems[0] || {
+          id: `pay_recon_${paymentRecord.gateway_order_id}`,
+          order_id: paymentRecord.gateway_order_id,
+          amount: Math.round(Number(paymentRecord.amount) * 100),
+          currency: paymentRecord.currency || 'INR',
+          method: 'razorpay',
         };
 
-        if (options.transaction) {
-          await executeReconciliation(options.transaction);
-        } else {
-          await paymentRepository.handleManagedTransaction(executeReconciliation);
+        const finalizationResult = await this.finalizeCapturedPayment({
+          paymentRecord,
+          gatewayPayment: paymentEntity,
+          source: 'reconciliation',
+          options: options.transaction ? { transaction: options.transaction } : {},
+        });
+
+        if (finalizationResult.mismatch) {
+          return {
+            reconciled: false,
+            mismatch: true,
+            status: paymentRecord.status,
+            reason: finalizationResult.reason,
+          };
         }
 
-        return { reconciled: true, status: 'captured', paymentId };
+        return {
+          reconciled: true,
+          status: 'captured',
+          alreadyCaptured: finalizationResult.alreadyCaptured,
+          latePaymentCancelled: !!finalizationResult.latePaymentCancelled,
+          paymentId: finalizationResult.payment ? finalizationResult.payment.gateway_payment_id : paymentEntity.id,
+          payment: finalizationResult.payment,
+        };
       }
 
       // SECTION 9: Broaden reconciliation to handle failed/cancelled gateway states
@@ -930,17 +913,19 @@ class PaymentService {
           : await paymentRepository.findByPk(paymentRecord.id, options.transaction ? { transaction: options.transaction } : {});
 
         const executeFailure = async (transaction) => {
-          await paymentModel.update(
-            {
-              status: 'failed',
-              notes: {
-                ...(paymentModel.notes || {}),
-                failure_reason: failureReason,
-                reconciled_at: new Date().toISOString(),
+          if (paymentModel.status !== 'captured') {
+            await paymentModel.update(
+              {
+                status: 'failed',
+                notes: {
+                  ...(paymentModel.notes || {}),
+                  failure_reason: failureReason,
+                  reconciled_at: new Date().toISOString(),
+                },
               },
-            },
-            { transaction }
-          );
+              { transaction }
+            );
+          }
         };
 
         if (options.transaction) {

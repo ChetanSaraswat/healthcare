@@ -19,7 +19,7 @@ COPY --chown=node:node . .
 ENV APP_PORT=8080
 ENV NODE_ENV=development
 EXPOSE $APP_PORT
-CMD ["npm", "run", "dev"]
+CMD ["tail", "-f", "/dev/null"]
 
 # Production stage (used by production builds and raw docker run)
 FROM base AS production

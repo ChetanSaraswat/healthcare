@@ -1,8 +1,8 @@
 export interface CreatePaymentOrderPayload {
   amount: number; // in INR
   currency?: string;
-  orderId?: number;
-  rentalOrderId?: number;
+  orderId?: number | string;
+  rentalOrderId?: number | string;
   idempotency_key?: string;
   notes?: Record<string, any>;
 }
@@ -15,7 +15,7 @@ export interface CreatePaymentOrderResponse {
     amount: number; // in paise
     amountInInr: number;
     currency: string;
-    paymentRecordId: number;
+    paymentRecordId?: number | null;
     receipt: string;
     status?: string;
     alreadyCaptured?: boolean;

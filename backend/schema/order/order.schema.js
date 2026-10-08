@@ -21,7 +21,7 @@ exports.createOrderSchema = z.object({
       items: z
         .array(
           z.object({
-            product_uuid: z.string().uuid('Valid product UUID is required'),
+            product_uuid: z.string().min(1, 'Valid product UUID or identifier is required'),
             quantity: z.number().int().positive().default(1),
             unit_price: z.number().optional(),
             total_price: z.number().optional(),

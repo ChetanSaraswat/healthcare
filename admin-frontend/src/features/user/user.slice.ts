@@ -1,7 +1,6 @@
 import { createAppSlice } from '@/store/create-app-slice';
 import { CustomerSummary, CustomerCareHistory } from '@aarogyamed/types';
 import { getCustomers, getCustomerCareHistory } from './get-customers/get-customers.action';
-import { INITIAL_MOCK_CUSTOMERS } from './get-customers/get-customers.service';
 
 export interface AdminUserState {
   customers: CustomerSummary[];
@@ -11,7 +10,7 @@ export interface AdminUserState {
 }
 
 const initialState: AdminUserState = {
-  customers: INITIAL_MOCK_CUSTOMERS,
+  customers: [],
   selectedCustomerHistory: null,
   customerLoading: false,
   error: null,

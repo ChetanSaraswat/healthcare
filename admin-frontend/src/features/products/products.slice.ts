@@ -3,7 +3,6 @@ import { Product } from '@/domain/entities/product.entity';
 import { ListProductsFilterParams } from './list-products/list-products.interface';
 import { listProducts } from './list-products/list-products.action';
 import { getProduct } from './get-product/get-product.action';
-import { INITIAL_MOCK_PRODUCTS } from './list-products/list-products.service';
 
 export interface ProductsState {
   products: Product[];
@@ -15,7 +14,7 @@ export interface ProductsState {
 }
 
 const initialState: ProductsState = {
-  products: INITIAL_MOCK_PRODUCTS,
+  products: [],
   selectedProduct: null,
   loading: false,
   error: null,
@@ -23,7 +22,7 @@ const initialState: ProductsState = {
     mode: 'all',
     sort: 'popular',
   },
-  total: INITIAL_MOCK_PRODUCTS.length,
+  total: 0,
 };
 
 export const productsSlice = createAppSlice({

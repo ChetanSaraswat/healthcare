@@ -15,7 +15,7 @@ router.post(
   paymentController.createRazorpayOrder
 );
 
-// 2. Verify Razorpay checkout signature and update order/rental
+// 2. Verify Razorpay checkout signature (non-authoritative browser callback notification)
 router.post(
   '/razorpay/verify',
   authMiddleware.optionalAuthenticate,

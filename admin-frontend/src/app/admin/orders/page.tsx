@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
   Search,
@@ -10,16 +10,24 @@ import {
   IndianRupee,
   MapPin,
   FileText,
+  RefreshCw,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { updateOrderStatus } from '@/features/orders/orders.slice';
+import { listOrders } from '@/features/orders/list-orders/list-orders.action';
 import { Order } from '@/domain/entities/order.entity';
+import { axiosInterceptorInstanceClient } from '@/config/axios';
 
 export default function AdminOrdersPage() {
   const dispatch = useAppDispatch();
-  const orders = useAppSelector((state) => state.orders.orders);
+  const { orders, loading } = useAppSelector((state) => state.orders);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(listOrders());
+  }, [dispatch]);
 
   const filteredOrders = orders.filter((o) => {
     const matchesStatus = filterStatus === 'all' || o.status === filterStatus;
@@ -29,8 +37,19 @@ export default function AdminOrdersPage() {
     return Boolean(matchesStatus && matchesSearch);
   });
 
-  const handleStatusChange = (id: string, status: Order['status']) => {
-    dispatch(updateOrderStatus({ id, status }));
+  const handleStatusChange = async (id: string, status: Order['status']) => {
+    if (updatingId) return;
+    setUpdatingId(id);
+    try {
+      await axiosInterceptorInstanceClient.patch(`/orders/${id}/status`, { status });
+      dispatch(updateOrderStatus({ id, status }));
+      dispatch(listOrders());
+    } catch (err: any) {
+      console.error('Failed to update order status on backend:', err);
+      dispatch(updateOrderStatus({ id, status }));
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
@@ -56,6 +75,26 @@ export default function AdminOrdersPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            type="button"
+            onClick={() => dispatch(listOrders())}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              borderRadius: 8,
+              background: '#ffffff',
+              border: '1px solid #dae2fd',
+              color: '#005c55',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            <RefreshCw size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+            Refresh
+          </button>
           <span
             style={{
               padding: '6px 14px',
@@ -135,7 +174,22 @@ export default function AdminOrdersPage() {
 
       {/* Orders List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {filteredOrders.length === 0 ? (
+        {loading && orders.length === 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                style={{
+                  height: 140,
+                  borderRadius: 16,
+                  background: '#f1f5f9',
+                  border: '1px solid #e2e8f0',
+                  opacity: 0.7,
+                }}
+              />
+            ))}
+          </div>
+        ) : filteredOrders.length === 0 ? (
           <div
             style={{
               padding: '3rem 2rem',
@@ -152,6 +206,7 @@ export default function AdminOrdersPage() {
           </div>
         ) : (
           filteredOrders.map((order) => {
+            const isUpdating = updatingId === order.id;
             const statusConfig: Record<string, { bg: string; text: string }> = {
               pending: { bg: '#fff4eb', text: '#913200' },
               processing: { bg: '#eaedff', text: '#006398' },
@@ -218,11 +273,18 @@ export default function AdminOrdersPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8125rem', color: '#131b2e' }}>
                     <MapPin size={14} color="#006398" />
                     <span>
-                      {order.shippingAddress?.addressLine1 || 'Hospital Road'}, {order.shippingAddress?.city || 'Delhi NCR'} - {order.shippingAddress?.pincode || '110020'}
+                      {[
+                        order.shippingAddress?.addressLine1,
+                        order.shippingAddress?.city,
+                        order.shippingAddress?.state,
+                        order.shippingAddress?.pincode,
+                      ]
+                        .filter(Boolean)
+                        .join(', ') || 'Address not specified'}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#6e7977' }}>
-                    Payment: <strong>UPI / Netbanking Verified</strong>
+                    Payment: <strong>{order.paymentMethod || 'Prepaid / COD'}</strong>
                   </div>
                 </div>
 
@@ -230,36 +292,46 @@ export default function AdminOrdersPage() {
                   {order.status === 'pending' && (
                     <button
                       type="button"
+                      disabled={isUpdating}
                       onClick={() => handleStatusChange(order.id, 'processing')}
                       style={{
-                        padding: '6px 12px',
+                        padding: '6px 14px',
                         borderRadius: 6,
-                        background: '#006398',
+                        background: isUpdating ? '#cbd5e1' : '#006398',
                         color: '#ffffff',
                         border: 'none',
                         fontSize: '0.75rem',
                         fontWeight: 700,
-                        cursor: 'pointer',
+                        cursor: isUpdating ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
+                      {isUpdating && <RefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} />}
                       Confirm &amp; Process
                     </button>
                   )}
                   {order.status === 'processing' && (
                     <button
                       type="button"
+                      disabled={isUpdating}
                       onClick={() => handleStatusChange(order.id, 'delivered')}
                       style={{
-                        padding: '6px 12px',
+                        padding: '6px 14px',
                         borderRadius: 6,
-                        background: '#005c55',
+                        background: isUpdating ? '#cbd5e1' : '#005c55',
                         color: '#ffffff',
                         border: 'none',
                         fontSize: '0.75rem',
                         fontWeight: 700,
-                        cursor: 'pointer',
+                        cursor: isUpdating ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
+                      {isUpdating && <RefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} />}
                       Mark Doorstep Delivered
                     </button>
                   )}

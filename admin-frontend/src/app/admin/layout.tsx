@@ -22,14 +22,13 @@ import {
   FileText,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { setDemoAdmin } from '@/features/auth/auth.slice';
 import { loginUser } from '@/features/auth/login/login.action';
+import { ToastSnackbar } from '@/components/common/ToastSnackbar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -62,8 +61,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const user = result.data?.user;
       if (user?.role !== 'super_admin') {
         setLoginError(`Access denied: Account '${user?.email || adminEmail}' has role '${user?.role}'. An administrator account is required.`);
-      } else {
-        setAdminModalOpen(false);
       }
     } catch (err: any) {
       setLoginError(err || 'Failed to authenticate administrator credentials.');
@@ -141,149 +138,104 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {authUser ? ` Currently signed in as "${authUser.name}" (${authUser.role}).` : ' Please sign in with an administrator account to continue.'}
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <button
-              type="button"
-              onClick={() => dispatch(setDemoAdmin())}
-              style={{
-                background: '#005c55',
-                color: '#ffffff',
-                border: 'none',
-                padding: '12px 20px',
-                borderRadius: 12,
-                fontSize: '0.9375rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                boxShadow: '0 4px 14px rgba(0, 92, 85, 0.25)',
-              }}
-            >
-              <Sparkles size={16} />
-              <span>Log In as Demo Super Admin (Dr. Rajesh)</span>
-            </button>
+          <div style={{ textAlign: 'left', marginTop: '1.5rem' }}>
+            <form onSubmit={handleAdminLogin}>
+              {loginError && (
+                <div style={{ background: '#fdf2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.75rem', borderRadius: 8, fontSize: '0.8125rem', marginBottom: '1rem' }}>
+                  {loginError}
+                </div>
+              )}
 
-            <button
-              type="button"
-              onClick={() => setAdminModalOpen(true)}
-              style={{
-                background: '#f2f3ff',
-                color: '#131b2e',
-                border: '1px solid #dae2fd',
-                padding: '12px 20px',
-                borderRadius: 12,
-                fontSize: '0.9375rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Enter Custom Admin Credentials
-            </button>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#475569', marginBottom: '0.375rem' }}>
+                  Admin Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  placeholder="admin@aarogyamed.com"
+                  style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9375rem', outline: 'none' }}
+                />
+              </div>
 
-            <a
-              href={process.env.NEXT_PUBLIC_STOREFRONT_URL || 'http://localhost:3000'}
-              style={{
-                color: '#6e7977',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                textDecoration: 'none',
-                marginTop: 8,
-              }}
-            >
-              ← Return to AarogyaMed Public Storefront
-            </a>
-          </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#475569', marginBottom: '0.375rem' }}>
+                  Administrator Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9375rem', outline: 'none' }}
+                />
+              </div>
 
-          {adminModalOpen && (
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.6)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                padding: '1rem',
-              }}
-            >
-              <div
+              <button
+                type="submit"
+                disabled={isSubmitting}
                 style={{
-                  background: '#ffffff',
-                  borderRadius: 20,
-                  maxWidth: 440,
                   width: '100%',
-                  padding: '2rem',
-                  textAlign: 'left',
-                  boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+                  background: '#005c55',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: 12,
+                  fontSize: '0.9375rem',
+                  fontWeight: 700,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 14px rgba(0, 92, 85, 0.25)',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  marginBottom: 10,
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#131b2e' }}>Administrator Authentication</h3>
-                  <button
-                    type="button"
-                    onClick={() => { setAdminModalOpen(false); setLoginError(null); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6e7977' }}
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
+                {isSubmitting ? 'Authenticating...' : 'Sign In to Clinical Console'}
+              </button>
 
-                <form onSubmit={handleAdminLogin}>
-                  {loginError && (
-                    <div style={{ background: '#fdf2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.75rem', borderRadius: 8, fontSize: '0.8125rem', marginBottom: '1rem' }}>
-                      {loginError}
-                    </div>
-                  )}
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminEmail('admin@aarogyamed.com');
+                  setAdminPassword('Admin@12345');
+                }}
+                style={{
+                  width: '100%',
+                  background: '#f8fafc',
+                  color: '#475569',
+                  border: '1px solid #cbd5e1',
+                  padding: '8px 14px',
+                  borderRadius: 8,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  marginBottom: 12,
+                }}
+              >
+                Fill Verified Seed Admin Credentials
+              </button>
+            </form>
 
-                  <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#475569', marginBottom: '0.375rem' }}>Admin Email / ID</label>
-                    <input
-                      type="text"
-                      required
-                      value={adminEmail}
-                      onChange={(e) => setAdminEmail(e.target.value)}
-                      placeholder="admin@aarogyamed.com"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9375rem', outline: 'none' }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#475569', marginBottom: '0.375rem' }}>Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={adminPassword}
-                      onChange={(e) => setAdminPassword(e.target.value)}
-                      placeholder="••••••••"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9375rem', outline: 'none' }}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    style={{
-                      width: '100%',
-                      background: '#005c55',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '12px',
-                      borderRadius: 12,
-                      fontSize: '0.9375rem',
-                      fontWeight: 700,
-                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                      opacity: isSubmitting ? 0.7 : 1,
-                    }}
-                  >
-                    {isSubmitting ? 'Verifying Admin Access...' : 'Sign In to Operations Console'}
-                  </button>
-                </form>
-              </div>
+            <div style={{ textAlign: 'center' }}>
+              <a
+                href={process.env.NEXT_PUBLIC_STOREFRONT_URL || 'http://localhost:3000'}
+                style={{
+                  color: '#6e7977',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
+              >
+                ← Return to AarogyaMed Public Storefront
+              </a>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -348,6 +300,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       icon: Users,
       badge: customers.length > 0 ? `${customers.length} patients` : null,
       badgeColor: '#006398',
+    },
+    {
+      label: 'Policies & Legal CMS',
+      href: '/admin/policies',
+      icon: ShieldCheck,
+      badge: 'Live CMS',
+      badgeColor: '#005c55',
     },
   ];
 
@@ -498,25 +457,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ExternalLink size={18} color="#6e7977" />
             <span>Customer Storefront</span>
           </Link>
-          <Link
-            href="/hubs"
-            target="_blank"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '10px 14px',
-              borderRadius: 10,
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              color: '#3e4947',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <Globe2 size={18} color="#6e7977" />
-            <span>Experience Centers</span>
-          </Link>
         </nav>
 
         {/* Translation Coverage Pill in Sidebar */}
@@ -664,6 +604,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Page Content Body */}
         <main style={{ padding: '1.75rem', flex: 1 }}>{children}</main>
+        <ToastSnackbar />
       </div>
     </div>
   );

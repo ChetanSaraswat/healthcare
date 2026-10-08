@@ -1,14 +1,14 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useEffect } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { INITIAL_MOCK_CONDITIONS } from '@/features/conditions/list-conditions/list-conditions.service';
+import { getStaticConditionBySlug } from '@/content/learn/conditions';
 import { ConditionEntity } from '@/domain/entities/condition.entity';
-import { INITIAL_MOCK_PRODUCTS } from '@/features/products/list-products/list-products.service';
+import { listProducts } from '@/features/products/list-products/list-products.action';
 import { ProductCard } from '@/components/product/ProductCard';
 import { useTranslation } from '@/locales';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import {
   ShieldAlert,
   HeartHandshake,
@@ -19,6 +19,7 @@ import {
   Activity,
   Sparkles,
   Layers,
+  ShoppingBag,
 } from 'lucide-react';
 
 interface ConditionPageProps {
@@ -29,12 +30,10 @@ interface ConditionPageProps {
 
 export default function ConditionDetailPage({ params }: ConditionPageProps) {
   const resolvedParams = use(params);
+  const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
 
-  const conditionsFromStore = useAppSelector((state) => state.conditions.conditions);
-  const condition = (conditionsFromStore && conditionsFromStore.length > 0 ? conditionsFromStore : INITIAL_MOCK_CONDITIONS).find(
-    (c) => c.slug === resolvedParams.slug || c.tag === resolvedParams.slug
-  );
+  const condition = getStaticConditionBySlug(resolvedParams.slug);
 
   if (!condition) {
     notFound();
@@ -42,8 +41,17 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
 
   const localized = ConditionEntity.getLocalized(condition, locale);
 
-  // Tag-based linking: find products matching this condition's tag
-  const matchingProducts = INITIAL_MOCK_PRODUCTS.filter((p) =>
+  const productsFromStore = useAppSelector((state) => state.products.products);
+  const productsLoading = useAppSelector((state) => state.products.loading);
+
+  useEffect(() => {
+    if (!productsFromStore || productsFromStore.length === 0) {
+      dispatch(listProducts());
+    }
+  }, [dispatch, productsFromStore]);
+
+  // Tag-based linking: find live products matching this condition's tag
+  const matchingProducts = (productsFromStore || []).filter((p) =>
     p.conditionTags?.includes(condition.tag)
   );
 
@@ -515,17 +523,72 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
-            gap: '1.75rem',
-          }}
-        >
-          {matchingProducts.map((prod) => (
-            <ProductCard key={prod.id} product={prod} />
-          ))}
-        </div>
+        {productsLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.75rem' }}>
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                style={{
+                  height: 380,
+                  borderRadius: 16,
+                  background: '#f1f5f9',
+                  opacity: 0.7,
+                }}
+              />
+            ))}
+          </div>
+        ) : matchingProducts.length > 0 ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+              gap: '1.75rem',
+            }}
+          >
+            {matchingProducts.map((prod) => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              background: '#f8fafc',
+              borderRadius: 16,
+              padding: '2.5rem 1.5rem',
+              textAlign: 'center',
+              border: '1px dashed #cbd5e1',
+            }}
+          >
+            <ShoppingBag size={36} color="#64748b" style={{ margin: '0 auto 12px' }} />
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#1e293b', margin: '0 0 6px' }}>
+              {locale === 'hi'
+                ? 'वर्तमान में कोई कैटलॉग उपकरण इस स्थिति से मैप नहीं है'
+                : 'No equipment currently tagged for this condition'}
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', maxWidth: 450, margin: '0 auto 1.25rem' }}>
+              {locale === 'hi'
+                ? 'हमारे पूर्ण उपकरण कैटलॉग को देखें या क्लिनिकल सहायता टीम से संपर्क करें।'
+                : 'Browse our full medical equipment catalog or speak with our clinical biomedical specialists.'}
+            </p>
+            <Link
+              href="/shop"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#005c55',
+                color: '#ffffff',
+                padding: '9px 20px',
+                borderRadius: 9999,
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              {locale === 'hi' ? 'सभी उपकरण देखें' : 'Explore Medical Catalog'}
+            </Link>
+          </div>
+        )}
       </section>
     </div>
   );

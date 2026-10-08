@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -16,13 +16,23 @@ import {
   Layers,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { listProducts } from '@/features/products/list-products/list-products.action';
+import { listCategories } from '@/features/categories/list-categories/list-categories.action';
 import { deleteProduct } from '@/features/products/products.slice';
+import { axiosInterceptorInstanceClient } from '@/config/axios';
 
 export default function AdminProductsPage() {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.products);
+  const loading = useAppSelector((state) => state.products.loading);
+  const categories = useAppSelector((state) => state.categories.categories);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    dispatch(listProducts());
+    dispatch(listCategories());
+  }, [dispatch]);
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
@@ -32,9 +42,14 @@ export default function AdminProductsPage() {
     return Boolean(matchesSearch && matchesCat);
   });
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     if (confirm(`Are you sure you want to remove "${name}" from the active medical catalog?`)) {
-      dispatch(deleteProduct(id));
+      try {
+        await axiosInterceptorInstanceClient.delete(`/products/${id}`);
+        dispatch(deleteProduct(id));
+      } catch (err: any) {
+        alert(err?.response?.data?.message || err?.message || 'Failed to delete product from database');
+      }
     }
   };
 
@@ -119,30 +134,24 @@ export default function AdminProductsPage() {
           />
         </div>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          {['all', 'cat-respiratory', 'cat-mobility', 'cat-homecare'].map((cat) => (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {[{ id: 'all', name: 'All Categories' }, ...categories].map((cat) => (
             <button
-              key={cat}
+              key={cat.id}
               type="button"
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => setSelectedCategory(cat.id)}
               style={{
                 padding: '8px 14px',
                 borderRadius: 8,
-                border: selectedCategory === cat ? '1px solid #005c55' : '1px solid #dae2fd',
-                background: selectedCategory === cat ? '#e8f5f3' : '#ffffff',
-                color: selectedCategory === cat ? '#005c55' : '#3e4947',
+                border: selectedCategory === cat.id ? '1px solid #005c55' : '1px solid #dae2fd',
+                background: selectedCategory === cat.id ? '#e8f5f3' : '#ffffff',
+                color: selectedCategory === cat.id ? '#005c55' : '#3e4947',
                 fontSize: '0.8125rem',
-                fontWeight: selectedCategory === cat ? 700 : 500,
+                fontWeight: selectedCategory === cat.id ? 700 : 500,
                 cursor: 'pointer',
               }}
             >
-              {cat === 'all'
-                ? 'All Categories'
-                : cat === 'cat-respiratory'
-                ? 'Respiratory'
-                : cat === 'cat-mobility'
-                ? 'Mobility'
-                : 'Homecare'}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -185,7 +194,49 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map((p) => {
+            {loading && products.length === 0 ? (
+              [1, 2, 3, 4].map((n) => (
+                <tr key={n} style={{ borderBottom: '1px solid #f2f3ff' }}>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f1f5f9' }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ width: 140, height: 16, borderRadius: 4, background: '#f1f5f9' }} />
+                        <div style={{ width: 80, height: 12, borderRadius: 4, background: '#f1f5f9' }} />
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ width: 90, height: 16, borderRadius: 4, background: '#f1f5f9' }} />
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ width: 70, height: 16, borderRadius: 4, background: '#f1f5f9' }} />
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ width: 80, height: 16, borderRadius: 4, background: '#f1f5f9' }} />
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ width: 50, height: 16, borderRadius: 4, background: '#f1f5f9' }} />
+                  </td>
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ width: 60, height: 20, borderRadius: 999, background: '#f1f5f9' }} />
+                  </td>
+                  <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                    <div style={{ display: 'inline-flex', gap: 8 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: '#f1f5f9' }} />
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: '#f1f5f9' }} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : filteredProducts.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ padding: '2.5rem', textAlign: 'center', color: '#6e7977' }}>
+                  No medical equipment records found matching the query.
+                </td>
+              </tr>
+            ) : (
+              filteredProducts.map((p) => {
               const hasHindi = Boolean(p.translations?.hi);
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid #f2f3ff', transition: 'background 0.1s ease' }}>
@@ -205,7 +256,7 @@ export default function AdminProductsPage() {
                         }}
                       >
                         <Image
-                          src={p.images?.[0] || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200'}
+                          src={p.images?.[0] || '/images/oxygen_concentrator.png'}
                           alt={p.name}
                           fill
                           sizes="48px"
@@ -346,7 +397,8 @@ export default function AdminProductsPage() {
                   </td>
                 </tr>
               );
-            })}
+            })
+          )}
           </tbody>
         </table>
       </div>

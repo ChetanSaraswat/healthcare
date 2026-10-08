@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . .
 ENV PORT=3001
 EXPOSE 3001
-CMD ["npm", "run", "dev"]
+CMD ["tail", "-f", "/dev/null"]
 
 # 3. Production builder stage
 FROM dependencies AS builder

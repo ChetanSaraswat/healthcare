@@ -23,7 +23,7 @@ function getTransporter() {
       secure: SMTP_PORT === 465,
       ignoreTLS: true,
       tls: {
-        rejectUnauthorized: false,
+        rejectUnauthorized: process.env.NODE_ENV === 'production',
       },
     };
 

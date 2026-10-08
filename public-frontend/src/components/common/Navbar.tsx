@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { setLocale } from '@/features/ui/ui.slice';
+import { setLocale, showToast } from '@/features/ui/ui.slice';
 import { useTranslation } from '@/locales';
 import styles from './Navbar.module.scss';
 import {
@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { AuthModal } from '../auth/AuthModal';
 import { logout } from '@/features/auth/auth.slice';
+import { clearCart } from '@/features/cart/cart.slice';
+import { clearCheckoutSession } from '@/features/payment/checkout-session';
 import { UserEntity } from '@/domain/entities/user.entity';
 
 export const Navbar: React.FC = () => {
@@ -67,6 +69,8 @@ export const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(clearCart());
+    clearCheckoutSession();
     setIsUserDropdownOpen(false);
     router.push('/');
   };
@@ -75,41 +79,24 @@ export const Navbar: React.FC = () => {
   const firstName = authUser?.name ? authUser.name.split(' ')[0] : 'User';
 
 
+  const handleHotlineClick = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText('1800-889-2273');
+      dispatch(
+        showToast({
+          type: 'info',
+          message:
+            locale === 'hi'
+              ? '📞 24/7 केयरगिवर हेल्पलाइन (1800-889-2273) क्लिपबोर्ड पर कॉपी हो गई है'
+              : '📞 24/7 Caregiver Clinical Hotline (1800-889-2273) copied to clipboard!',
+        })
+      );
+    }
+  };
+
   return (
     <header className={styles.navbarWrapper}>
-      {/* 1. Clinical Emergency & Caregiver Hotline Banner */}
-      <div className={styles.topBar}>
-        <div className={styles.container}>
-          <div className={styles.leftPill}>
-            <span className={styles.badge}>
-              <ShieldCheck size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-              {t.common.certifiedBadge}
-            </span>
-            <span className={styles.supportText}>
-              {t.common.helpline}
-            </span>
-          </div>
-          <div className={styles.rightLinks}>
-            <Link href="/assessment">
-              <Stethoscope size={14} /> {locale === 'hi' ? 'उपकरण चयन सहायक' : 'Care Assessment'}
-            </Link>
-            <Link href="/hubs">
-              <MapPin size={14} /> {locale === 'hi' ? 'अनुभव केंद्र' : 'Experience Centers'}
-            </Link>
-            <Link href="/blog">
-              <Sparkles size={14} /> {t.common.knowledgeHub}
-            </Link>
-            <Link href="/account/rentals">
-              <Clock size={14} /> {t.common.activeRentals}
-            </Link>
-            <Link href="/admin" style={{ color: '#005c55', fontWeight: 700 }}>
-              <ShieldCheck size={14} /> Admin
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Main Navigation Bar */}
+      {/* Main Navigation Bar */}
       <div className={styles.mainNav}>
         <div className={styles.container}>
           {/* Brand Logo */}
@@ -132,8 +119,13 @@ export const Navbar: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button type="submit" className={styles.searchBtn}>
-              {t.common.searchBtn}
+            <button
+              type="submit"
+              className={styles.searchBtn}
+              aria-label={t.common.searchBtn}
+              title={t.common.searchBtn}
+            >
+              <Search size={16} />
             </button>
           </form>
 
@@ -383,7 +375,7 @@ export const Navbar: React.FC = () => {
       {/* 3. Category & Clinical Condition Sub-navigation Bar */}
       <nav className={styles.categorySubNav}>
         <div className={styles.container}>
-          <Link href="/shop" className={styles.navItem}>
+          <Link href="/shop" className={styles.navItem}  >
             {t.common.allEquipment}
           </Link>
           <Link href="/learn/sleep-apnea" className={`${styles.navItem} ${styles.highlight}`}>
@@ -395,16 +387,29 @@ export const Navbar: React.FC = () => {
           <Link href="/about" className={styles.navItem}>
             {locale === 'hi' ? 'हमारे बारे में' : 'About Us'}
           </Link>
-          <Link href="/hubs" className={styles.navItem}>
-            {locale === 'hi' ? 'अनुभव केंद्र' : 'Experience Hubs'}
-          </Link>
-          <a
-            href="tel:18008892273"
+          <button
+            type="button"
+            onClick={handleHotlineClick}
             className={styles.navItem}
-            style={{ marginLeft: 'auto', color: '#005c55', display: 'flex', alignItems: 'center', gap: 4 }}
+            title={locale === 'hi' ? 'क्लिक करके हॉटलाइन कॉपी करें' : 'Click to copy 24/7 hotline'}
+            style={{
+              marginLeft: 'auto',
+              color: '#005c55',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              font: 'inherit',
+            }}
           >
-            <PhoneCall size={14} /> {t.common.immediateDispatch}
-          </a>
+            <PhoneCall size={14} />
+            <span>{t.common.immediateDispatch}</span>
+            <span style={{ fontSize: '0.8125rem', opacity: 0.9, fontWeight: 700 }}>
+              1800-889-2273
+            </span>
+          </button>
         </div>
       </nav>
 

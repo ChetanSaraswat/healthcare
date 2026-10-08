@@ -50,7 +50,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
-    command: ["npm", "run", "dev"]
     env_file:
       - .env
     environment:
@@ -73,21 +72,6 @@ services:
     restart: on-failure
     tty: true
     stdin_open: true
-
-  test-database:
-    image: postgres:16.1-alpine3.18
-    container_name: aarogyamed-test-postgres
-    restart: unless-stopped
-    ports:
-      - "${DB_TEST_PORT:-5433}:5432"
-    environment:
-      - POSTGRES_USER=${DB_TEST_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_TEST_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_TEST_DATABASE:-aarogyamed_test_db}
-    volumes:
-      - pg_test_data:/var/lib/postgresql/data
-    networks:
-      - aarogyamed_network
 
 networks:
   aarogyamed_network:

@@ -16,4 +16,5 @@ module.exports = {
   paymentRepository: require('./payment.repository'),
   webhookEventRepository: require('./webhook-event.repository'),
   notificationLogRepository: require('./notification-log.repository'),
+  staticPageRepository: require('./static-page.repository'),
 };

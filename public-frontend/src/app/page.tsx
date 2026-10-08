@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useAppSelector } from '@/store/hooks';
-import { ProductCard } from '@/components/product/ProductCard';
-import { INITIAL_MOCK_PRODUCTS } from '@/features/products/list-products/list-products.service';
-import { INITIAL_MOCK_CATEGORIES } from '@/features/categories/list-categories/list-categories.service';
-import { INITIAL_MOCK_CONDITIONS } from '@/features/conditions/list-conditions/list-conditions.service';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { listCategories } from '@/features/categories/list-categories/list-categories.action';
+import { STATIC_LEARN_CONDITIONS } from '@/content/learn/conditions';
 import { ConditionEntity } from '@/domain/entities/condition.entity';
 import { useTranslation } from '@/locales';
 import styles from './page.module.scss';
@@ -28,16 +26,19 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Live Redux catalog data binding with fallback
-  const reduxProducts = useAppSelector((state) => state.products?.products);
-  const reduxCategories = useAppSelector((state) => state.categories?.categories);
+  // Live Redux catalog data binding with loading state - NO fake fallback
+  const categoriesList = useAppSelector((state) => state.categories?.categories) || [];
+  const categoriesLoading = useAppSelector((state) => state.categories?.loading);
 
-  const productsList = reduxProducts && reduxProducts.length > 0 ? reduxProducts : INITIAL_MOCK_PRODUCTS;
-  const categoriesList = reduxCategories && reduxCategories.length > 0 ? reduxCategories : INITIAL_MOCK_CATEGORIES;
-  const featuredProducts = productsList.slice(0, 4);
+  useEffect(() => {
+    if (categoriesList.length === 0) {
+      dispatch(listCategories());
+    }
+  }, [dispatch, categoriesList.length]);
 
   const heroSlides = [
     {
@@ -108,9 +109,9 @@ export default function HomePage() {
       primaryCtaTextEn: 'About AarogyaMed',
       primaryCtaTextHi: 'आरोग्यमेड के बारे में',
       primaryCtaLink: '/about',
-      secondaryCtaTextEn: 'Experience Hubs',
-      secondaryCtaTextHi: 'अनुभव केंद्र खोजें',
-      secondaryCtaLink: '/hubs',
+      secondaryCtaTextEn: '24/7 Clinical Support',
+      secondaryCtaTextHi: '24/7 क्लिनिकल सहायता',
+      secondaryCtaLink: '/contact',
     },
   ];
 
@@ -189,7 +190,7 @@ export default function HomePage() {
                   <div className={styles.lbl}>{t.common.sterilization}</div>
                 </div>
                 <div className={styles.statItem}>
-                  <div className={styles.num}>40,000+</div>
+                  <div className={styles.num}>40+</div>
                   <div className={styles.lbl}>{t.common.familiesSupported}</div>
                 </div>
               </div>
@@ -229,21 +230,62 @@ export default function HomePage() {
           </div>
 
           <div className={styles.categoryGrid}>
-            {categoriesList.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/shop?category=${cat.id}`}
-                className={styles.catCard}
-              >
-                <div className={styles.catIcon}>{getCategoryIcon(cat.icon)}</div>
-                <h3>{cat.name}</h3>
-                <p>{cat.description}</p>
-                <div className={styles.catFooter}>
-                  <span>Explore {cat.productCount} models</span>
-                  <ArrowRight size={14} />
+            {categoriesLoading && categoriesList.length === 0 ? (
+              [1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className={styles.catCard}
+                  style={{ opacity: 0.6, pointerEvents: 'none', minHeight: 180 }}
+                >
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 12,
+                      background: '#e0e5eb',
+                      marginBottom: 16,
+                    }}
+                  />
+                  <div
+                    style={{
+                      height: 18,
+                      width: '70%',
+                      background: '#e0e5eb',
+                      borderRadius: 4,
+                      marginBottom: 8,
+                    }}
+                  />
+                  <div
+                    style={{
+                      height: 14,
+                      width: '90%',
+                      background: '#edf0f5',
+                      borderRadius: 4,
+                    }}
+                  />
                 </div>
-              </Link>
-            ))}
+              ))
+            ) : categoriesList.length === 0 ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem 0', color: '#6e7977' }}>
+                {locale === 'hi' ? 'कोई श्रेणी उपलब्ध नहीं है।' : 'No categories currently available.'}
+              </div>
+            ) : (
+              categoriesList.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/shop?category=${cat.id}`}
+                  className={styles.catCard}
+                >
+                  <div className={styles.catIcon}>{getCategoryIcon(cat.icon)}</div>
+                  <h3>{cat.name}</h3>
+                  <p>{cat.description}</p>
+                  <div className={styles.catFooter}>
+                    <span>Explore {cat.productCount} models</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -312,45 +354,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Featured Equipment Grid */}
-      <section className={styles.productsSection}>
-        <div className={styles.container}>
-          <div className={styles.sectionTitleRow}>
-            <div className={styles.pretitle}>Verified Clinical Catalog</div>
-            <h2>Most Requested Critical Care Equipment</h2>
-            <p>
-              Every unit is eligible for either direct purchase with full manufacturer warranty or
-              flexible monthly rental with zero maintenance liability.
-            </p>
-          </div>
 
-          <div className={styles.productGrid}>
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link
-              href="/shop"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#005c55',
-                color: '#ffffff',
-                padding: '14px 32px',
-                borderRadius: 9999,
-                fontWeight: 700,
-                textDecoration: 'none',
-              }}
-            >
-              <span>{t.common.viewCatalog}</span>
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* 4.5. Clinical Trust & Biomedical Compliance Banner */}
       <section className={styles.clinicalTrustBannerSection}>
@@ -362,8 +366,8 @@ export default function HomePage() {
               </div>
               <h3>
                 {locale === 'hi'
-                  ? 'भारत के 40,000+ परिवार आरोग्यमेड के क्लिनिकल मानकों पर भरोसा क्यों करते हैं?'
-                  : 'Why 40,000+ Indian Families Trust AarogyaMed Clinical Standards'}
+                  ? 'भारत के 40+ परिवार आरोग्यमेड के क्लिनिकल मानकों पर भरोसा क्यों करते हैं?'
+                  : 'Why 40+ Indian Families Trust AarogyaMed Clinical Standards'}
               </h3>
               <p>
                 {locale === 'hi'
@@ -376,9 +380,9 @@ export default function HomePage() {
                 <span>{locale === 'hi' ? 'हमारे क्लिनिकल मानक' : 'Our Clinical Protocols'}</span>
                 <ArrowRight size={16} />
               </Link>
-              <Link href="/hubs" className={styles.btnHelpline}>
-                <MapPin size={16} />
-                <span>{locale === 'hi' ? 'अनुभव केंद्र खोजें' : 'Experience Centers'}</span>
+              <Link href="/contact" className={styles.btnHelpline}>
+                <PhoneCall size={16} />
+                <span>{locale === 'hi' ? '24/7 क्लिनिकल हेल्पलाइन' : '24/7 Clinical Support'}</span>
               </Link>
             </div>
           </div>
@@ -401,7 +405,7 @@ export default function HomePage() {
           </div>
 
           <div className={styles.conditionGrid}>
-            {INITIAL_MOCK_CONDITIONS.map((cond) => {
+            {STATIC_LEARN_CONDITIONS.map((cond) => {
               const locCond = ConditionEntity.getLocalized(cond, locale);
               return (
                 <Link

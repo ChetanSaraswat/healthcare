@@ -47,11 +47,9 @@ export const cartSlice = createAppSlice({
       (state, action) => {
         const item = state.items.find((i) => i.id === action.payload.id);
         if (item) {
-          if (action.payload.quantity <= 0) {
-            state.items = state.items.filter((i) => i.id !== action.payload.id);
-          } else {
-            item.quantity = action.payload.quantity;
-          }
+          // Invariant: Quantity cannot be decreased below 1 via minus button.
+          // To remove, user must explicitly trigger removeFromCart.
+          item.quantity = Math.max(1, action.payload.quantity);
         }
         state.pricing = CartPricingCalculator.calculate(state.items);
       }
@@ -61,7 +59,8 @@ export const cartSlice = createAppSlice({
       (state, action) => {
         const item = state.items.find((i) => i.id === action.payload.id);
         if (item && item.type === 'rent') {
-          item.rentalDays = Math.max(1, action.payload.durationDays);
+          // Custom rental duration supported between 1 and 180 days
+          item.rentalDays = Math.min(180, Math.max(1, action.payload.durationDays));
         }
         state.pricing = CartPricingCalculator.calculate(state.items);
       }
@@ -91,6 +90,12 @@ export const cartSlice = createAppSlice({
       }
     }),
   }),
+  extraReducers: (builder) => {
+    builder.addCase('auth/logout', (state) => {
+      state.items = [];
+      state.pricing = CartPricingCalculator.calculate([]);
+    });
+  },
 });
 
 export const {

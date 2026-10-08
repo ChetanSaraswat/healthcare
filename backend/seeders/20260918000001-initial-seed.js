@@ -1,5 +1,5 @@
 'use strict';
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
@@ -189,7 +189,7 @@ module.exports = {
           subcategory_id: subcategories[0].id,
           brand: 'ResMed',
           description: 'The world’s leading auto-adjusting CPAP machine with integrated HumidAir heated humidifier and climate control. Designed for comfortable, whisper-quiet sleep apnea therapy.',
-          images: JSON.stringify(['/images/products/airsense-10.png']),
+          images: JSON.stringify(['/images/oxygen_concentrator.png', '/images/elderly_couple.png']),
           videos: JSON.stringify([]),
           specifications: JSON.stringify([
             { label: 'Pressure Range', value: '4 to 20 cm H2O' },
@@ -222,7 +222,7 @@ module.exports = {
           subcategory_id: subcategories[1].id,
           brand: 'Philips Respironics',
           description: 'Compact 5-liter stationary oxygen concentrator delivering continuous flow medical oxygen with low power consumption and ultra-durable recessed flow meter.',
-          images: JSON.stringify(['/images/products/everflo-5l.png']),
+          images: JSON.stringify(['/images/oxygen_concentrator.png', '/images/caregiver.png']),
           videos: JSON.stringify([]),
           specifications: JSON.stringify([
             { label: 'Flow Rate', value: '0.5 to 5 LPM' },
@@ -255,7 +255,7 @@ module.exports = {
           subcategory_id: subcategories[3].id,
           brand: 'AarogyaCare Pro',
           description: 'Heavy-duty motorized 5-function ICU bed with remote handset, Trendelenburg positioning, ABS collapsible railings, and central braking system.',
-          images: JSON.stringify(['/images/products/icu-bed.png']),
+          images: JSON.stringify(['/images/hospital_bed.png', '/images/caregiver.png']),
           videos: JSON.stringify([]),
           specifications: JSON.stringify([
             { label: 'Functions', value: 'Backrest, Knee rest, Height Adjustment, Trendelenburg, Reverse Trendelenburg' },
@@ -287,7 +287,7 @@ module.exports = {
           subcategory_id: subcategories[2].id,
           brand: 'Karma Healthcare',
           description: 'Ultra-lightweight aircraft-grade aluminum wheelchair with patented S-Ergo seating system to relieve pressure and prevent slippage.',
-          images: JSON.stringify(['/images/products/karma-wheelchair.png']),
+          images: JSON.stringify(['/images/hospital_bed.png', '/images/elderly_couple.png']),
           videos: JSON.stringify([]),
           specifications: JSON.stringify([
             { label: 'Frame Material', value: 'Aircraft Grade Aluminum' },

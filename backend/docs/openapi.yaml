@@ -1,4 +1,4 @@
- openapi: 3.0.3
+openapi: 3.0.3
 info:
   title: AarogyaMed Biomedical & Clinical Equipment Platform API
   description: >-
@@ -317,6 +317,36 @@ components:
         - razorpay_order_id
         - razorpay_payment_id
         - razorpay_signature
+    VerifyPaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            status:
+              type: string
+              enum: [pending, captured, failed]
+              example: pending
+            paymentId:
+              type: string
+              example: pay_Kjs8923fdh
+            orderId:
+              type: integer
+              nullable: true
+              example: 12
+            rentalOrderId:
+              type: integer
+              nullable: true
+              example: null
+            message:
+              type: string
+              example: Payment received and awaiting confirmation
 paths:
   /health:
     get:
@@ -742,8 +772,8 @@ paths:
           $ref: '#/components/schemas/ErrorResponse'
   /payments/verify:
     post:
-      summary: Verify & Capture Razorpay Payment
-      description: Verifies HMAC SHA-256 signature and captures the payment in database with concurrency locking.
+      summary: Verify Razorpay Payment Callback (Non-authoritative)
+      description: Verifies HMAC SHA-256 signature from browser checkout callback, records payment ID, and returns current authoritative payment state without performing financial capture or marking orders paid.
       security:
         - BearerAuth: []
       requestBody:
@@ -754,7 +784,11 @@ paths:
               $ref: '#/components/schemas/VerifyPaymentRequest'
       responses:
         '200':
-          description: Payment captured and order confirmed
+          description: Payment signature verified and current non-authoritative status returned (pending or captured)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPaymentResponse'
         '400':
           $ref: '#/components/schemas/ErrorResponse'
   /payments/webhook:

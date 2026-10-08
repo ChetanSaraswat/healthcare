@@ -16,10 +16,11 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
+import { STATIC_BLOG_POSTS } from '@/content/blog/posts';
+
 export default function CaregiverHubPage() {
   const locale = useAppSelector((state) => state.ui.locale);
-  const rawPosts = useAppSelector((state) => state.blog?.posts || []);
-  const publishedPosts = rawPosts.filter((p) => p.status === 'published');
+  const publishedPosts = STATIC_BLOG_POSTS.filter((p) => p.status === 'published');
 
   const [activeReadingPost, setActiveReadingPost] = useState<BlogPost | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);

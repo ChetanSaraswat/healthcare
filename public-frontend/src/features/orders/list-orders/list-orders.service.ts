@@ -2,55 +2,60 @@ import { axiosInterceptorInstanceClient } from '@/config/axios';
 import { Order } from '@/domain/entities/order.entity';
 import { ListOrdersResponse } from './list-orders.interface';
 
-export const INITIAL_MOCK_ORDERS: Order[] = [
-  {
-    id: 'ord-demo-01',
-    orderNumber: 'ARM-BUY-2026-9041',
-    shippingAddress: {
-      fullName: 'Sunita Sharma',
-      phone: '+91 98765 43210',
-      email: 'sunita.sharma@example.com',
-      addressLine1: 'B-402, Green Glen Layout, Bellandur',
-      city: 'Bengaluru',
-      state: 'Karnataka',
-      pincode: '560103',
-    },
-    items: [
-      {
-        id: 'ord-item-01',
-        orderId: 'ord-demo-01',
-        productId: 'prod-006',
-        productName: 'Anti-Decubitus Ripple Medical Air Mattress with Pump',
-        productImage: '/images/hospital_bed.png',
-        unitPrice: 3200,
-        quantity: 1,
-        totalPrice: 3200,
-      },
-    ],
-    subtotal: 3200,
-    shippingFee: 0,
-    tax: 384,
-    total: 3200,
-    paymentStatus: 'paid',
-    paymentMethod: 'UPI (Google Pay)',
-    status: 'delivered',
-    createdAt: '2026-08-15T11:20:00.000Z',
-    updatedAt: '2026-08-16T16:00:00.000Z',
-  },
-];
+// Dynamic database-driven orders - no fake mock data
+export const INITIAL_MOCK_ORDERS: Order[] = [];
 
 export const listOrdersService = async (): Promise<ListOrdersResponse> => {
   try {
-    const response = await axiosInterceptorInstanceClient.get('/orders');
-    if (response.data && Array.isArray(response.data.data)) {
-      return response.data;
+    const response = await axiosInterceptorInstanceClient.get('/orders/my');
+    const rawList = response.data?.data;
+    if (Array.isArray(rawList)) {
+      const orders: Order[] = rawList.map((o: any) => ({
+        id: String(o.id),
+        orderNumber: `ARM-BUY-${String(o.id).padStart(4, '0')}`,
+        shippingAddress: {
+          fullName: o.user?.name || o.address?.label || '',
+          phone: o.user?.phone || '',
+          email: o.user?.email || '',
+          addressLine1: o.address?.line1 || '',
+          city: o.address?.city || '',
+          state: o.address?.state || '',
+          pincode: o.address?.pincode || '',
+        },
+        items: Array.isArray(o.items)
+          ? o.items.map((it: any) => ({
+              id: String(it.id),
+              orderId: String(o.id),
+              productId: String(it.product_id),
+              productName: it.product?.name || '',
+              productImage: (Array.isArray(it.product?.images) && it.product.images[0]) || '/images/oxygen_concentrator.png',
+              unitPrice: parseFloat(it.unit_price) || 0,
+              quantity: Number(it.quantity) || 1,
+              totalPrice: (parseFloat(it.unit_price) || 0) * (Number(it.quantity) || 1),
+            }))
+          : [],
+        subtotal: parseFloat(o.total_amount) || 0,
+        shippingFee: 0,
+        tax: Math.round((parseFloat(o.total_amount) || 0) * 0.12),
+        total: parseFloat(o.total_amount) || 0,
+        paymentStatus: o.status === 'paid' ? 'paid' : 'pending',
+        paymentMethod: o.payment_id ? 'Razorpay Online' : 'Cash on Delivery',
+        status: o.status || 'pending',
+        createdAt: o.created_at || new Date().toISOString(),
+        updatedAt: o.updated_at || new Date().toISOString(),
+      }));
+
+      return {
+        success: true,
+        data: orders,
+      };
     }
   } catch (err) {
-    // Return mock
+    console.warn('[listOrdersService] Error fetching customer orders:', err);
   }
 
   return {
     success: true,
-    data: INITIAL_MOCK_ORDERS,
+    data: [],
   };
 };

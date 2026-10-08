@@ -20,7 +20,8 @@ class MockWhatsAppProvider extends WhatsAppProvider {
       };
     }
 
-    const messageId = `mock_wa_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const crypto = require('crypto');
+    const messageId = `wa_${crypto.randomUUID()}`;
     const record = {
       messageId,
       to,

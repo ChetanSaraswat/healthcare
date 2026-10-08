@@ -29,14 +29,14 @@ class OrderValidationService {
         throw new BadRequest('Product UUID (product_uuid) is required for each item');
       }
 
-      const product = await productRepository.findOneInstance({
-        uuid: productUuid,
-        buy_available: true,
-        status: 'active',
-      });
+      const product = await productRepository.findByIdentifier(
+        productUuid,
+        { buy_available: true, status: 'active' },
+        true
+      );
 
       if (!product) {
-        throw new BadRequest(`Product #${productUuid} is not available for purchase`);
+        throw new BadRequest(`Product '${productUuid}' is not available for purchase`);
       }
 
       const quantity = Number(item.quantity);

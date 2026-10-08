@@ -1,14 +1,10 @@
 const { blogPostRepository } = require('../repository');
 const { NotFound, Conflict } = require('../libs/error');
+const { slugify } = require('../libs/utils');
 
 class BlogService {
   slugify(text) {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    return slugify(text);
   }
 
   resolveLocalizedPost(plainPost, locale = 'en') {

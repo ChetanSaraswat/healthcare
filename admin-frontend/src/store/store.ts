@@ -44,7 +44,7 @@ export type RootState = ReturnType<typeof rootReducer>;
 const persistConfig = {
   key: 'aarogyamed_admin_root',
   storage,
-  whitelist: ['auth', 'ui'],
+  whitelist: ['auth'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

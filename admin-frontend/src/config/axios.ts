@@ -81,23 +81,74 @@ export function extractApiErrorMessage(error: any, fallback = 'An unexpected err
   return fallback;
 }
 
+let lastErrorToast = {
+  message: '',
+  timestamp: 0,
+};
+
+function triggerErrorSnackbar(message: string) {
+  if (typeof window === 'undefined') return;
+  const now = Date.now();
+  if (lastErrorToast.message === message && now - lastErrorToast.timestamp < 1500) {
+    return;
+  }
+  lastErrorToast = { message, timestamp: now };
+
+  window.dispatchEvent(
+    new CustomEvent('aarogyamed:toast', {
+      detail: { type: 'error', message, duration: 4500 },
+    })
+  );
+}
+
 axiosInterceptorInstanceClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const extractedMessage = extractApiErrorMessage(error);
-    if (extractedMessage) {
-      error.message = extractedMessage;
-    }
+    const status = error.response?.status;
+    const url = error.config?.url || '';
+    const isSilentCheck = url.includes('/auth/me') && status === 401;
 
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      const url = error.config?.url || '';
-      if (!url.includes('/auth/login')) {
+    let userFacingMessage = extractApiErrorMessage(error, '');
+
+    if (status === 400 && !userFacingMessage) {
+      userFacingMessage = 'Invalid request parameters. Please verify input data.';
+    } else if (status === 401) {
+      if (typeof window !== 'undefined' && !url.includes('/auth/login')) {
         localStorage.removeItem('aarogyamed_admin_auth_token');
       }
+      if (!isSilentCheck && !userFacingMessage) {
+        userFacingMessage = 'Admin session expired. Please sign in again.';
+      }
+    } else if (status === 403) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'Administrative access denied. Insufficient permissions.';
+      }
+    } else if (status === 404) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'Requested admin resource or entity was not found.';
+      }
+    } else if (status === 409) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'A conflicting record already exists in the database.';
+      }
+    } else if (status === 422) {
+      if (!userFacingMessage) {
+        userFacingMessage = 'Validation failed. Please verify required fields and formats.';
+      }
+    } else if (status === 429) {
+      userFacingMessage = 'Rate limit exceeded. Please wait a moment.';
+    } else if (status && status >= 500) {
+      userFacingMessage = 'Backend service encountered an error. Please try again.';
+    } else if (!error.response && (error.message === 'Network Error' || error.code === 'ERR_NETWORK')) {
+      userFacingMessage = 'Unable to connect to AarogyaMed backend API. Check your network.';
     }
 
-    if (error.response?.status === 403) {
-      console.warn('[AarogyaMed Admin] 403 Forbidden:', extractedMessage);
+    if (!isSilentCheck && userFacingMessage) {
+      triggerErrorSnackbar(userFacingMessage);
+    }
+
+    if (userFacingMessage) {
+      error.message = userFacingMessage;
     }
 
     return Promise.reject(error);

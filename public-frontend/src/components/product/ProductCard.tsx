@@ -39,24 +39,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     router.push('/cart');
   };
 
-  const handleQuickRent = (e: React.MouseEvent) => {
+  const handleExploreRentalPlans = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(
-      addToCart({
-        id: `${product.id}-rent`,
-        productId: product.id,
-        name: localized.name,
-        slug: product.slug,
-        image: product.primaryImage,
-        type: 'rent',
-        quantity: 1,
-        dailyRate: product.rentalDailyRate,
-        rentalDays: product.rentalMinDays || 7,
-        rentalDeposit: product.rentalSecurityDeposit,
-      })
-    );
-    router.push('/cart');
+    router.push(`/product/${product.slug}?mode=rent`);
   };
 
   const discountPercent =
@@ -64,10 +50,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       ? Math.round(((product.mrp - product.buyPrice) / product.mrp) * 100)
       : 0;
 
+  const hasRealRating = Boolean(product.rating && product.reviewsCount && product.reviewsCount > 0);
+
+  const imageSrc = product.primaryImage || product.images?.[0] || '/images/oxygen_concentrator.png';
+
   return (
     <div className={styles.card}>
       <Link href={`/product/${product.slug}`} className={styles.imageBox}>
-        <img src={product.primaryImage} alt={localized.name} />
+        {imageSrc ? <img src={imageSrc} alt={localized.name} /> : null}
         <div className={styles.badgeStack}>
           {product.certifications && product.certifications[0] && (
             <span className={styles.certBadge}>
@@ -86,12 +76,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {localized.name}
         </Link>
 
+        {/* Real Rating Only - Empty State if no genuine reviews exist */}
         <div className={styles.ratingRow}>
-          <div className={styles.stars}>
-            <Star size={14} fill="#ea580c" />
-          </div>
-          <span className={styles.score}>{product.rating || 4.9}</span>
-          <span>({product.reviewsCount || 85} {locale === 'hi' ? 'समीक्षाएं' : 'reviews'})</span>
+          {hasRealRating ? (
+            <>
+              <div className={styles.stars}>
+                <Star size={14} fill="#ea580c" />
+              </div>
+              <span className={styles.score}>{product.rating}</span>
+              <span>({product.reviewsCount} {locale === 'hi' ? 'समीक्षाएं' : 'reviews'})</span>
+            </>
+          ) : (
+            <span style={{ color: '#005c55', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <ShieldCheck size={13} /> {locale === 'hi' ? 'चिकित्सकीय रूप से सत्यापित' : 'AarogyaMed Verified'}
+            </span>
+          )}
         </div>
 
         {/* Dual Buy vs Rent Pricing Grid */}
@@ -115,26 +114,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </div>
 
+        {/* Distinct Actions: Buy Outright vs Explore Rental Plans */}
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.buyBtn}
             onClick={handleQuickBuy}
-            aria-label={`Buy ${localized.name}`}
+            aria-label={`Buy ${localized.name} outright`}
+            title={locale === 'hi' ? 'सीधे खरीदें' : 'Buy Outright'}
           >
-            <ShoppingBag size={14} /> {t.product.buyNow}
+            <ShoppingBag size={14} /> {locale === 'hi' ? 'सीधे खरीदें' : 'Buy Outright'}
           </button>
           <button
             type="button"
             className={styles.rentBtn}
-            onClick={handleQuickRent}
-            aria-label={`Rent ${localized.name}`}
+            onClick={handleExploreRentalPlans}
+            aria-label={`Explore rental plans for ${localized.name}`}
+            title={locale === 'hi' ? 'रेंटल योजनाएं देखें' : 'Explore Rental Plans'}
           >
-            <CalendarClock size={14} /> {t.product.rentNow}
+            <CalendarClock size={14} /> {locale === 'hi' ? 'रेंटल योजनाएं देखें' : 'Explore Rental Plans'}
           </button>
         </div>
       </div>
     </div>
   );
 };
-

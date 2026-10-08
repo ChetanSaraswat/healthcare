@@ -34,6 +34,27 @@ class ProductRepository extends BaseRepository {
     return count > 0;
   }
 
+  async findByIdentifier(identifier, additionalCriteria = {}, asInstance = false) {
+    if (!identifier) return null;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+    const isInteger = Number.isInteger(identifier) || (typeof identifier === 'string' && /^\d+$/.test(identifier));
+
+    let whereClause = {};
+    if (isUuid) {
+      whereClause = { uuid: identifier, ...additionalCriteria };
+    } else if (isInteger) {
+      whereClause = { id: parseInt(identifier, 10), ...additionalCriteria };
+    } else {
+      whereClause = { slug: identifier, ...additionalCriteria };
+    }
+
+    if (asInstance) {
+      return await this.model.findOne({ where: whereClause });
+    }
+    const res = await this.model.findOne({ where: whereClause });
+    return res && res.toJSON ? res.toJSON() : res;
+  }
+
   async findWithFilters(filters = {}) {
     const {
       category,
@@ -106,10 +127,17 @@ class ProductRepository extends BaseRepository {
     if (category) {
       const isNum = !isNaN(Number(category));
       include[0].where = isNum ? { id: Number(category) } : { slug: category };
+      include[0].required = true;
     }
 
     if (tag) {
-      include[2].where = { slug: tag };
+      include[2].where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${tag}%` } },
+          { display_name: { [Op.iLike]: `%${tag}%` } },
+        ],
+      };
+      include[2].required = true;
     }
 
     let order = [['created_at', 'DESC']];

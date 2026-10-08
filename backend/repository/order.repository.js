@@ -7,8 +7,18 @@ class OrderRepository extends BaseRepository {
     super(payload);
   }
 
-  async findOrderDetails(uuid, userId = null, options = {}) {
-    const where = { uuid };
+  async findOrderDetails(identifier, userId = null, options = {}) {
+    if (!identifier) return null;
+    const isUuid = typeof identifier === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+    const isInteger = Number.isInteger(identifier) || (typeof identifier === 'string' && /^\d+$/.test(identifier));
+
+    if (!isUuid && !isInteger) {
+      return null;
+    }
+
+    const where = isUuid
+      ? { uuid: identifier }
+      : { id: typeof identifier === 'string' ? parseInt(identifier, 10) : identifier };
 
     if (userId) {
       where.user_id = userId;

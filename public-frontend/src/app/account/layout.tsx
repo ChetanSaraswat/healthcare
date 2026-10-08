@@ -117,7 +117,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   const userName = authUser.name;
   const userEmail = authUser.email;
-  const userPhone = authUser.phone || '+91 98765 43210';
+  const userPhone = authUser.phone;
   const initials = UserEntity.getInitials(userName);
 
 

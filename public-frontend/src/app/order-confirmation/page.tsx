@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React, { useState, Suspense } from 'react';
@@ -18,6 +17,7 @@ import {
   FileText,
   Printer,
   CreditCard,
+  AlertTriangle,
 } from 'lucide-react';
 
 function OrderConfirmationContent() {
@@ -25,7 +25,7 @@ function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('paymentId');
   const method = searchParams.get('method');
-  const warning = searchParams.get('warning');
+  const statusParam = searchParams.get('status');
 
   const latestOrder = useAppSelector((state) => state.orders.latestPlacedOrder);
   const latestRental = useAppSelector((state) => state.rentals.latestPlacedRental);
@@ -34,10 +34,104 @@ function OrderConfirmationContent() {
   const orderNum = latestOrder?.orderNumber || 'ARM-BUY-2026-9482';
   const rentalNum = latestRental?.rentalOrderNumber || 'ARM-RNT-2026-3391';
 
+  // In the Razorpay instant capture flow, orders reaching confirmation are confirmed immediately
+  const isFailed = statusParam === 'failed';
+
   return (
     <div style={{ maxWidth: 840, margin: '3rem auto 6rem', padding: '0 1.5rem' }}>
-      {/* Success Badge */}
-      <div
+
+      {/* 1. Failed State */}
+      {isFailed && (
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 24,
+            border: '1.5px solid #fecaca',
+            boxShadow: '0 10px 32px rgba(220, 38, 38, 0.08)',
+            padding: '3.5rem 2rem',
+            textAlign: 'center',
+            marginBottom: '2rem',
+          }}
+        >
+          <div
+            style={{
+              width: 76,
+              height: 76,
+              borderRadius: '50%',
+              background: '#fef2f2',
+              color: '#dc2626',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              border: '2px solid #dc2626',
+            }}
+          >
+            <AlertTriangle size={44} />
+          </div>
+
+          <span
+            style={{
+              background: '#fef2f2',
+              color: '#dc2626',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              padding: '4px 14px',
+              borderRadius: 9999,
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {locale === 'hi' ? 'भुगतान विफल' : 'Payment Failed'}
+          </span>
+
+          <h1 style={{ fontSize: '2.125rem', fontWeight: 800, color: '#131b2e', margin: '1rem 0 0.5rem' }}>
+            {locale === 'hi' ? 'भुगतान की पुष्टि नहीं हो सकी' : 'Payment Could Not Be Confirmed'}
+          </h1>
+          <p style={{ color: '#52605d', fontSize: '1.0625rem', maxWidth: 620, margin: '0 auto 2rem', lineHeight: 1.6 }}>
+            {locale === 'hi'
+              ? 'गेटवे ने इस भुगतान को अस्वीकार कर दिया। आपके खाते से कोई राशि नहीं काटी गई है, या कटी हुई राशि स्वतः वापस आ जाएगी। कृपया पुनः प्रयास करें।'
+              : 'The gateway reported that this payment attempt was declined or cancelled. Your order remains pending and you can retry payment.'}
+          </p>
+
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <Link
+              href="/checkout"
+              style={{
+                background: '#005c55',
+                color: '#ffffff',
+                padding: '12px 24px',
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: '0.9375rem',
+                textDecoration: 'none',
+              }}
+            >
+              Retry Payment
+            </Link>
+            <Link
+              href="/shop"
+              style={{
+                background: '#faf8ff',
+                color: '#00201d',
+                padding: '12px 24px',
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: '0.9375rem',
+                border: '1.5px solid #dae2fd',
+                textDecoration: 'none',
+              }}
+            >
+              Return to Catalog
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Confirmed State (Rendered when captured or COD) */}
+      {!isFailed && (
+        <>
+          <div
         style={{
           background: '#ffffff',
           borderRadius: 24,
@@ -374,6 +468,8 @@ function OrderConfirmationContent() {
           </div>
         </div>
       </div>
+        </>
+      )}
 
       {/* Clinical GST Tax Invoice Modal */}
       <ClinicalInvoiceModal

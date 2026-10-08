@@ -30,8 +30,10 @@ function computeCartFingerprint(items) {
     .join('|');
 }
 
+const crypto = require('crypto');
+
 function generateIdempotencyKey() {
-  return `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+  return crypto.randomUUID();
 }
 
 function loadCheckoutSession(currentFingerprint, storage) {
