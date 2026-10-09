@@ -102,7 +102,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 padding: '4px 10px',
                 borderRadius: 6,
@@ -124,7 +124,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
               type="button"
               onClick={handlePrint}
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 border: 'none',
                 padding: '8px 16px',
@@ -171,26 +171,61 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
-              borderBottom: '2px solid #005c55',
+              borderBottom: '2px solid #16453A',
               paddingBottom: '1.5rem',
               marginBottom: '1.75rem',
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: '1.625rem', fontWeight: 900, color: '#005c55', letterSpacing: '-0.02em' }}>
-                  AarogyaMed
-                </span>
-                <span style={{ fontSize: '0.75rem', color: '#006398', fontWeight: 700, borderLeft: '1px solid #bdc9c6', paddingLeft: 8 }}>
-                  Healthcare Technologies India
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                <img src="/images/logo.png" alt="Omkar Healthcare" width={40} height={40} style={{ objectFit: 'contain' }} />
+                <div style={{ display: 'inline-flex', flexDirection: 'column', width: 'fit-content' }}>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: '1.45rem',
+                      fontWeight: 900,
+                      color: '#16453A',
+                      letterSpacing: '0.06em',
+                      lineHeight: 1,
+                      width: '100%',
+                    }}
+                  >
+                    OMKAR
+                  </span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      marginTop: 3,
+                    }}
+                  >
+                    <span style={{ flex: 1, height: '1.5px', background: '#B75932', marginRight: 4 }} />
+                    <span
+                      style={{
+                        fontSize: '0.62rem',
+                        fontWeight: 800,
+                        color: '#B75932',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      HEALTHCARE
+                    </span>
+                    <span style={{ flex: 1, height: '1.5px', background: '#B75932', marginLeft: 4 }} />
+                  </div>
+                </div>
               </div>
               <div style={{ fontSize: '0.8125rem', color: '#6e7977', lineHeight: 1.5 }}>
                 Regd. Office: 14/B, Hosur Road, Koramangala 5th Block<br />
                 Bengaluru, Karnataka — 560095<br />
                 <strong>GSTIN:</strong> {InvoiceEntity.GSTIN} | <strong>PAN:</strong> {InvoiceEntity.PAN}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 700, marginTop: 4 }}>
+              <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 700, marginTop: 4 }}>
                 CDSCO License: {InvoiceEntity.CDSCO_LICENSE} • {InvoiceEntity.ISO_CERTIFICATION}
               </div>
             </div>
@@ -199,7 +234,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
               <h1 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#131b2e', margin: '0 0 4px', textTransform: 'uppercase' }}>
                 {isRental ? 'Medical Equipment Rental Invoice' : 'Tax Invoice (GST Compliant)'}
               </h1>
-              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#005c55' }}>
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#16453A' }}>
                 {invoiceNum}
               </div>
               <div style={{ fontSize: '0.8125rem', color: '#6e7977', marginTop: 2 }}>
@@ -225,7 +260,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
             }}
           >
             <div>
-              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 800, color: '#005c55', marginBottom: 4 }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 800, color: '#16453A', marginBottom: 4 }}>
                 Billed To (Patient / Caregiver):
               </div>
               <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#131b2e' }}>
@@ -239,7 +274,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
             </div>
 
             <div>
-              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 800, color: '#005c55', marginBottom: 4 }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 800, color: '#16453A', marginBottom: 4 }}>
                 Fulfillment & Delivery Details:
               </div>
               <div style={{ fontSize: '0.8125rem', color: '#3e4947', lineHeight: 1.5 }}>
@@ -315,7 +350,7 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
               </div>
               <div
                 style={{
-                  borderTop: '2px solid #005c55',
+                  borderTop: '2px solid #16453A',
                   paddingTop: 8,
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -323,8 +358,8 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
                   fontWeight: 900,
                 }}
               >
-                <span style={{ color: '#005c55' }}>Grand Total (INR):</span>
-                <span style={{ color: '#005c55' }}>₹{gstBreakdown.grandTotal.toLocaleString('en-IN')}</span>
+                <span style={{ color: '#16453A' }}>Grand Total (INR):</span>
+                <span style={{ color: '#16453A' }}>₹{gstBreakdown.grandTotal.toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>
@@ -347,8 +382,8 @@ export const ClinicalInvoiceModal: React.FC<ClinicalInvoiceModalProps> = ({
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 800, color: '#005c55', fontSize: '0.875rem' }}>
-                For AarogyaMed Healthcare India
+              <div style={{ fontWeight: 800, color: '#16453A', fontSize: '0.875rem' }}>
+                For Omkar Healthcare India
               </div>
               <div style={{ fontStyle: 'italic', color: '#3e4947', marginTop: 14 }}>
                 Authorized Biomedical Signatory

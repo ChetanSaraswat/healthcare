@@ -200,7 +200,7 @@ export default function CheckoutPage() {
         <Link
           href="/shop"
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '12px 24px',
             borderRadius: 9999,
@@ -380,7 +380,7 @@ export default function CheckoutPage() {
           key: rzpOrderData.keyId,
           amount: rzpOrderData.amount,
           currency: rzpOrderData.currency || 'INR',
-          name: 'AarogyaMed Healthcare',
+          name: 'Omkar Healthcare',
           description: 'Medical Equipment Purchase / Rental Security Deposit',
           order_id: rzpOrderData.orderId,
           prefill: {
@@ -389,7 +389,7 @@ export default function CheckoutPage() {
             contact: data.phone,
           },
           theme: {
-            color: '#005c55',
+            color: '#16453A',
           },
           modal: {
             ondismiss: () => {

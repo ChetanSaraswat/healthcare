@@ -46,6 +46,10 @@ exports.listProductSchema = z.object({
     maxPrice: z.coerce.number().nonnegative().optional(),
     page: z.coerce.number().int().positive().optional().default(1),
     limit: z.coerce.number().int().positive().max(100).optional().default(20),
-    sortBy: z.enum(['price_asc', 'price_desc', 'newest', 'name']).optional().default('newest'),
+    sortBy: z.enum(['price_asc', 'price_desc', 'price_low', 'price_high', 'newest', 'popular', 'name']).optional().default('newest'),
   }),
+});
+
+exports.updateProductSchema = z.object({
+  body: exports.createProductSchema.shape.body.partial(),
 });

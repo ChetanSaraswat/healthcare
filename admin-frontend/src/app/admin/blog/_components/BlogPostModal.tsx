@@ -131,8 +131,8 @@ export function BlogPostModal({
               fontSize: '0.8125rem',
               fontWeight: 700,
               border: '1px solid',
-              borderColor: editTab === 'en' ? '#005c55' : '#cbd5e1',
-              background: editTab === 'en' ? '#005c55' : '#ffffff',
+              borderColor: editTab === 'en' ? '#16453A' : '#cbd5e1',
+              background: editTab === 'en' ? '#16453A' : '#ffffff',
               color: editTab === 'en' ? '#ffffff' : '#475569',
               cursor: 'pointer',
             }}
@@ -148,8 +148,8 @@ export function BlogPostModal({
               fontSize: '0.8125rem',
               fontWeight: 700,
               border: '1px solid',
-              borderColor: editTab === 'hi' ? '#005c55' : '#cbd5e1',
-              background: editTab === 'hi' ? '#005c55' : '#ffffff',
+              borderColor: editTab === 'hi' ? '#16453A' : '#cbd5e1',
+              background: editTab === 'hi' ? '#16453A' : '#ffffff',
               color: editTab === 'hi' ? '#ffffff' : '#475569',
               cursor: 'pointer',
             }}
@@ -332,7 +332,7 @@ export function BlogPostModal({
                 type="text"
                 value={formData.coverImage || ''}
                 onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                placeholder="/images/hospital_bed.png"
+                placeholder="/images/oxygen_concentrator.png"
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -483,7 +483,7 @@ export function BlogPostModal({
                 gap: 8,
                 padding: '10px 22px',
                 borderRadius: 10,
-                background: '#005c55',
+                background: '#16453A',
                 border: 'none',
                 color: '#ffffff',
                 fontSize: '0.875rem',

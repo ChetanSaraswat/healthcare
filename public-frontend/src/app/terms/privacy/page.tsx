@@ -17,7 +17,7 @@ export default function PrivacyTermsPage() {
                 padding: '4px 12px',
                 borderRadius: 999,
                 background: '#e8f5f3',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.8125rem',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -54,7 +54,7 @@ export default function PrivacyTermsPage() {
                 1. Confidential Handling of Patient Information
               </h2>
               <p style={{ margin: 0 }}>
-                AarogyaMed recognizes that patient health diagnoses, clinical prescriptions, and residential care addresses are deeply personal. All information shared during order placement, rental scheduling, or clinical consultation is stored on encrypted HIPAA-compliant database infrastructure within Indian data centers.
+                Omkar Healthcare recognizes that patient health diagnoses, clinical prescriptions, and residential care addresses are deeply personal. All information shared during order placement, rental scheduling, or clinical consultation is stored on encrypted HIPAA-compliant database infrastructure within Indian data centers.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function PrivacyTermsPage() {
                 3. Security Deposit &amp; Payment Credentials
               </h2>
               <p style={{ margin: 0 }}>
-                Payment processing is handled via certified Level 1 PCI-DSS payment gateways (such as Razorpay). AarogyaMed never stores customer credit card numbers or UPI MPINs on internal servers.
+                Payment processing is handled via certified Level 1 PCI-DSS payment gateways (such as Razorpay). Omkar Healthcare never stores customer credit card numbers or UPI MPINs on internal servers.
               </p>
             </section>
           </div>

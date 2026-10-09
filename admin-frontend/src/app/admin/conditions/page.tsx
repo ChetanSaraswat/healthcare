@@ -117,12 +117,12 @@ export default function AdminConditionsPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#6e7977' }}>Total Clinical Guides</span>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eaf8f6', color: '#005c55', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eaf8f6', color: '#16453A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <BookOpen size={18} />
             </div>
           </div>
           <div style={{ fontSize: '1.875rem', fontWeight: 800, color: '#131b2e' }}>{totalGuides}</div>
-          <span style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600 }}>Active on Storefront</span>
+          <span style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600 }}>Active on Storefront</span>
         </div>
 
         <div
@@ -183,7 +183,7 @@ export default function AdminConditionsPage() {
             </div>
           </div>
           <div style={{ fontSize: '1.875rem', fontWeight: 800, color: '#131b2e' }}>{totalIllustrations}</div>
-          <span style={{ fontSize: '0.75rem', color: '#7c3aed', fontWeight: 600 }}>AarogyaMed Commissioned</span>
+          <span style={{ fontSize: '0.75rem', color: '#7c3aed', fontWeight: 600 }}>Omkar Healthcare Commissioned</span>
         </div>
       </div>
 
@@ -208,15 +208,23 @@ export default function AdminConditionsPage() {
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div
+          className="custom-scrollbar"
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 310px)',
+            minHeight: 380,
+          }}
+        >
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
-            <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #edf2f7', color: '#475569', fontWeight: 700 }}>
-                <th style={{ padding: '14px 20px' }}>Condition Guide</th>
-                <th style={{ padding: '14px 20px' }}>Equipment Tag Link</th>
-                <th style={{ padding: '14px 20px' }}>Content Blocks</th>
-                <th style={{ padding: '14px 20px' }}>Bilingual Coverage</th>
-                <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+              <tr style={{ background: '#f8fafc', color: '#475569', fontWeight: 700 }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Condition Guide</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Equipment Tag Link</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Content Blocks</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Bilingual Coverage</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', textAlign: 'right', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -367,7 +375,7 @@ export default function AdminConditionsPage() {
                             borderRadius: 8,
                             fontSize: '0.8125rem',
                             fontWeight: 700,
-                            background: '#005c55',
+                            background: '#16453A',
                             border: 'none',
                             color: '#ffffff',
                             cursor: 'pointer',
@@ -489,8 +497,8 @@ export default function AdminConditionsPage() {
                   fontSize: '0.8125rem',
                   fontWeight: 700,
                   border: '1px solid',
-                  borderColor: editTab === 'en' ? '#005c55' : '#cbd5e1',
-                  background: editTab === 'en' ? '#005c55' : '#ffffff',
+                  borderColor: editTab === 'en' ? '#16453A' : '#cbd5e1',
+                  background: editTab === 'en' ? '#16453A' : '#ffffff',
                   color: editTab === 'en' ? '#ffffff' : '#475569',
                   cursor: 'pointer',
                 }}
@@ -506,8 +514,8 @@ export default function AdminConditionsPage() {
                   fontSize: '0.8125rem',
                   fontWeight: 700,
                   border: '1px solid',
-                  borderColor: editTab === 'hi' ? '#005c55' : '#cbd5e1',
-                  background: editTab === 'hi' ? '#005c55' : '#ffffff',
+                  borderColor: editTab === 'hi' ? '#16453A' : '#cbd5e1',
+                  background: editTab === 'hi' ? '#16453A' : '#ffffff',
                   color: editTab === 'hi' ? '#ffffff' : '#475569',
                   cursor: 'pointer',
                 }}
@@ -645,7 +653,7 @@ export default function AdminConditionsPage() {
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#005c55' }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#16453A' }}>
                         Symptoms Infographic (Commissioned Asset)
                       </span>
                       <span style={{ fontSize: '0.6875rem', background: '#dcfce7', color: '#15803d', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
@@ -662,7 +670,7 @@ export default function AdminConditionsPage() {
               {/* Content Blocks Section */}
               <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Layers size={18} color="#005c55" />
+                  <Layers size={18} color="#16453A" />
                   Systemic Health Effects Content Blocks ({editFormData.contentBlocks?.length || 0})
                 </h3>
 
@@ -737,7 +745,7 @@ export default function AdminConditionsPage() {
                                   Alt: {block.illustration.altText[editTab]}
                                 </div>
                               </div>
-                              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#005c55', background: '#e0f3f0', padding: '2px 6px', borderRadius: 4 }}>
+                              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#16453A', background: '#e0f3f0', padding: '2px 6px', borderRadius: 4 }}>
                                 {block.illustration.sourceAttribution}
                               </span>
                             </div>
@@ -789,7 +797,7 @@ export default function AdminConditionsPage() {
                     alignItems: 'center',
                     gap: 6,
                     fontSize: '0.875rem',
-                    color: '#005c55',
+                    color: '#16453A',
                     fontWeight: 700,
                     textDecoration: 'none',
                   }}
@@ -824,7 +832,7 @@ export default function AdminConditionsPage() {
                       padding: '10px 22px',
                       borderRadius: 10,
                       border: 'none',
-                      background: '#005c55',
+                      background: '#16453A',
                       color: '#ffffff',
                       fontSize: '0.875rem',
                       fontWeight: 700,

@@ -38,13 +38,13 @@ export const PincodeChecker: React.FC = () => {
           gap: 6,
           fontSize: '0.8125rem',
           fontWeight: 700,
-          color: '#00201d',
+          color: '#0C2E27',
           marginBottom: 8,
           textTransform: 'uppercase',
           letterSpacing: '0.04em',
         }}
       >
-        <MapPin size={16} color="#005c55" />
+        <MapPin size={16} color="#16453A" />
         <span>Check Hub Delivery &amp; Setup Serviceability</span>
       </div>
 
@@ -71,7 +71,7 @@ export const PincodeChecker: React.FC = () => {
         <button
           type="submit"
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             border: 'none',
             borderRadius: 8,
@@ -93,7 +93,7 @@ export const PincodeChecker: React.FC = () => {
             gap: 6,
             marginTop: 8,
             fontSize: '0.8125rem',
-            color: '#005c55',
+            color: '#16453A',
             fontWeight: 600,
           }}
         >

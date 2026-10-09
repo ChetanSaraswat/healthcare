@@ -42,7 +42,7 @@ const rootReducer = combineSlices({
 export type RootState = ReturnType<typeof rootReducer>;
 
 const persistConfig = {
-  key: 'aarogyamed_admin_root',
+  key: 'omkar_admin_root',
   storage,
   whitelist: ['auth'],
 };

@@ -68,12 +68,12 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
           marginBottom: '2rem',
         }}
       >
-        <Link href="/" style={{ color: '#005c55', textDecoration: 'none' }}>
+        <Link href="/" style={{ color: '#16453A', textDecoration: 'none' }}>
           {locale === 'hi' ? 'होम' : 'Home'}
         </Link>
         <ChevronRight size={14} />
-        <Link href="/blog" style={{ color: '#005c55', textDecoration: 'none' }}>
-          {t.common.knowledgeHub}
+        <Link href="/learn" style={{ color: '#16453A', textDecoration: 'none' }}>
+          {t.common.educationGuides || (locale === 'hi' ? 'शिक्षा एवं केयर गाइड' : 'Education & Guides')}
         </Link>
         <ChevronRight size={14} />
         <span style={{ color: '#131b2e', fontWeight: 600 }}>{localized.name}</span>
@@ -82,7 +82,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
       {/* Hero Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #004741 0%, #005c55 100%)',
+          background: 'linear-gradient(135deg, #0F352C 0%, #16453A 100%)',
           borderRadius: 24,
           color: '#ffffff',
           padding: '3.5rem 2.5rem',
@@ -217,7 +217,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
                   style={{
                     fontSize: '0.6875rem',
                     fontWeight: 700,
-                    color: '#005c55',
+                    color: '#16453A',
                     background: '#e0f3f0',
                     padding: '3px 8px',
                     borderRadius: 6,
@@ -321,7 +321,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
                                 width: 8,
                                 height: 8,
                                 borderRadius: '50%',
-                                background: isHeart ? '#e11d48' : isBrain ? '#6d28d9' : '#005c55',
+                                background: isHeart ? '#e11d48' : isBrain ? '#6d28d9' : '#16453A',
                                 marginTop: 7,
                                 flexShrink: 0,
                               }}
@@ -420,7 +420,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
                               style={{
                                 fontSize: '0.6875rem',
                                 fontWeight: 700,
-                                color: '#005c55',
+                                color: '#16453A',
                                 background: '#e0f3f0',
                                 padding: '3px 8px',
                                 borderRadius: 6,
@@ -458,7 +458,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
               height: 44,
               borderRadius: 12,
               background: '#eaf8f6',
-              color: '#005c55',
+              color: '#16453A',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -467,7 +467,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
             <HeartHandshake size={24} />
           </div>
           <div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#005c55', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16453A', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {locale === 'hi' ? 'देखभालकर्ता रिकवरी प्रोटोकॉल' : 'Caregiver Clinical Protocols'}
             </span>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
@@ -494,8 +494,8 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <CheckCircle2 size={18} color="#005c55" />
-                <strong style={{ fontSize: '1rem', color: '#005c55' }}>
+                <CheckCircle2 size={18} color="#16453A" />
+                <strong style={{ fontSize: '1rem', color: '#16453A' }}>
                   {tip.title}
                 </strong>
               </div>
@@ -510,7 +510,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
       {/* 4. Recommended Medical Equipment (Tag-Linked) */}
       <section>
         <div style={{ marginBottom: '2rem' }}>
-          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#006398', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#B75932', textTransform: 'uppercase' }}>
             {locale === 'hi' ? 'टैग-लिंक्ड क्लिनिकल कैटलॉग' : 'Tag-Linked Clinical Catalog'}
           </span>
           <h2 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#131b2e', marginTop: 4 }}>
@@ -576,7 +576,7 @@ export default function ConditionDetailPage({ params }: ConditionPageProps) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 8,
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 padding: '9px 20px',
                 borderRadius: 9999,

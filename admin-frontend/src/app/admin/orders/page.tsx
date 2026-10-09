@@ -17,25 +17,44 @@ import { updateOrderStatus } from '@/features/orders/orders.slice';
 import { listOrders } from '@/features/orders/list-orders/list-orders.action';
 import { Order } from '@/domain/entities/order.entity';
 import { axiosInterceptorInstanceClient } from '@/config/axios';
+import { PaginationControl } from '@/components/common/PaginationControl';
 
 export default function AdminOrdersPage() {
   const dispatch = useAppDispatch();
-  const { orders, loading } = useAppSelector((state) => state.orders);
+  const { orders, loading, total, totalPages } = useAppSelector((state) => state.orders);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    dispatch(listOrders());
-  }, [dispatch]);
+  const fetchOrders = React.useCallback(() => {
+    dispatch(
+      listOrders({
+        page: currentPage,
+        limit: pageSize,
+        status: filterStatus !== 'all' ? filterStatus : undefined,
+        search: searchQuery.trim() || undefined,
+      })
+    );
+  }, [dispatch, currentPage, pageSize, filterStatus, searchQuery]);
 
-  const filteredOrders = orders.filter((o) => {
-    const matchesStatus = filterStatus === 'all' || o.status === filterStatus;
-    const matchesSearch =
-      o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.shippingAddress?.city?.toLowerCase().includes(searchQuery.toLowerCase());
-    return Boolean(matchesStatus && matchesSearch);
-  });
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchOrders();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [fetchOrders]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
+
+  const handleStatusSelect = (st: string) => {
+    setFilterStatus(st);
+    setCurrentPage(1);
+  };
 
   const handleStatusChange = async (id: string, status: Order['status']) => {
     if (updatingId) return;
@@ -43,7 +62,7 @@ export default function AdminOrdersPage() {
     try {
       await axiosInterceptorInstanceClient.patch(`/orders/${id}/status`, { status });
       dispatch(updateOrderStatus({ id, status }));
-      dispatch(listOrders());
+      fetchOrders();
     } catch (err: any) {
       console.error('Failed to update order status on backend:', err);
       dispatch(updateOrderStatus({ id, status }));
@@ -86,7 +105,7 @@ export default function AdminOrdersPage() {
               borderRadius: 8,
               background: '#ffffff',
               border: '1px solid #dae2fd',
-              color: '#005c55',
+              color: '#16453A',
               fontSize: '0.8125rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -100,7 +119,7 @@ export default function AdminOrdersPage() {
               padding: '6px 14px',
               borderRadius: 8,
               background: '#e8f5f3',
-              color: '#005c55',
+              color: '#16453A',
               fontSize: '0.8125rem',
               fontWeight: 700,
             }}
@@ -135,7 +154,7 @@ export default function AdminOrdersPage() {
             type="text"
             placeholder="Search by order ID or city..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             style={{
               width: '100%',
               padding: '10px 12px 10px 38px',
@@ -149,17 +168,17 @@ export default function AdminOrdersPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 6 }}>
-          {['all', 'pending', 'processing', 'shipped', 'delivered'].map((st) => (
+          {['all', 'pending', 'paid', 'shipped', 'delivered', 'cancelled'].map((st) => (
             <button
               key={st}
               type="button"
-              onClick={() => setFilterStatus(st)}
+              onClick={() => handleStatusSelect(st)}
               style={{
                 padding: '7px 12px',
                 borderRadius: 8,
-                border: filterStatus === st ? '1px solid #005c55' : '1px solid #dae2fd',
+                border: filterStatus === st ? '1px solid #16453A' : '1px solid #dae2fd',
                 background: filterStatus === st ? '#e8f5f3' : '#ffffff',
-                color: filterStatus === st ? '#005c55' : '#3e4947',
+                color: filterStatus === st ? '#16453A' : '#3e4947',
                 fontSize: '0.8125rem',
                 fontWeight: filterStatus === st ? 700 : 500,
                 cursor: 'pointer',
@@ -172,8 +191,29 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Orders List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Orders Content Card */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: 16,
+          border: '1px solid #e2e7ff',
+          overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+        }}
+      >
+        <div
+          className="custom-scrollbar"
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 310px)',
+            minHeight: 380,
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
         {loading && orders.length === 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[1, 2, 3].map((n) => (
@@ -189,7 +229,7 @@ export default function AdminOrdersPage() {
               />
             ))}
           </div>
-        ) : filteredOrders.length === 0 ? (
+        ) : orders.length === 0 ? (
           <div
             style={{
               padding: '3rem 2rem',
@@ -205,13 +245,13 @@ export default function AdminOrdersPage() {
             </h3>
           </div>
         ) : (
-          filteredOrders.map((order) => {
+          orders.map((order) => {
             const isUpdating = updatingId === order.id;
             const statusConfig: Record<string, { bg: string; text: string }> = {
               pending: { bg: '#fff4eb', text: '#913200' },
-              processing: { bg: '#eaedff', text: '#006398' },
-              shipped: { bg: '#e8f5f3', text: '#005c55' },
-              delivered: { bg: '#e8f5f3', text: '#005c55' },
+              processing: { bg: '#eaedff', text: '#B75932' },
+              shipped: { bg: '#e8f5f3', text: '#16453A' },
+              delivered: { bg: '#e8f5f3', text: '#16453A' },
               cancelled: { bg: '#ffdad6', text: '#ba1a1a' },
             };
             const statusStyle = statusConfig[order.status] || { bg: '#f2f3ff', text: '#3e4947' };
@@ -252,7 +292,7 @@ export default function AdminOrdersPage() {
 
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '0.6875rem', color: '#6e7977', display: 'block' }}>Total Paid (incl. GST)</span>
-                    <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#005c55' }}>
+                    <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16453A' }}>
                       ₹{order.total?.toLocaleString('en-IN')}
                     </span>
                   </div>
@@ -271,7 +311,7 @@ export default function AdminOrdersPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8125rem', color: '#131b2e' }}>
-                    <MapPin size={14} color="#006398" />
+                    <MapPin size={14} color="#B75932" />
                     <span>
                       {[
                         order.shippingAddress?.addressLine1,
@@ -297,7 +337,7 @@ export default function AdminOrdersPage() {
                       style={{
                         padding: '6px 14px',
                         borderRadius: 6,
-                        background: isUpdating ? '#cbd5e1' : '#006398',
+                        background: isUpdating ? '#cbd5e1' : '#B75932',
                         color: '#ffffff',
                         border: 'none',
                         fontSize: '0.75rem',
@@ -320,7 +360,7 @@ export default function AdminOrdersPage() {
                       style={{
                         padding: '6px 14px',
                         borderRadius: 6,
-                        background: isUpdating ? '#cbd5e1' : '#005c55',
+                        background: isUpdating ? '#cbd5e1' : '#16453A',
                         color: '#ffffff',
                         border: 'none',
                         fontSize: '0.75rem',
@@ -340,6 +380,23 @@ export default function AdminOrdersPage() {
             );
           })
         )}
+        </div>
+
+        {/* Backend-Driven Pagination Controls Bar */}
+        <div style={{ borderTop: '1px solid #e2e7ff', background: '#fafbff' }}>
+          <PaginationControl
+            currentPage={currentPage}
+            totalPages={totalPages || 1}
+            totalItems={total || 0}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setCurrentPage(1);
+            }}
+            isLoading={loading}
+          />
+        </div>
       </div>
     </div>
   );

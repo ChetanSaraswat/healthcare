@@ -17,7 +17,24 @@ export const getCustomersService = async (
       params: filters,
     });
     if (response.data && response.data.data) {
-      return response.data;
+      const rawPayload = response.data.data;
+      const rawItems: CustomerSummary[] = Array.isArray(rawPayload.items)
+        ? rawPayload.items
+        : Array.isArray(rawPayload)
+        ? rawPayload
+        : [];
+      const pagination = rawPayload.pagination;
+
+      return {
+        success: true,
+        data: {
+          customers: rawItems,
+          total: pagination?.total ?? rawItems.length,
+          page: pagination?.page ?? (filters?.page || 1),
+          limit: pagination?.limit ?? (filters?.limit || 10),
+          totalPages: pagination?.totalPages ?? 1,
+        },
+      };
     }
   } catch (err) {
     console.warn('[getCustomersService] Error fetching customers:', err);
@@ -25,7 +42,13 @@ export const getCustomersService = async (
 
   return {
     success: true,
-    data: [],
+    data: {
+      customers: [],
+      total: 0,
+      page: filters?.page || 1,
+      limit: filters?.limit || 10,
+      totalPages: 1,
+    },
   };
 };
 

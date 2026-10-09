@@ -69,6 +69,7 @@ export interface Product {
   warrantyInfo?: string;
   estimatedDeliveryHours?: number;
   featured?: boolean;
+  status?: 'active' | 'draft' | 'out_of_stock';
   rating?: number;
   reviewsCount?: number;
 }

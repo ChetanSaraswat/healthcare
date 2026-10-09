@@ -37,7 +37,7 @@
     padding: 3px 8px;
     border-radius: 9999px;
     background: #eaf8f6;
-    color: #005c55;
+    color: #16453A;
   }
 
   .rentBadge {
@@ -45,8 +45,8 @@
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 9999px;
-    background: #fff0eb;
-    color: #ea580c;
+    background: #FBF2ED;
+    color: #B75932;
   }
 }
 
@@ -68,7 +68,7 @@
   transition: border-color 0.2s ease;
 
   &:hover {
-    border-color: #005c55;
+    border-color: #16453A;
   }
 
   @media (max-width: 640px) {
@@ -104,7 +104,7 @@
     text-decoration: none;
 
     &:hover {
-      color: #005c55;
+      color: #16453A;
     }
   }
 
@@ -118,11 +118,11 @@
   }
 
   .buyTag {
-    color: #005c55;
+    color: #16453A;
   }
 
   .rentTag {
-    color: #ea580c;
+    color: #B75932;
   }
 }
 
@@ -141,8 +141,8 @@
   .requestedDurationBadge {
     display: inline-flex;
     align-items: center;
-    background: #fff7ed;
-    color: #ea580c;
+    background: #FAF5EC;
+    color: #B75932;
     border: 1px solid #fed7aa;
     padding: 3px 10px;
     border-radius: 6px;
@@ -176,9 +176,9 @@
     transition: all 0.15s ease;
 
     &.activeDuration {
-      background: #005c55;
+      background: #16453A;
       color: #ffffff;
-      border-color: #005c55;
+      border-color: #16453A;
     }
   }
 }
@@ -220,7 +220,7 @@
     padding: 6px 12px;
     cursor: pointer;
     font-weight: 700;
-    color: #005c55;
+    color: #16453A;
     transition: background 0.15s ease;
 
     &:hover {
@@ -242,7 +242,7 @@
   .mainPrice {
     font-size: 1.125rem;
     font-weight: 800;
-    color: #00201d;
+    color: #0C2E27;
   }
 
   .breakdown {
@@ -304,11 +304,11 @@
       border: 1px solid #a3faef;
       border-radius: 8px;
       padding: 8px 10px;
-      color: #005c55;
+      color: #16453A;
       font-weight: 600;
 
       strong {
-        color: #005c55;
+        color: #16453A;
       }
     }
   }
@@ -333,7 +333,7 @@
     .totalAmount {
       font-size: 1.5rem;
       font-weight: 800;
-      color: #005c55;
+      color: #16453A;
     }
   }
 
@@ -342,14 +342,14 @@
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 0.75rem;
-    color: #006398;
+    color: #B75932;
     margin-bottom: 1.25rem;
     line-height: 1.4;
   }
 
   .checkoutBtn {
     width: 100%;
-    background: #005c55;
+    background: #16453A;
     color: #ffffff;
     border: none;
     border-radius: 12px;
@@ -364,7 +364,7 @@
     gap: 8px;
 
     &:hover {
-      background: #004741;
+      background: #0F352C;
       box-shadow: 0 4px 14px rgba(0, 92, 85, 0.3);
     }
   }

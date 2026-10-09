@@ -50,22 +50,22 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
 
   return (
     <article style={{ maxWidth: 880, margin: '2rem auto 6rem', padding: '0 1.5rem', fontFamily: 'inherit' }}>
-      {/* Back to Blog */}
+      {/* Back to Education & Guides */}
       <div style={{ marginBottom: '1.5rem' }}>
         <Link
-          href="/blog"
+          href="/learn"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            color: '#005c55',
+            color: '#16453A',
             fontWeight: 700,
             fontSize: '0.875rem',
             textDecoration: 'none',
           }}
         >
           <ArrowLeft size={16} />
-          <span>{locale === 'hi' ? 'सभी क्लिनिकल लेख देखें' : 'Back to Clinical Guides'}</span>
+          <span>{locale === 'hi' ? 'शिक्षा एवं केयर गाइड पर वापस जाएं' : 'Back to Education & Guides'}</span>
         </Link>
       </div>
 
@@ -76,7 +76,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
             padding: '4px 12px',
             borderRadius: 999,
             background: '#e8f5f3',
-            color: '#005c55',
+            color: '#16453A',
             fontSize: '0.75rem',
             fontWeight: 800,
             textTransform: 'uppercase',
@@ -119,7 +119,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               width: 38,
               height: 38,
               borderRadius: '50%',
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -130,7 +130,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           </div>
           <div>
             <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#131b2e' }}>{post.authorName}</div>
-            <div style={{ fontSize: '0.75rem', color: '#005c55' }}>AarogyaMed Biomedical Advisory Panel</div>
+            <div style={{ fontSize: '0.75rem', color: '#16453A' }}>Omkar Biomedical Advisory Panel</div>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
             padding: '8px 16px',
             borderRadius: 9999,
             background: '#f2f3ff',
-            color: '#006398',
+            color: '#B75932',
             border: 'none',
             fontSize: '0.8125rem',
             fontWeight: 700,
@@ -178,7 +178,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
           }}
         >
           <div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#005c55' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#16453A' }}>
               Related Medical Equipment
             </span>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131b2e', margin: '4px 0 0' }}>
@@ -191,7 +191,7 @@ export default function BlogPostDetailPage({ params }: BlogPostPageProps) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '12px 24px',
               borderRadius: 9999,

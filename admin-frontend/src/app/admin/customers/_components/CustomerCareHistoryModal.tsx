@@ -83,7 +83,7 @@ export function CustomerCareHistoryModal({
                 width: 48,
                 height: 48,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #005c55 0%, #006398 100%)',
+                background: 'linear-gradient(135deg, #16453A 0%, #B75932 100%)',
                 color: '#ffffff',
                 fontWeight: 800,
                 fontSize: '1.125rem',
@@ -112,7 +112,7 @@ export function CustomerCareHistoryModal({
                     fontSize: '0.6875rem',
                     fontWeight: 700,
                     background: 'rgba(0, 92, 85, 0.1)',
-                    color: '#005c55',
+                    color: '#16453A',
                   }}
                 >
                   Caregiver ID #{selectedHistory?.id}
@@ -162,8 +162,8 @@ export function CustomerCareHistoryModal({
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              color: modalTab === 'all' ? '#005c55' : '#6e7977',
-              borderBottom: modalTab === 'all' ? '2px solid #005c55' : '2px solid transparent',
+              color: modalTab === 'all' ? '#16453A' : '#6e7977',
+              borderBottom: modalTab === 'all' ? '2px solid #16453A' : '2px solid transparent',
             }}
           >
             Care Journey Overview
@@ -177,8 +177,8 @@ export function CustomerCareHistoryModal({
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              color: modalTab === 'buy' ? '#006398' : '#6e7977',
-              borderBottom: modalTab === 'buy' ? '2px solid #006398' : '2px solid transparent',
+              color: modalTab === 'buy' ? '#B75932' : '#6e7977',
+              borderBottom: modalTab === 'buy' ? '2px solid #B75932' : '2px solid transparent',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
@@ -215,8 +215,8 @@ export function CustomerCareHistoryModal({
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              color: modalTab === 'addresses' ? '#005c55' : '#6e7977',
-              borderBottom: modalTab === 'addresses' ? '2px solid #005c55' : '2px solid transparent',
+              color: modalTab === 'addresses' ? '#16453A' : '#6e7977',
+              borderBottom: modalTab === 'addresses' ? '2px solid #16453A' : '2px solid transparent',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
@@ -258,7 +258,7 @@ export function CustomerCareHistoryModal({
                             {addr.label || 'Home'}
                           </span>
                           {addr.isDefault && (
-                            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#005c55', background: 'rgba(0, 92, 85, 0.1)', padding: '2px 6px', borderRadius: 4 }}>
+                            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#16453A', background: 'rgba(0, 92, 85, 0.1)', padding: '2px 6px', borderRadius: 4 }}>
                               Default Delivery
                             </span>
                           )}
@@ -281,7 +281,7 @@ export function CustomerCareHistoryModal({
                 <div style={{ marginBottom: '1.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                     <h3 style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#131b2e', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <ShoppingBag size={16} style={{ color: '#006398' }} />
+                      <ShoppingBag size={16} style={{ color: '#B75932' }} />
                       Outright Purchases (Buy Flow)
                     </h3>
                     <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>
@@ -318,12 +318,12 @@ export function CustomerCareHistoryModal({
                                   padding: '2px 8px',
                                   borderRadius: 12,
                                   background: order.status === 'delivered' ? 'rgba(0, 92, 85, 0.1)' : 'rgba(0, 99, 152, 0.1)',
-                                  color: order.status === 'delivered' ? '#005c55' : '#006398',
+                                  color: order.status === 'delivered' ? '#16453A' : '#B75932',
                                 }}
                               >
                                 {order.status.toUpperCase()}
                               </span>
-                              <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#005c55' }}>
+                              <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#16453A' }}>
                                 ₹{(order.total || (order as any).totalAmount || 0).toLocaleString('en-IN')}
                               </span>
                             </div>
@@ -396,7 +396,7 @@ export function CustomerCareHistoryModal({
                                   padding: '2px 8px',
                                   borderRadius: 12,
                                   background: rental.status === 'active' ? 'rgba(0, 92, 85, 0.1)' : 'rgba(185, 66, 0, 0.1)',
-                                  color: rental.status === 'active' ? '#005c55' : '#b94200',
+                                  color: rental.status === 'active' ? '#16453A' : '#b94200',
                                 }}
                               >
                                 {rental.status.toUpperCase()}
@@ -421,7 +421,7 @@ export function CustomerCareHistoryModal({
                                   <div style={{ fontWeight: 700, color: '#131b2e' }}>
                                     ₹{item.rentalCost.toLocaleString('en-IN')}
                                   </div>
-                                  <div style={{ fontSize: '0.6875rem', color: '#005c55', fontWeight: 600 }}>
+                                  <div style={{ fontSize: '0.6875rem', color: '#16453A', fontWeight: 600 }}>
                                     Deposit: ₹{item.securityDeposit.toLocaleString('en-IN')}
                                   </div>
                                 </div>

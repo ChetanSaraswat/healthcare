@@ -32,6 +32,13 @@ router.patch(
   (req, res, next) => productController.update(req, res, next)
 );
 
+router.put(
+  '/:id',
+  authenticate,
+  authorize('super_admin'),
+  (req, res, next) => productController.update(req, res, next)
+);
+
 router.delete(
   '/:id',
   authenticate,

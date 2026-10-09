@@ -7,7 +7,9 @@ import { Category } from '@/domain/entities/category.entity';
 import { listCategories } from '@/features/categories/list-categories/list-categories.action';
 import { listProducts } from '@/features/products/list-products/list-products.action';
 import { addCategory, updateCategory, deleteCategory } from '@/features/categories/categories.slice';
-import { axiosInterceptorInstanceClient } from '@/config/axios';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { axiosInterceptorInstanceClient, extractApiErrorMessage } from '@/config/axios';
 import {
   FolderTree,
   PlusCircle,
@@ -20,7 +22,9 @@ import {
   Layers,
   Sparkles,
   Search,
+  RefreshCw,
 } from 'lucide-react';
+import { categoryFormSchema, CategoryFormValues } from '@/features/categories/category-form.schema';
 
 export default function AdminCategoriesPage() {
   const dispatch = useAppDispatch();
@@ -34,19 +38,12 @@ export default function AdminCategoriesPage() {
   }, [dispatch]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [modalConfig, setModalConfig] = useState<{
+    mode: 'create' | 'edit';
+    category?: Category | null;
+    parent?: Category | null;
+  } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    slug: '',
-    parentId: '',
-    description: '',
-    displayOrder: 1,
-    isActive: true,
-  });
 
   const rootCategories = categories.filter((c) => !c.parentId);
   const subCategories = categories.filter((c) => Boolean(c.parentId));
@@ -57,93 +54,17 @@ export default function AdminCategoriesPage() {
   };
 
   const openCreateModal = (parent?: Category) => {
-    setEditingCategory(null);
-    setFormData({
-      name: '',
-      slug: '',
-      parentId: parent ? parent.id : '',
-      description: '',
-      displayOrder: categories.length + 1,
-      isActive: true,
+    setModalConfig({
+      mode: 'create',
+      parent: parent || null,
     });
-    setModalMode('create');
   };
 
   const openEditModal = (cat: Category) => {
-    setEditingCategory(cat);
-    setFormData({
-      name: cat.name,
-      slug: cat.slug,
-      parentId: cat.parentId || '',
-      description: cat.description || '',
-      displayOrder: cat.displayOrder || 1,
-      isActive: cat.isActive !== false,
+    setModalConfig({
+      mode: 'edit',
+      category: cat,
     });
-    setModalMode('edit');
-  };
-
-  const handleNameChange = (name: string) => {
-    const slug = name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    setFormData({ ...formData, name, slug: formData.slug && modalMode === 'edit' ? formData.slug : slug });
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name.trim() || !formData.slug.trim()) return;
-
-    try {
-      if (modalMode === 'create') {
-        const payload = {
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          description: formData.description.trim(),
-          parent_id: formData.parentId ? Number(formData.parentId) : null,
-          display_order: Number(formData.displayOrder),
-          is_active: formData.isActive,
-        };
-        const res = await axiosInterceptorInstanceClient.post('/categories', payload);
-        const saved = res.data?.data;
-        const newCat: Category = {
-          id: String(saved?.id || saved?.uuid || `cat-${Date.now()}`),
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          parentId: formData.parentId ? formData.parentId : null,
-          description: formData.description.trim(),
-          displayOrder: Number(formData.displayOrder),
-          isActive: formData.isActive,
-        };
-        dispatch(addCategory(newCat));
-        showToast(`Category "${newCat.name}" successfully created.`);
-      } else if (modalMode === 'edit' && editingCategory) {
-        const payload = {
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          description: formData.description.trim(),
-          parent_id: formData.parentId ? Number(formData.parentId) : null,
-          display_order: Number(formData.displayOrder),
-          is_active: formData.isActive,
-        };
-        await axiosInterceptorInstanceClient.patch(`/categories/${editingCategory.id}`, payload);
-        const updatedCat: Category = {
-          ...editingCategory,
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          parentId: formData.parentId ? formData.parentId : null,
-          description: formData.description.trim(),
-          displayOrder: Number(formData.displayOrder),
-          isActive: formData.isActive,
-        };
-        dispatch(updateCategory(updatedCat));
-        showToast(`Category "${updatedCat.name}" updated successfully.`);
-      }
-      setModalMode(null);
-    } catch (err: any) {
-      alert(err?.response?.data?.message || err?.message || 'Failed to save category');
-    }
   };
 
   const handleDelete = async (cat: Category) => {
@@ -153,7 +74,8 @@ export default function AdminCategoriesPage() {
         dispatch(deleteCategory(cat.id));
         showToast(`Category "${cat.name}" deleted.`);
       } catch (err: any) {
-        alert(err?.response?.data?.message || err?.message || 'Failed to delete category');
+        const msg = extractApiErrorMessage(err, 'Failed to delete category');
+        showToast(msg);
       }
     }
   };
@@ -179,7 +101,7 @@ export default function AdminCategoriesPage() {
             bottom: 24,
             right: 24,
             zIndex: 9999,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '12px 20px',
             borderRadius: 12,
@@ -211,7 +133,7 @@ export default function AdminCategoriesPage() {
           type="button"
           onClick={() => openCreateModal()}
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             border: 'none',
             padding: '10px 20px',
@@ -237,14 +159,14 @@ export default function AdminCategoriesPage() {
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e', marginTop: 4 }}>
             {categories.length}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 4 }}>
+          <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 4 }}>
             Active in catalog tree
           </div>
         </div>
 
         <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #dae2fd' }}>
           <div style={{ fontSize: '0.8125rem', color: '#6e7977', fontWeight: 600 }}>Root Classifications</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#006398', marginTop: 4 }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B75932', marginTop: 4 }}>
             {rootCategories.length}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#6e7977', marginTop: 4 }}>
@@ -254,7 +176,7 @@ export default function AdminCategoriesPage() {
 
         <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #dae2fd' }}>
           <div style={{ fontSize: '0.8125rem', color: '#6e7977', fontWeight: 600 }}>Subcategories</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ea580c', marginTop: 4 }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B75932', marginTop: 4 }}>
             {subCategories.length}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#6e7977', marginTop: 4 }}>
@@ -264,10 +186,10 @@ export default function AdminCategoriesPage() {
 
         <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #dae2fd' }}>
           <div style={{ fontSize: '0.8125rem', color: '#6e7977', fontWeight: 600 }}>Classified Products</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#005c55', marginTop: 4 }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#16453A', marginTop: 4 }}>
             {products.length}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 4 }}>
+          <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 4 }}>
             100% Taxonomically Mapped
           </div>
         </div>
@@ -322,8 +244,17 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
 
-        {/* Categories List View */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* Categories List View - Scrollable */}
+        <div
+          className="custom-scrollbar"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: 'calc(100vh - 310px)',
+            minHeight: 380,
+            overflowY: 'auto',
+          }}
+        >
           {loading && categories.length === 0 ? (
             <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[1, 2, 3, 4].map((n) => (
@@ -360,13 +291,13 @@ export default function AdminCategoriesPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <FolderTree size={20} color="#005c55" />
+                    <FolderTree size={20} color="#16453A" />
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <strong style={{ fontSize: '0.9375rem', color: '#131b2e' }}>{root.name}</strong>
                         <span
                           style={{
-                            background: '#005c55',
+                            background: '#16453A',
                             color: '#ffffff',
                             fontSize: '0.6875rem',
                             fontWeight: 800,
@@ -388,7 +319,7 @@ export default function AdminCategoriesPage() {
                     <span
                       style={{
                         background: '#eaf8f6',
-                        color: '#005c55',
+                        color: '#16453A',
                         padding: '4px 10px',
                         borderRadius: 6,
                         fontSize: '0.75rem',
@@ -404,7 +335,7 @@ export default function AdminCategoriesPage() {
                       style={{
                         background: '#ffffff',
                         border: '1px solid #dae2fd',
-                        color: '#005c55',
+                        color: '#16453A',
                         padding: '6px 12px',
                         borderRadius: 6,
                         fontSize: '0.75rem',
@@ -515,189 +446,324 @@ export default function AdminCategoriesPage() {
       </div>
 
       {/* CREATE / EDIT CATEGORY MODAL */}
-      {modalMode && (
+      {/* CREATE / EDIT CATEGORY MODAL */}
+      {modalConfig && (
+        <CategoryFormModal
+          mode={modalConfig.mode}
+          category={modalConfig.category || null}
+          parent={modalConfig.parent || null}
+          rootCategories={rootCategories}
+          categoriesCount={categories.length}
+          onClose={() => setModalConfig(null)}
+          onSaved={(cat, isNew) => {
+            if (isNew) {
+              dispatch(addCategory(cat));
+              showToast(`Category "${cat.name}" successfully created.`);
+            } else {
+              dispatch(updateCategory(cat));
+              showToast(`Category "${cat.name}" updated successfully.`);
+            }
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CategoryFormModal({
+  mode,
+  category,
+  parent,
+  rootCategories,
+  categoriesCount,
+  onClose,
+  onSaved,
+}: {
+  mode: 'create' | 'edit';
+  category?: Category | null;
+  parent?: Category | null;
+  rootCategories: Category[];
+  categoriesCount: number;
+  onClose: () => void;
+  onSaved: (cat: Category, isNew: boolean) => void;
+}) {
+  const [submitting, setSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      name: category?.name || '',
+      slug: category?.slug || '',
+      parentId: category?.parentId || (parent ? parent.id : ''),
+      description: category?.description || '',
+      displayOrder: category?.displayOrder || categoriesCount + 1,
+      isActive: category?.isActive !== false,
+    },
+  });
+
+  const nameVal = watch('name');
+
+  useEffect(() => {
+    if (mode === 'create' && nameVal) {
+      const generated = nameVal
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      setValue('slug', generated, { shouldValidate: true });
+    }
+  }, [nameVal, mode, setValue]);
+
+  const onSubmit = async (values: CategoryFormValues) => {
+    setSubmitting(true);
+    try {
+      const payload = {
+        name: values.name.trim(),
+        slug: values.slug?.trim() || values.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        description: values.description?.trim() || '',
+        parent_id: values.parentId ? Number(values.parentId) : null,
+        display_order: Number(values.displayOrder),
+        is_active: values.isActive,
+      };
+
+      if (mode === 'create') {
+        const res = await axiosInterceptorInstanceClient.post('/categories', payload);
+        const saved = res.data?.data;
+        const newCat: Category = {
+          id: String(saved?.id || saved?.uuid || `cat-${Date.now()}`),
+          name: values.name.trim(),
+          slug: payload.slug,
+          parentId: values.parentId || null,
+          description: payload.description,
+          displayOrder: Number(values.displayOrder),
+          isActive: values.isActive,
+        };
+        onSaved(newCat, true);
+      } else if (category) {
+        await axiosInterceptorInstanceClient.patch(`/categories/${category.id}`, payload);
+        const updatedCat: Category = {
+          ...category,
+          name: values.name.trim(),
+          slug: payload.slug,
+          parentId: values.parentId || null,
+          description: payload.description,
+          displayOrder: Number(values.displayOrder),
+          isActive: values.isActive,
+        };
+        onSaved(updatedCat, false);
+      }
+      onClose();
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err?.message || 'Failed to save category');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(19, 27, 46, 0.5)',
+        backdropFilter: 'blur(3px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '1rem',
+      }}
+    >
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: 20,
+          width: '100%',
+          maxWidth: 520,
+          boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <div
           style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(19, 27, 46, 0.5)',
-            backdropFilter: 'blur(3px)',
+            padding: '1.25rem 1.5rem',
+            borderBottom: '1px solid #eaedff',
             display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '1rem',
           }}
         >
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: 20,
-              width: '100%',
-              maxWidth: 520,
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
+            {mode === 'create' ? 'Add New Category' : 'Edit Category'}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6e7977' }}
           >
-            <div
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
+              Category Name *
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. CPAP & BiPAP Masks"
+              {...register('name')}
               style={{
-                padding: '1.25rem 1.5rem',
-                borderBottom: '1px solid #eaedff',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: `1px solid ${errors.name ? '#ba1a1a' : '#dae2fd'}`,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+            {errors.name && (
+              <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                {errors.name.message}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
+              URL Slug *
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. cpap-bipap-masks"
+              {...register('slug')}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: `1px solid ${errors.slug ? '#ba1a1a' : '#dae2fd'}`,
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+            {errors.slug && (
+              <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                {errors.slug.message}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
+              Parent Classification (Optional)
+            </label>
+            <select
+              {...register('parentId')}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: '1px solid #dae2fd',
+                fontSize: '0.875rem',
+                outline: 'none',
+                background: '#ffffff',
               }}
             >
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
-                {modalMode === 'create' ? 'Add New Category' : 'Edit Category'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setModalMode(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6e7977' }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleFormSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
-                  Category Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. CPAP & BiPAP Masks"
-                  value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    outline: 'none',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
-                  URL Slug *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. cpap-bipap-masks"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    outline: 'none',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
-                  Parent Classification (Optional)
-                </label>
-                <select
-                  value={formData.parentId}
-                  onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    outline: 'none',
-                    background: '#ffffff',
-                  }}
-                >
-                  <option value="">-- None (Top Level Root Category) --</option>
-                  {rootCategories.map((root) => (
-                    <option key={root.id} value={root.id}>
-                      {root.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
-                  Clinical Description
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Clinical purpose and equipment scope..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  paddingTop: '1rem',
-                  borderTop: '1px solid #eaedff',
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: 12,
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setModalMode(null)}
-                  style={{
-                    background: 'none',
-                    border: '1px solid #dae2fd',
-                    padding: '10px 18px',
-                    borderRadius: 8,
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    color: '#6e7977',
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    background: '#005c55',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '10px 22px',
-                    borderRadius: 8,
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0, 92, 85, 0.25)',
-                  }}
-                >
-                  {modalMode === 'create' ? 'Create Category' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+              <option value="">-- None (Top Level Root Category) --</option>
+              {rootCategories.map((root) => (
+                <option key={root.id} value={root.id}>
+                  {root.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 4 }}>
+              Clinical Description
+            </label>
+            <textarea
+              rows={2}
+              placeholder="Clinical purpose and equipment scope..."
+              {...register('description')}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: '1px solid #dae2fd',
+                fontSize: '0.875rem',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              paddingTop: '1rem',
+              borderTop: '1px solid #eaedff',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 12,
+            }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: '1px solid #dae2fd',
+                padding: '10px 18px',
+                borderRadius: 8,
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                color: '#6e7977',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                background: submitting ? '#6e7977' : '#16453A',
+                color: '#ffffff',
+                border: 'none',
+                padding: '10px 22px',
+                borderRadius: 8,
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                cursor: submitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 92, 85, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {submitting ? (
+                <>
+                  <RefreshCw size={14} className="animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : mode === 'create' ? (
+                'Create Category'
+              ) : (
+                'Save Changes'
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

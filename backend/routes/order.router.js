@@ -5,13 +5,14 @@ const { authenticate, authorize } = require('../middlewares/auth.middleware');
 const {
   createOrderSchema,
   updateOrderStatusSchema,
+  listOrdersSchema,
 } = require('../schema/order/order.schema');
 
 router.post('/', authenticate, validate(createOrderSchema), (req, res, next) =>
   orderController.create(req, res, next)
 );
 
-router.get('/my', authenticate, (req, res, next) =>
+router.get('/my', authenticate, validate(listOrdersSchema), (req, res, next) =>
   orderController.getMyOrders(req, res, next)
 );
 
@@ -19,6 +20,7 @@ router.get(
   '/all',
   authenticate,
   authorize('super_admin'),
+  validate(listOrdersSchema),
   (req, res, next) => orderController.getAllOrders(req, res, next)
 );
 
@@ -26,6 +28,7 @@ router.get(
   '/',
   authenticate,
   authorize('super_admin'),
+  validate(listOrdersSchema),
   (req, res, next) => orderController.getAllOrders(req, res, next)
 );
 

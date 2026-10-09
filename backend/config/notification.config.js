@@ -2,8 +2,8 @@
 
 module.exports = {
   // Recipient details
-  adminEmail: process.env.ADMIN_NOTIFICATION_EMAIL || 'care@aarogyamed.com',
-  adminWhatsAppNumber: process.env.ADMIN_WHATSAPP_NUMBER || '+919876543210',
+  adminEmail: process.env.ADMIN_NOTIFICATION_EMAIL || 'care@omkarhealthcare.com',
+  adminWhatsAppNumber: process.env.ADMIN_ALERT_PHONE || process.env.ADMIN_WHATSAPP_NUMBER || '',
 
   // WhatsApp provider selection: 'mock' (default for dev/testing), 'cloud_api' (Meta), or 'twilio'
   whatsappProvider: process.env.WHATSAPP_PROVIDER,

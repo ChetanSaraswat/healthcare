@@ -43,7 +43,7 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Globe size={18} color="#005c55" />
+          <Globe size={18} color="#16453A" />
           <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#131b2e' }}>
             {t.admin.languageTabs}
           </span>
@@ -65,7 +65,7 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
             onClick={() => onSelectLocale('en')}
             style={{
               border: 'none',
-              background: selectedLocale === 'en' ? '#005c55' : 'transparent',
+              background: selectedLocale === 'en' ? '#16453A' : 'transparent',
               color: selectedLocale === 'en' ? '#ffffff' : '#3e4947',
               padding: '6px 16px',
               borderRadius: 8,
@@ -83,7 +83,7 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
             onClick={() => onSelectLocale('hi')}
             style={{
               border: 'none',
-              background: selectedLocale === 'hi' ? '#005c55' : 'transparent',
+              background: selectedLocale === 'hi' ? '#16453A' : 'transparent',
               color: selectedLocale === 'hi' ? '#ffffff' : '#3e4947',
               padding: '6px 16px',
               borderRadius: 8,
@@ -103,7 +103,7 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
             <span
               style={{
                 background: '#eaf8f6',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 padding: '4px 10px',
@@ -119,8 +119,8 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
           ) : (
             <span
               style={{
-                background: '#fff0eb',
-                color: '#ea580c',
+                background: '#FBF2ED',
+                color: '#B75932',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 padding: '4px 10px',
@@ -140,7 +140,7 @@ export const LanguageTabs: React.FC<LanguageTabsProps> = ({
               type="button"
               onClick={onAutoTranslate}
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 border: 'none',
                 padding: '5px 12px',

@@ -11,6 +11,9 @@ export interface ProductsState {
   error: string | null;
   filters: ListProductsFilterParams;
   total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: ProductsState = {
@@ -23,6 +26,9 @@ const initialState: ProductsState = {
     sort: 'popular',
   },
   total: 0,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 export const productsSlice = createAppSlice({
@@ -40,16 +46,28 @@ export const productsSlice = createAppSlice({
       state.total += 1;
     }),
     updateProduct: create.reducer<Product>((state, action) => {
-      const idx = state.products.findIndex((p) => p.id === action.payload.id);
+      const idx = state.products.findIndex(
+        (p) =>
+          p.id === action.payload.id ||
+          (p.uuid && p.uuid === action.payload.uuid) ||
+          p.slug === action.payload.slug
+      );
       if (idx !== -1) {
         state.products[idx] = action.payload;
       }
-      if (state.selectedProduct && state.selectedProduct.id === action.payload.id) {
+      if (
+        state.selectedProduct &&
+        (state.selectedProduct.id === action.payload.id ||
+          (state.selectedProduct.uuid && state.selectedProduct.uuid === action.payload.uuid) ||
+          state.selectedProduct.slug === action.payload.slug)
+      ) {
         state.selectedProduct = action.payload;
       }
     }),
     deleteProduct: create.reducer<string>((state, action) => {
-      state.products = state.products.filter((p) => p.id !== action.payload);
+      state.products = state.products.filter(
+        (p) => p.id !== action.payload && p.uuid !== action.payload && p.slug !== action.payload
+      );
       state.total = Math.max(0, state.total - 1);
     }),
   }),
@@ -64,6 +82,8 @@ export const productsSlice = createAppSlice({
         state.loading = false;
         state.products = action.payload.data.products;
         state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.totalPages = action.payload.data.totalPages;
       })
       .addCase(listProducts.rejected, (state, action) => {
         state.loading = false;

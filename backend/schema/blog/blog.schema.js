@@ -33,7 +33,7 @@ exports.createBlogPostSchema = z.object({
     summary: z.string().nullable().optional(),
     body: z.string({ required_error: 'Body is required' }).min(10),
     cover_image: z.string().nullable().optional(),
-    author_name: z.string().optional().default('AarogyaMed Editorial Team'),
+    author_name: z.string().optional().default('Omkar Healthcare Editorial Team'),
     status: z.enum(['draft', 'published']).optional().default('published'),
     translations: z.array(translationItemSchema).optional().default([]),
   }),

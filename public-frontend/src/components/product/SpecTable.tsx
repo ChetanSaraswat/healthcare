@@ -47,7 +47,7 @@ export const SpecTable: React.FC<SpecTableProps> = ({ specifications, className 
               style={{
                 padding: '12px 18px',
                 fontWeight: 700,
-                color: '#00201d',
+                color: '#0C2E27',
                 width: '38%',
                 fontSize: '0.8125rem',
                 textTransform: 'uppercase',
@@ -60,7 +60,7 @@ export const SpecTable: React.FC<SpecTableProps> = ({ specifications, className 
               style={{
                 padding: '12px 18px',
                 fontWeight: 700,
-                color: '#00201d',
+                color: '#0C2E27',
                 fontSize: '0.8125rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em',

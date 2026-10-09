@@ -1,9 +1,10 @@
 {
   "common": {
-    "brandName": "AarogyaMed",
+    "brandName": "Omkar Healthcare",
+    "home": "Home",
     "tagline": "CARE EQUIPMENT & RENTALS",
     "helpline": "24/7 Caregiver Clinical Helpline: 1800-889-CARE (2273)",
-    "certifiedBadge": "CDSCO & ISO 13485 Certified",
+    "certifiedBadge": "Hospital-Grade Certified Equipment",
     "dispatchPill": "4-Hour Urgent Clinical Dispatch across 40+ Cities",
     "knowledgeHub": "Caregiver Knowledge Hub",
     "activeRentals": "Active Rentals",
@@ -22,7 +23,12 @@
     "viewCatalog": "View Full Equipment Catalog",
     "callTollFree": "Call Toll Free: 1800-889-2273",
     "chatWhatsApp": "Chat with Clinical Specialist on WhatsApp",
-    "whatsappBubble": "Caregiver WhatsApp Helpdesk"
+    "whatsappBubble": "Caregiver WhatsApp Helpdesk",
+    "experienceCenters": "Experience Centers",
+    "educationGuides": "Education & Care Guides",
+    "profile": "Profile",
+    "wishlist": "Wishlist",
+    "contact": "Contact"
   },
   "product": {
     "buyOutright": "Buy Equipment",
@@ -43,7 +49,7 @@
     "specificationsTitle": "Hospital-Grade Technical Specifications",
     "paramHeader": "Parameter / Feature",
     "specHeader": "Clinical Specification",
-    "biomedicalGuarantee": "AarogyaMed Biomedical Guarantee",
+    "biomedicalGuarantee": "Omkar Biomedical Guarantee",
     "biomedicalGuaranteeText": "Whether purchased brand new or rented, this device is inspected and calibrated using calibrated biomedical flow and pressure analyzers. Accompanied by technician installation and physical patient/caregiver demonstration at home.",
     "checkServiceability": "Check Hub Delivery & Setup Serviceability",
     "pincodePlaceholder": "Enter 6-digit Pincode",
@@ -56,7 +62,7 @@
   "cart": {
     "cartTitle": "Your Healthcare Cart",
     "emptyCartTitle": "Your Healthcare Cart is Empty",
-    "emptyCartSubtitle": "Explore our certified medical catalog for oxygen concentrators, ICU beds, CPAP machines, and rehabilitation equipment available for direct buy and flexible rental.",
+    "emptyCartSubtitle": "Explore our certified medical catalog for oxygen concentrators, CPAP & BiPAP machines, and respiratory equipment available for direct buy and flexible rental.",
     "browseCatalog": "Browse Medical Catalog",
     "purchaseSection": "Equipment for Purchase",
     "rentalSection": "Equipment for Flexible Rental",
@@ -84,7 +90,7 @@
     "email": "Email Address (For Tax Invoices & Calibration Certificates) *",
     "addressSection": "2. Hospital Delivery & Setup Address",
     "street": "Street Address & House/Flat Number *",
-    "landmark": "Floor, Landmark & Elevator Access (Crucial for ICU Bed Assembly)",
+    "landmark": "Floor, Landmark & Elevator Access (Crucial for Timely Delivery)",
     "city": "City Hub *",
     "state": "State *",
     "pincode": "Pincode *",
@@ -99,7 +105,7 @@
   "confirmation": {
     "badge": "Step 4 of 4: Order Confirmed",
     "title": "Equipment Order & Clinical Dispatch Confirmed",
-    "subtitle": "Thank you for trusting AarogyaMed. Your equipment has been allocated from our sterilized clinical hub and assigned to our biomedical logistics coordinator.",
+    "subtitle": "Thank you for trusting Omkar Healthcare. Your equipment has been allocated from our sterilized clinical hub and assigned to our biomedical logistics coordinator.",
     "viewRentals": "View Active Rentals & Tracking",
     "returnCatalog": "Return to Equipment Catalog",
     "whatNext": "What Happens Next?",
@@ -128,5 +134,27 @@
     "hindiComplete": "Hindi Complete",
     "missingHindi": "Missing Hindi Translation",
     "missingHindiWarning": "Warning: Hindi translation is incomplete. English content will be displayed as fallback."
+  },
+  "experienceCentersPage": {
+    "title": "Experience Centers & Facilities",
+    "subtitle": "Visit our official centers to see, test, and understand certified medical equipment with personalized caregiver guidance.",
+    "introTitle": "Experience Medical Equipment Firsthand",
+    "introText": "Selecting equipment like oxygen concentrators, BiPAP machines, or specialized respiratory equipment can be critical. At Omkar Healthcare Experience Centers, patients and family caregivers can physically inspect calibrated equipment, test operation, and receive guidance from our specialists before choosing to buy or rent.",
+    "experienceCentersTitle": "Official Experience Centers",
+    "experienceCentersSubtitle": "Walk-in equipment trial, live demonstration, and rental consultation.",
+    "warehouseTitle": "Dispatch & Storage Facility",
+    "warehouseSubtitle": "Central medical equipment storage and biomedical dispatch operations.",
+    "getDirections": "Get Directions",
+    "call": "Call Center",
+    "viewOnMaps": "View on Google Maps",
+    "visitPolicyLabel": "Visit Policy",
+    "addressLabel": "Address",
+    "typeExperienceCenter": "Experience Center",
+    "typeWarehouse": "Warehouse & Dispatch",
+    "featuresTrial": "Hands-on Equipment Trial",
+    "featuresGuidance": "Caregiver Guidance",
+    "featuresAssistance": "Purchase & Rental Consultation",
+    "noHoursWalkIn": "Walk-in hours not available (Visits by prior appointment only)",
+    "warehouseNotice": "Warehouse location handles biomedical sterilization, testing, and dispatch. In-person visits are strictly by prior appointment only."
   }
 }

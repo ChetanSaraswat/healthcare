@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       author_name: {
         type: DataTypes.STRING,
-        defaultValue: 'AarogyaMed Editorial Team',
+        defaultValue: 'Omkar Healthcare Editorial Team',
       },
       status: {
         type: DataTypes.ENUM('draft', 'published'),

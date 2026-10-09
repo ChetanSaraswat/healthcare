@@ -11,7 +11,7 @@ class TwilioWhatsAppProvider extends WhatsAppProvider {
     super();
     this.accountSid = config.accountSid || process.env.TWILIO_ACCOUNT_SID || '';
     this.authToken = config.authToken || process.env.TWILIO_AUTH_TOKEN || '';
-    this.fromNumber = config.fromNumber || process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886';
+    this.fromNumber = config.fromNumber || process.env.TWILIO_WHATSAPP_FROM || '';
     this.contentSid = config.contentSid || process.env.TWILIO_CONTENT_SID || '';
   }
 

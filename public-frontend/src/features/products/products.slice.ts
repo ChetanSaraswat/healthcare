@@ -11,6 +11,9 @@ export interface ProductsState {
   error: string | null;
   filters: ListProductsFilterParams;
   total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: ProductsState = {
@@ -23,6 +26,9 @@ const initialState: ProductsState = {
     sort: 'popular',
   },
   total: 0,
+  page: 1,
+  limit: 12,
+  totalPages: 1,
 };
 
 export const productsSlice = createAppSlice({
@@ -64,6 +70,8 @@ export const productsSlice = createAppSlice({
         state.loading = false;
         state.products = action.payload.data.products;
         state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.totalPages = action.payload.data.totalPages;
       })
       .addCase(listProducts.rejected, (state, action) => {
         state.loading = false;

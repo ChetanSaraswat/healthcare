@@ -30,8 +30,8 @@ export const authSlice = createAppSlice({
       state.isAuthenticated = false;
       state.error = null;
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('aarogyamed_auth_token');
-        sessionStorage.removeItem('aarogyamed_checkout_session');
+        localStorage.removeItem('omkar_auth_token');
+        sessionStorage.removeItem('omkar_checkout_session');
       }
     }),
     clearAuthError: create.reducer((state) => {
@@ -52,7 +52,7 @@ export const authSlice = createAppSlice({
         state.isAuthenticated = true;
         state.error = null;
         if (typeof window !== 'undefined' && action.payload?.data?.token) {
-          localStorage.setItem('aarogyamed_auth_token', action.payload.data.token);
+          localStorage.setItem('omkar_auth_token', action.payload.data.token);
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -71,7 +71,7 @@ export const authSlice = createAppSlice({
         state.isAuthenticated = true;
         state.error = null;
         if (typeof window !== 'undefined' && action.payload?.data?.token) {
-          localStorage.setItem('aarogyamed_auth_token', action.payload.data.token);
+          localStorage.setItem('omkar_auth_token', action.payload.data.token);
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -96,7 +96,7 @@ export const authSlice = createAppSlice({
             state.token = null;
             state.isAuthenticated = false;
             if (typeof window !== 'undefined') {
-              localStorage.removeItem('aarogyamed_auth_token');
+              localStorage.removeItem('omkar_auth_token');
             }
           }
         }

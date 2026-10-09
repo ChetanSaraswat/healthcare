@@ -30,8 +30,8 @@ export const authSlice = createAppSlice({
       state.isAuthenticated = false;
       state.error = null;
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('aarogyamed_auth_token');
-        localStorage.removeItem('aarogyamed_admin_auth_token');
+        localStorage.removeItem('omkar_auth_token');
+        localStorage.removeItem('omkar_admin_auth_token');
       }
     }),
     clearAuthError: create.reducer((state) => {
@@ -52,8 +52,8 @@ export const authSlice = createAppSlice({
         state.isAuthenticated = true;
         state.error = null;
         if (typeof window !== 'undefined' && action.payload?.data?.token) {
-          localStorage.setItem('aarogyamed_auth_token', action.payload.data.token);
-          localStorage.setItem('aarogyamed_admin_auth_token', action.payload.data.token);
+          localStorage.setItem('omkar_auth_token', action.payload.data.token);
+          localStorage.setItem('omkar_admin_auth_token', action.payload.data.token);
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -72,7 +72,7 @@ export const authSlice = createAppSlice({
         state.isAuthenticated = true;
         state.error = null;
         if (typeof window !== 'undefined' && action.payload?.data?.token) {
-          localStorage.setItem('aarogyamed_auth_token', action.payload.data.token);
+          localStorage.setItem('omkar_auth_token', action.payload.data.token);
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -97,7 +97,7 @@ export const authSlice = createAppSlice({
             state.token = null;
             state.isAuthenticated = false;
             if (typeof window !== 'undefined') {
-              localStorage.removeItem('aarogyamed_auth_token');
+              localStorage.removeItem('omkar_auth_token');
             }
           }
         }

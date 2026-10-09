@@ -23,6 +23,7 @@ import {
   Clock,
   Truck,
   RotateCcw,
+  Sparkles,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -71,7 +72,7 @@ function LoginContent() {
 
   const dispatch = useAppDispatch();
   const { locale } = useTranslation();
-  const { isAuthenticated, loading, error, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, loading, error } = useAppSelector((state) => state.auth);
 
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
@@ -81,6 +82,7 @@ function LoginContent() {
     handleSubmit: handleLoginSubmit,
     formState: { errors: loginErrors },
     reset: resetLogin,
+    setValue: setLoginValue,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
@@ -136,81 +138,94 @@ function LoginContent() {
     }
   };
 
+  const handleQuickFill = (email: string, pass: string) => {
+    setActiveTab('login');
+    setLoginValue('identifier', email, { shouldValidate: true });
+    setLoginValue('password', pass, { shouldValidate: true });
+  };
+
   return (
-    <div className={styles.loginContainer}>
-      {/* Left Column: Brand & Trust Badges */}
-      <div className={styles.heroColumn}>
-        <div className={styles.heroContent}>
-          <div className={styles.brandBadge}>
-            <ShieldCheck size={16} />
-            <span>CDSCO Registered • ISO 13485 Certified</span>
+    <div className={styles.pageContainer}>
+      <div className={styles.authCard}>
+        {/* Left Column: Clinical Trust Sidebar */}
+        <div className={styles.trustSidebar}>
+          <div>
+            <div className={styles.trustHeader}>
+              <div className={styles.brandBadge}>
+                <ShieldCheck size={16} />
+                <span>Hospital-Grade Certified Medical Equipment</span>
+              </div>
+              <h1>
+                {locale === 'hi'
+                  ? 'अस्पताल-स्तरीय चिकित्सा देखभाल सीधे आपके घर पर'
+                  : 'Hospital-Grade Clinical Equipment Delivered to Your Home'}
+              </h1>
+              <p>
+                {locale === 'hi'
+                  ? 'सत्यापित ऑक्सीजन कंसंट्रेटर, ऑटो-सीपैप, बाईपैप और रेस्पिरेटरी उपकरण रेंटल व खरीद। 4 घंटे में बायोमेडिकल स्थापना।'
+                  : 'Rent or buy calibrated oxygen concentrators, auto-CPAP machines, and BiPAP devices with rapid 4-hour sanitized dispatch.'}
+              </p>
+            </div>
+
+            <div className={styles.trustFeatures}>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <Clock size={20} />
+                </div>
+                <div>
+                  <h4 className={styles.featureTitle}>
+                    {locale === 'hi' ? '4 घंटे की आपातकालीन स्थापना' : '4-Hour Emergency Dispatch'}
+                  </h4>
+                  <p className={styles.featureDesc}>
+                    {locale === 'hi'
+                      ? 'सभी प्रमुख मेट्रो क्षेत्रों में प्रशिक्षित बायोमेडिकल इंजीनियरों द्वारा।'
+                      : 'Deployed with factory calibration certificates across all metro hubs.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <Truck size={20} />
+                </div>
+                <div>
+                  <h4 className={styles.featureTitle}>
+                    {locale === 'hi' ? 'निःशुल्क डिलीवरी और स्टरलाइज़ेशन' : 'Free Delivery & Sterilization'}
+                  </h4>
+                  <p className={styles.featureDesc}>
+                    {locale === 'hi'
+                      ? 'हर यूनिट डिलीवरी से पहले अस्पताल-ग्रेड ऑटोक्लेविंग से गुजरती है।'
+                      : 'Every unit passes a multi-point biological safety inspection.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <RotateCcw size={20} />
+                </div>
+                <div>
+                  <h4 className={styles.featureTitle}>
+                    {locale === 'hi' ? 'लचीला रेंटल एवं 100% वापसी' : 'Flexible Rental & Security Return'}
+                  </h4>
+                  <p className={styles.featureDesc}>
+                    {locale === 'hi'
+                      ? 'बिना किसी परेशानी के अवधि बढ़ाएं। वापसी पर तुरंत सिक्योरिटी रिफंड।'
+                      : 'Extend rental days seamlessly; instant deposit refund upon return.'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className={styles.heroTitle}>
-            {locale === 'hi'
-              ? 'अस्पताल-स्तरीय चिकित्सा देखभाल सीधे आपके घर पर'
-              : 'Hospital-Grade Clinical Equipment Delivered to Your Home'}
-          </h1>
-          <p className={styles.heroSubtitle}>
-            {locale === 'hi'
-              ? 'सत्यापित ऑक्सीजन कंसंट्रेटर, आईसीयू बेड, बाईपैप और मोबिलिटी उपकरण रेंटल व खरीद। 4 घंटे में बायोमेडिकल स्थापना।'
-              : 'Rent or buy calibrated ICU beds, oxygen concentrators, BiPAP machines, and wheelchairs with rapid 4-hour sanitized dispatch.'}
-          </p>
 
-          <div className={styles.featuresList}>
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <Clock size={20} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>
-                  {locale === 'hi' ? '4 घंटे की आपातकालीन स्थापना' : '4-Hour Emergency Dispatch'}
-                </h4>
-                <p className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'सभी प्रमुख मेट्रो क्षेत्रों में प्रशिक्षित बायोमेडिकल इंजीनियरों द्वारा।'
-                    : 'Deployed with factory calibration certificates across all metro hubs.'}
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <Truck size={20} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>
-                  {locale === 'hi' ? 'निःशुल्क डिलीवरी और स्टरलाइज़ेशन' : 'Free Delivery & Sterilization'}
-                </h4>
-                <p className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'हर यूनिट डिलीवरी से पहले अस्पताल-ग्रेड ऑटोक्लेविंग से गुजरती है।'
-                    : 'Every unit passes a multi-point biological safety inspection.'}
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>
-                <RotateCcw size={20} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>
-                  {locale === 'hi' ? 'लचीला रेंटल एवं 100% वापसी' : 'Flexible Rental & Security Return'}
-                </h4>
-                <p className={styles.featureDesc}>
-                  {locale === 'hi'
-                    ? 'बिना किसी परेशानी के अवधि बढ़ाएं। वापसी पर तुरंत सिक्योरिटी रिफंड।'
-                    : 'Extend rental days seamlessly; instant deposit refund upon return.'}
-                </p>
-              </div>
-            </div>
+          <div className={styles.trustFooter}>
+            <ShieldCheck size={18} />
+            <span>CDSCO Compliant &amp; ISO 13485 Biomedical Certified Facility</span>
           </div>
         </div>
-      </div>
 
-      {/* Right Column: Auth Form */}
-      <div className={styles.formColumn}>
-        <div className={styles.formCard}>
+        {/* Right Column: Auth Form Section */}
+        <div className={styles.formSection}>
           <div className={styles.tabBar}>
             <button
               type="button"
@@ -228,16 +243,16 @@ function LoginContent() {
             </button>
           </div>
 
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>
+          <div className={styles.formHeader}>
+            <h2>
               {activeTab === 'login'
                 ? (locale === 'hi' ? 'अपने खाते में साइन इन करें' : 'Sign In to Patient Portal')
                 : (locale === 'hi' ? 'नया रोगी खाता बनाएं' : 'Create Caregiver Account')}
             </h2>
-            <p className={styles.cardSubtitle}>
+            <p>
               {activeTab === 'login'
-                ? (locale === 'hi' ? 'अपने ऑर्डर और रेंटल ट्रैक करने के लिए क्रेडेंशियल्स दर्ज करें' : 'Enter your registered email or phone to access rentals & orders.')
-                : (locale === 'hi' ? 'त्वरित चेकआउट और रेंटल प्रबंधन के लिए साइन अप करें' : 'Sign up for express delivery, order tracking & custom rental plans.')}
+                ? (locale === 'hi' ? 'अपने ऑर्डर और रेंटल ट्रैक करने के लिए क्रेडेंशियल्स दर्ज करें।' : 'Enter your registered email or phone to access rentals & orders.')
+                : (locale === 'hi' ? 'त्वरित चेकआउट और रेंटल प्रबंधन के लिए साइन अप करें।' : 'Sign up for express delivery, order tracking & custom rental plans.')}
             </p>
           </div>
 
@@ -291,6 +306,7 @@ function LoginContent() {
                     className={styles.passwordToggle}
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -312,6 +328,30 @@ function LoginContent() {
                   : (locale === 'hi' ? 'लॉग इन करें' : 'Sign In')}
                 <ArrowRight size={16} />
               </button>
+
+              {/* Quick Demo Test Buttons */}
+              <div className={styles.demoBox}>
+                <div className={styles.demoTitle}>
+                  <Sparkles size={13} color="#16453A" />
+                  <span>{locale === 'hi' ? 'त्वरित परीक्षण (डेमो खाते):' : 'Quick Demo Test Accounts:'}</span>
+                </div>
+                <div className={styles.demoButtons}>
+                  <button
+                    type="button"
+                    className={styles.demoBtn}
+                    onClick={() => handleQuickFill('ramesh.verma@example.com', 'Admin@12345')}
+                  >
+                    {locale === 'hi' ? 'रोगी डेमो (रमेश)' : 'Patient Demo'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.demoBtn}
+                    onClick={() => handleQuickFill('admin@omkarhealthcare.com', 'Admin@12345')}
+                  >
+                    {locale === 'hi' ? 'एडमिन डेमो' : 'Admin Demo'}
+                  </button>
+                </div>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit(onRegister)} noValidate>
@@ -396,6 +436,7 @@ function LoginContent() {
                     className={styles.passwordToggle}
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -420,10 +461,10 @@ function LoginContent() {
             </form>
           )}
 
-          <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#6e7977' }}>
+          <div className={styles.termsText}>
             {locale === 'hi'
-              ? 'साइन इन करके आप आरोग्यमेड के रेंटल एवं वारंटी नियमों से सहमत होते हैं।'
-              : 'By signing in, you agree to AarogyaMed Biomedical Terms of Rental & CDSCO Privacy Policy.'}
+              ? 'साइन इन करके आप ओमकार हेल्थकेयर के रेंटल एवं वारंटी नियमों से सहमत होते हैं।'
+              : 'By signing in, you agree to Omkar Biomedical Terms of Rental & CDSCO Privacy Policy.'}
           </div>
         </div>
       </div>

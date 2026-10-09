@@ -1,0 +1,128 @@
+.skeletonCard {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #dae2fd;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(19, 27, 46, 0.04);
+  position: relative;
+}
+
+.shimmerBox {
+  background: #f1f5f9;
+  background-image: linear-gradient(
+    90deg,
+    rgba(241, 245, 249, 1) 0%,
+    rgba(226, 232, 240, 0.8) 50%,
+    rgba(241, 245, 249, 1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite ease-in-out;
+}
+
+.imageBox {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+}
+
+.badgeStack {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.badgePill {
+  width: 100px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+}
+
+.categoryTag {
+  width: 80px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.titleLine1 {
+  width: 90%;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.titleLine2 {
+  width: 65%;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.ratingRow {
+  width: 120px;
+  height: 16px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.pricingSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 0.75rem;
+  padding: 10px;
+  background: #faf8ff;
+  border-radius: 10px;
+  border: 1px solid #eaedff;
+}
+
+.priceCol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.priceLabel {
+  width: 60px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.priceAmount {
+  width: 75px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
+.actionBtn {
+  height: 38px;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

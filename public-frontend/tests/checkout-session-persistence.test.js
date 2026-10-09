@@ -20,7 +20,7 @@ class MockStorage {
 }
 
 // Inlined logic matching checkout-session.ts
-const CHECKOUT_SESSION_KEY = 'aarogyamed_checkout_session';
+const CHECKOUT_SESSION_KEY = 'omkar_checkout_session';
 
 function computeCartFingerprint(items) {
   if (!items || items.length === 0) return '';

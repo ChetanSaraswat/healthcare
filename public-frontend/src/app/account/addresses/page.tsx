@@ -148,7 +148,7 @@ export default function AccountAddressesPage() {
           type="button"
           onClick={handleOpenAdd}
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             border: 'none',
             padding: '9px 18px',
@@ -191,7 +191,7 @@ export default function AccountAddressesPage() {
             type="button"
             onClick={handleOpenAdd}
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               border: 'none',
               padding: '10px 22px',
@@ -218,7 +218,7 @@ export default function AccountAddressesPage() {
               style={{
                 background: '#ffffff',
                 borderRadius: 16,
-                border: addr.isDefault ? '2px solid #005c55' : '1px solid #dae2fd',
+                border: addr.isDefault ? '2px solid #16453A' : '1px solid #dae2fd',
                 padding: '1.5rem',
                 display: 'flex',
                 flexDirection: 'column',
@@ -233,7 +233,7 @@ export default function AccountAddressesPage() {
                 {/* Header line: Label + Default badge */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: '0.875rem', color: '#131b2e' }}>
-                    <span style={{ color: '#005c55' }}>{getLabelIcon(addr.label)}</span>
+                    <span style={{ color: '#16453A' }}>{getLabelIcon(addr.label)}</span>
                     <span>{addr.label}</span>
                   </div>
 
@@ -241,7 +241,7 @@ export default function AccountAddressesPage() {
                     <span
                       style={{
                         background: '#eaf8f6',
-                        color: '#005c55',
+                        color: '#16453A',
                         fontSize: '0.6875rem',
                         fontWeight: 800,
                         padding: '3px 10px',
@@ -290,7 +290,7 @@ export default function AccountAddressesPage() {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#005c55',
+                        color: '#16453A',
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -312,7 +312,7 @@ export default function AccountAddressesPage() {
                     onClick={() => handleOpenEdit(addr)}
                     style={{
                       background: '#faf8ff',
-                      color: '#005c55',
+                      color: '#16453A',
                       border: '1px solid #dae2fd',
                       padding: '5px 10px',
                       borderRadius: 6,
@@ -422,9 +422,9 @@ export default function AccountAddressesPage() {
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         cursor: 'pointer',
-                        border: formData.label === lbl ? '2px solid #005c55' : '1px solid #dae2fd',
+                        border: formData.label === lbl ? '2px solid #16453A' : '1px solid #dae2fd',
                         background: formData.label === lbl ? '#eaf8f6' : '#ffffff',
-                        color: formData.label === lbl ? '#005c55' : '#3e4947',
+                        color: formData.label === lbl ? '#16453A' : '#3e4947',
                       }}
                     >
                       {lbl}
@@ -598,7 +598,7 @@ export default function AccountAddressesPage() {
                   type="submit"
                   disabled={submitting}
                   style={{
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     border: 'none',
                     padding: '10px 22px',

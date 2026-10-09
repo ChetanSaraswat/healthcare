@@ -7,6 +7,7 @@ import { listCategories } from '@/features/categories/list-categories/list-categ
 import { STATIC_LEARN_CONDITIONS } from '@/content/learn/conditions';
 import { ConditionEntity } from '@/domain/entities/condition.entity';
 import { useTranslation } from '@/locales';
+import { CONTACT_CONFIG } from '@/config/contact.config';
 import styles from './page.module.scss';
 import {
   ShieldCheck,
@@ -15,7 +16,6 @@ import {
   Sparkles,
   ArrowRight,
   Wind,
-  Bed,
   Accessibility,
   Activity,
   HeartPulse,
@@ -55,9 +55,9 @@ export default function HomePage() {
         </>
       ),
       subtitleEn:
-        'From ICU motorized beds and 10L oxygen concentrators to auto-CPAP machines. Delivered, sanitized to biomedical standards, and installed directly at your home by certified technicians.',
+        'From high-output 10L medical oxygen concentrators to auto-adjusting CPAP and BiPAP machines. Delivered, sanitized to biomedical standards, and calibrated directly at your home by certified technicians.',
       subtitleHi:
-        'आईसीयू मोटराइज्ड बेड और 10L ऑक्सीजन कंसंट्रेटर से लेकर ऑटो-सीपैप मशीनों तक। रोगाणुरहित कैलिब्रेटेड उपकरण, प्रमाणित तकनीशियनों द्वारा सीधे आपके घर पर स्थापित।',
+        'उच्च-उत्पादन 10L मेडिकल ऑक्सीजन कंसंट्रेटर से लेकर ऑटो-एडजस्टिंग सीपैप और बाईपैप मशीनों तक। रोगाणुरहित कैलिब्रेटेड उपकरण, प्रमाणित तकनीशियनों द्वारा सीधे आपके घर पर स्थापित।',
       primaryCtaTextEn: 'Explore Rental Plans',
       primaryCtaTextHi: 'रेंटल योजनाएं देखें',
       primaryCtaLink: '/shop?mode=rent',
@@ -106,8 +106,8 @@ export default function HomePage() {
         'Zero arbitrary deductions. Deposits are safeguarded in escrow and refunded directly to your bank account upon technician equipment pickup.',
       subtitleHi:
         'शून्य अनुचित कटौती। तकनीशियन द्वारा उपकरण पिकअप के 24 घंटे के भीतर सुरक्षा जमा राशि सीधे आपके बैंक खाते में वापस।',
-      primaryCtaTextEn: 'About AarogyaMed',
-      primaryCtaTextHi: 'आरोग्यमेड के बारे में',
+      primaryCtaTextEn: 'About Omkar Healthcare',
+      primaryCtaTextHi: 'ओमकार हेल्थकेयर के बारे में',
       primaryCtaLink: '/about',
       secondaryCtaTextEn: '24/7 Clinical Support',
       secondaryCtaTextHi: '24/7 क्लिनिकल सहायता',
@@ -121,8 +121,6 @@ export default function HomePage() {
     switch (iconName) {
       case 'Wind':
         return <Wind size={24} />;
-      case 'Bed':
-        return <Bed size={24} />;
       case 'Accessibility':
         return <Accessibility size={24} />;
       case 'Activity':
@@ -203,15 +201,6 @@ export default function HomePage() {
                   alt="Compassionate geriatric caregiver assisting patient"
                 />
               </div>
-              <div className={styles.floatingBadge}>
-                <div className={styles.iconCircle}>
-                  <ShieldCheck size={24} />
-                </div>
-                <div className={styles.badgeText}>
-                  CDSCO &amp; ISO 13485 Registered
-                  <span>Technician Onboarding Included</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -221,17 +210,17 @@ export default function HomePage() {
       <section className={styles.categoriesSection}>
         <div className={styles.container}>
           <div className={styles.sectionTitleRow}>
-            <div className={styles.pretitle}>Hospital-Grade Clinical Categories</div>
+            <div className={styles.pretitle}>Hospital-Grade Respiratory Care</div>
             <h2>Specialized Equipment for Every Recovery Need</h2>
             <p>
-              Designed for home recovery, post-ICU transitions, and long-term geriatric care.
+              Designed for home respiratory therapy, acute lung care, and sleep apnea treatment.
               Available for immediate outright purchase or flexible weekly and monthly rental.
             </p>
           </div>
 
           <div className={styles.categoryGrid}>
             {categoriesLoading && categoriesList.length === 0 ? (
-              [1, 2, 3, 4].map((i) => (
+              [1, 2, 3].map((i) => (
                 <div
                   key={i}
                   className={styles.catCard}
@@ -265,26 +254,37 @@ export default function HomePage() {
                   />
                 </div>
               ))
-            ) : categoriesList.length === 0 ? (
+            ) : categoriesList.filter((cat) => (cat.productCount ?? 0) > 0).length === 0 ? (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem 0', color: '#6e7977' }}>
                 {locale === 'hi' ? 'कोई श्रेणी उपलब्ध नहीं है।' : 'No categories currently available.'}
               </div>
             ) : (
-              categoriesList.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/shop?category=${cat.id}`}
-                  className={styles.catCard}
-                >
-                  <div className={styles.catIcon}>{getCategoryIcon(cat.icon)}</div>
-                  <h3>{cat.name}</h3>
-                  <p>{cat.description}</p>
-                  <div className={styles.catFooter}>
-                    <span>Explore {cat.productCount} models</span>
-                    <ArrowRight size={14} />
-                  </div>
-                </Link>
-              ))
+              categoriesList
+                .filter((cat) => (cat.productCount ?? 0) > 0)
+                .map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={`/shop?category=${cat.id}`}
+                    className={styles.catCard}
+                  >
+                    <div className={styles.catIcon}>{getCategoryIcon(cat.icon)}</div>
+                    <h3>{cat.name}</h3>
+                    <p>
+                      {cat.description ||
+                        (cat.slug.includes('cpap')
+                          ? 'Auto-adjusting CPAP and BiPAP sleep therapy systems with heated humidifiers.'
+                          : cat.slug.includes('oxygen')
+                          ? 'Continuous medical oxygen concentrators delivering 93% ± 3% purity.'
+                          : 'Hospital-grade aerosol nebulizers and high-vacuum secretion suction machines.')}
+                    </p>
+                    <div className={styles.catFooter}>
+                      <span>
+                        Explore {cat.productCount} {cat.productCount === 1 ? 'model' : 'models'}
+                      </span>
+                      <ArrowRight size={14} />
+                    </div>
+                  </Link>
+                ))
             )}
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function HomePage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  color: '#005c55',
+                  color: '#16453A',
                   fontWeight: 700,
                   fontSize: '0.8125rem',
                   textTransform: 'uppercase',
@@ -320,7 +320,7 @@ export default function HomePage() {
                 Our 10-Step Hospital Sterilization Protocol
               </h2>
               <p style={{ color: '#3e4947', fontSize: '0.9375rem', lineHeight: 1.5 }}>
-                Every single piece of rental equipment returned to AarogyaMed undergoes a stringent
+                Every single piece of rental equipment returned to Omkar Healthcare undergoes a stringent
                 clinical re-conditioning procedure before it is dispatched to another family.
               </p>
             </div>
@@ -362,12 +362,12 @@ export default function HomePage() {
           <div className={styles.clinicalTrustBanner}>
             <div className={styles.bannerContent}>
               <div className={styles.badge}>
-                <ShieldCheck size={14} /> CDSCO &amp; ISO 13485 Registered
+                <ShieldCheck size={14} /> Certified Clinical Equipment
               </div>
               <h3>
                 {locale === 'hi'
-                  ? 'भारत के 40+ परिवार आरोग्यमेड के क्लिनिकल मानकों पर भरोसा क्यों करते हैं?'
-                  : 'Why 40+ Indian Families Trust AarogyaMed Clinical Standards'}
+                  ? 'भारत के 40+ परिवार ओमकार हेल्थकेयर के क्लिनिकल मानकों पर भरोसा क्यों करते हैं?'
+                  : 'Why 40+ Indian Families Trust Omkar Healthcare Clinical Standards'}
               </h3>
               <p>
                 {locale === 'hi'
@@ -439,7 +439,7 @@ export default function HomePage() {
               width: 56,
               height: 56,
               borderRadius: '50%',
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -456,14 +456,14 @@ export default function HomePage() {
           </h2>
           <p style={{ color: '#3e4947', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
             {locale === 'hi'
-              ? 'हमारे प्रशिक्षित बायोमेडिकल विशेषज्ञ और नर्सिंग सलाहकार 24/7 उपलब्ध हैं ताकि आपके डॉक्टर द्वारा निर्धारित सटीक ऑक्सीजन फ्लो, बेड स्पेसिफिकेशन या सीपैप प्रेशर चुनने में आपकी सहायता कर सकें।'
-              : 'Our trained biomedical specialists and geriatric nursing counselors are available 24/7 to help you select the exact flow rate, bed specifications, or CPAP pressure prescribed by your doctor.'}
+              ? 'हमारे प्रशिक्षित बायोमेडिकल विशेषज्ञ और क्लिनिकल सलाहकार 24/7 उपलब्ध हैं ताकि आपके डॉक्टर द्वारा निर्धारित सटीक ऑक्सीजन फ्लो, मास्क साइजिंग या सीपैप/बाईपैप प्रेशर चुनने में आपकी सहायता कर सकें।'
+              : 'Our trained biomedical specialists and clinical counselors are available 24/7 to help you select the exact flow rate, mask sizing, or CPAP/BiPAP pressure prescribed by your doctor.'}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             <a
-              href="tel:18008892273"
+              href={`tel:${CONTACT_CONFIG.phone}`}
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 padding: '14px 28px',
                 borderRadius: 9999,
@@ -475,24 +475,29 @@ export default function HomePage() {
                 gap: 8,
               }}
             >
-              <PhoneCall size={18} /> {t.common.callTollFree}
+              <PhoneCall size={18} /> {t.common.callTollFree || (locale === 'hi' ? 'कॉल करें' : 'Call Care Support')}
             </a>
-            <a
-              href="https://wa.me/919876543210"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                background: '#25D366',
-                color: '#ffffff',
-                padding: '14px 28px',
-                borderRadius: 9999,
-                fontWeight: 700,
-                textDecoration: 'none',
-                fontSize: '1rem',
-              }}
-            >
-              {t.common.chatWhatsApp}
-            </a>
+            {CONTACT_CONFIG.whatsappEnabled && (
+              <a
+                href={CONTACT_CONFIG.getWhatsAppHref(locale)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: '#25D366',
+                  color: '#ffffff',
+                  padding: '14px 28px',
+                  borderRadius: 9999,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  fontSize: '1rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                {t.common.chatWhatsApp}
+              </a>
+            )}
           </div>
         </div>
       </section>

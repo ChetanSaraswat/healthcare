@@ -20,9 +20,11 @@ import {
   BookOpen,
   Users,
   FileText,
+  LogOut,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loginUser } from '@/features/auth/login/login.action';
+import { logout } from '@/features/auth/auth.slice';
 import { ToastSnackbar } from '@/components/common/ToastSnackbar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -67,6 +69,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAdminSignout = () => {
+    dispatch(logout());
   };
 
   if (!isMounted) {
@@ -133,10 +139,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-0.02em' }}>
             Operations Console Access Restricted
           </h2>
-          <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: '0 0 1.75rem', lineHeight: 1.6 }}>
-            The AarogyaMed Clinical Operations Console requires verified administrator credentials.
+          <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: '0 0 1.25rem', lineHeight: 1.6 }}>
+            The Omkar Healthcare Clinical Operations Console requires verified administrator credentials.
             {authUser ? ` Currently signed in as "${authUser.name}" (${authUser.role}).` : ' Please sign in with an administrator account to continue.'}
           </p>
+
+          {authUser && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <button
+                type="button"
+                onClick={handleAdminSignout}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: '#fee2e2',
+                  border: '1px solid #fecaca',
+                  color: '#b91c1c',
+                  padding: '7px 14px',
+                  borderRadius: 8,
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                <LogOut size={14} />
+                Sign Out Current Account ({authUser.name})
+              </button>
+            </div>
+          )}
 
           <div style={{ textAlign: 'left', marginTop: '1.5rem' }}>
             <form onSubmit={handleAdminLogin}>
@@ -155,7 +186,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   required
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
-                  placeholder="admin@aarogyamed.com"
+                  placeholder="admin@omkarhealthcare.com"
                   style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9375rem', outline: 'none' }}
                 />
               </div>
@@ -179,7 +210,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 disabled={isSubmitting}
                 style={{
                   width: '100%',
-                  background: '#005c55',
+                  background: '#16453A',
                   color: '#ffffff',
                   border: 'none',
                   padding: '12px 20px',
@@ -202,7 +233,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 type="button"
                 onClick={() => {
-                  setAdminEmail('admin@aarogyamed.com');
+                  setAdminEmail('admin@omkarhealthcare.com');
                   setAdminPassword('Admin@12345');
                 }}
                 style={{
@@ -232,7 +263,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   textDecoration: 'none',
                 }}
               >
-                ← Return to AarogyaMed Public Storefront
+                ← Return to Omkar Healthcare Public Storefront
               </a>
             </div>
           </div>
@@ -273,14 +304,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       href: '/admin/conditions',
       icon: BookOpen,
       badge: `${conditions.length} guides`,
-      badgeColor: '#005c55',
+      badgeColor: '#16453A',
     },
     {
       label: 'Clinical Blog & CMS',
       href: '/admin/blog',
       icon: FileText,
       badge: `${blogPosts.length} articles`,
-      badgeColor: '#006398',
+      badgeColor: '#B75932',
     },
     {
       label: 'Category Taxonomy',
@@ -299,14 +330,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       href: '/admin/customers',
       icon: Users,
       badge: customers.length > 0 ? `${customers.length} patients` : null,
-      badgeColor: '#006398',
+      badgeColor: '#B75932',
     },
     {
       label: 'Policies & Legal CMS',
       href: '/admin/policies',
       icon: ShieldCheck,
       badge: 'Live CMS',
-      badgeColor: '#005c55',
+      badgeColor: '#16453A',
     },
   ];
 
@@ -314,7 +345,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div
       style={{
         display: 'flex',
-        minHeight: '100vh',
+        height: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
         background: '#f4f6fc',
         fontFamily: "'Plus Jakarta Sans', sans-serif",
         color: '#131b2e',
@@ -333,7 +366,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Permanently pinned, stationary shell */}
       <aside
         style={{
           width: 260,
@@ -341,12 +374,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           borderRight: '1px solid #e2e7ff',
           display: 'flex',
           flexDirection: 'column',
-          position: 'sticky',
-          top: 0,
           height: '100vh',
+          maxHeight: '100vh',
           zIndex: 50,
           flexShrink: 0,
           boxShadow: '1px 0 8px rgba(0,0,0,0.02)',
+          overflow: 'hidden',
         }}
       >
         {/* Brand Header */}
@@ -357,37 +390,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexShrink: 0,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 10,
-                background: 'linear-gradient(135deg, #005c55, #006398)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(0,92,85,0.3)',
-              }}
-            >
-              <ShieldCheck size={22} />
-            </div>
-            <div>
-              <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#005c55', letterSpacing: '-0.02em', display: 'block' }}>
-                AarogyaMed
-              </span>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#006398', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                Clinical Operations Hub
-              </span>
-            </div>
-          </div>
+          <Link href="/admin" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <img
+              src="/images/logo.svg"
+              alt="Omkar Healthcare"
+              style={{ height: 42, width: 'auto', objectFit: 'contain' }}
+            />
+          </Link>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={{ padding: '1.25rem 0.75rem', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {/* Navigation Links - Internally scrollable without moving brand or footer */}
+        <nav
+          className="custom-scrollbar"
+          style={{
+            padding: '1.25rem 0.75rem',
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}
+        >
           <div style={{ padding: '0 0.75rem 0.5rem', fontSize: '0.6875rem', fontWeight: 800, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Catalog &amp; Operations
           </div>
@@ -406,15 +432,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   borderRadius: 10,
                   fontSize: '0.875rem',
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#005c55' : '#3e4947',
+                  color: isActive ? '#16453A' : '#3e4947',
                   background: isActive ? '#e8f5f3' : 'transparent',
                   textDecoration: 'none',
                   transition: 'all 0.15s ease',
-                  borderLeft: isActive ? '3px solid #005c55' : '3px solid transparent',
+                  borderLeft: isActive ? '3px solid #16453A' : '3px solid transparent',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Icon size={18} color={isActive ? '#005c55' : '#6e7977'} />
+                  <Icon size={18} color={isActive ? '#16453A' : '#6e7977'} />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
@@ -425,7 +451,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       padding: '2px 8px',
                       borderRadius: 999,
                       background: item.badgeColor ? '#ffe5dc' : '#eaedff',
-                      color: item.badgeColor || '#006398',
+                      color: item.badgeColor || '#B75932',
                     }}
                   >
                     {item.badge}
@@ -467,14 +493,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             borderRadius: 12,
             background: 'linear-gradient(135deg, #f2f3ff 0%, #e2e7ff 100%)',
             border: '1px solid #dae2fd',
+            flexShrink: 0,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#131b2e', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Globe2 size={14} color="#005c55" />
+              <Globe2 size={14} color="#16453A" />
               Hindi Coverage
             </span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#005c55' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16453A' }}>
               {coveragePercent}%
             </span>
           </div>
@@ -483,7 +510,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               style={{
                 width: `${coveragePercent}%`,
                 height: '100%',
-                background: 'linear-gradient(90deg, #005c55, #006398)',
+                background: 'linear-gradient(90deg, #16453A, #B75932)',
                 borderRadius: 999,
                 transition: 'width 0.3s ease',
               }}
@@ -494,45 +521,79 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </p>
         </div>
 
-        {/* Admin User Footer */}
+        {/* Admin User Footer with Sign Out */}
         <div
           style={{
             padding: '1rem 1.25rem',
             borderTop: '1px solid #f2f3ff',
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            justifyContent: 'space-between',
+            gap: 10,
+            flexShrink: 0,
           }}
         >
-          <div
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: '#16453A',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '0.875rem',
+                flexShrink: 0,
+              }}
+            >
+              {authUser?.name ? authUser.name.slice(0, 2).toUpperCase() : 'AD'}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <span
+                style={{
+                  fontSize: '0.8125rem',
+                  fontWeight: 700,
+                  color: '#131b2e',
+                  display: 'block',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {authUser?.name || 'Admin Operations'}
+              </span>
+              <span style={{ fontSize: '0.6875rem', color: '#16453A', fontWeight: 600 }}>
+                {authUser?.role === 'super_admin' ? 'Super Administrator' : (authUser?.role || 'Administrator')}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleAdminSignout}
+            title="Sign Out of Operations Console"
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: '#005c55',
-              color: '#ffffff',
+              background: '#fff0ee',
+              border: '1px solid #ffdad6',
+              borderRadius: 8,
+              padding: '7px 8px',
+              color: '#ba1a1a',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: '0.875rem',
+              transition: 'all 0.15s ease',
             }}
           >
-            AD
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', display: 'block', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              Admin Operations
-            </span>
-            <span style={{ fontSize: '0.6875rem', color: '#005c55', fontWeight: 600 }}>
-              Super Administrator
-            </span>
-          </div>
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 0, overflow: 'hidden' }}>
         {/* Top Header */}
         <header
           style={{
@@ -543,8 +604,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0 1.5rem',
-            position: 'sticky',
-            top: 0,
+            flexShrink: 0,
             zIndex: 30,
             boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
           }}
@@ -569,41 +629,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
-                  background: '#005c55',
+                  background: '#16453A',
                   boxShadow: '0 0 0 3px rgba(0,92,85,0.2)',
                 }}
               />
-              <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#005c55' }}>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#16453A' }}>
                 Pan-India Medical Equipment Dispatch Active
               </span>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Link
-              href="/admin/products/new"
+            <button
+              type="button"
+              onClick={handleAdminSignout}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
                 padding: '7px 14px',
                 borderRadius: 8,
-                background: '#005c55',
-                color: '#ffffff',
+                background: '#fff0ee',
+                border: '1px solid #ffdad6',
+                color: '#ba1a1a',
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                textDecoration: 'none',
-                boxShadow: '0 2px 6px rgba(0,92,85,0.25)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
             >
-              <PlusCircle size={16} />
-              <span>New Product</span>
-            </Link>
+              <LogOut size={15} />
+              <span>Sign Out</span>
+            </button>
           </div>
         </header>
 
         {/* Page Content Body */}
-        <main style={{ padding: '1.75rem', flex: 1 }}>{children}</main>
+        <main className="custom-scrollbar" style={{ padding: '1.75rem', flex: 1, overflowY: 'auto', minWidth: 0 }}>
+          {children}
+        </main>
         <ToastSnackbar />
       </div>
     </div>

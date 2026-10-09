@@ -30,8 +30,8 @@ axiosInterceptorInstanceClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const token =
-        localStorage.getItem('aarogyamed_admin_auth_token') ||
-        localStorage.getItem('aarogyamed_auth_token');
+        localStorage.getItem('omkar_admin_auth_token') ||
+        localStorage.getItem('omkar_auth_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -70,7 +70,7 @@ export function extractApiErrorMessage(error: any, fallback = 'An unexpected err
 
   if (error.message && typeof error.message === 'string') {
     if (error.message === 'Network Error') {
-      return 'Unable to connect to AarogyaMed Operations server. Please verify backend service.';
+      return 'Unable to connect to Omkar Healthcare Operations server. Please verify backend service.';
     }
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       return 'Request to operations service timed out. Please try again.';
@@ -95,7 +95,7 @@ function triggerErrorSnackbar(message: string) {
   lastErrorToast = { message, timestamp: now };
 
   window.dispatchEvent(
-    new CustomEvent('aarogyamed:toast', {
+    new CustomEvent('omkar:toast', {
       detail: { type: 'error', message, duration: 4500 },
     })
   );
@@ -114,7 +114,7 @@ axiosInterceptorInstanceClient.interceptors.response.use(
       userFacingMessage = 'Invalid request parameters. Please verify input data.';
     } else if (status === 401) {
       if (typeof window !== 'undefined' && !url.includes('/auth/login')) {
-        localStorage.removeItem('aarogyamed_admin_auth_token');
+        localStorage.removeItem('omkar_admin_auth_token');
       }
       if (!isSilentCheck && !userFacingMessage) {
         userFacingMessage = 'Admin session expired. Please sign in again.';
@@ -140,7 +140,7 @@ axiosInterceptorInstanceClient.interceptors.response.use(
     } else if (status && status >= 500) {
       userFacingMessage = 'Backend service encountered an error. Please try again.';
     } else if (!error.response && (error.message === 'Network Error' || error.code === 'ERR_NETWORK')) {
-      userFacingMessage = 'Unable to connect to AarogyaMed backend API. Check your network.';
+      userFacingMessage = 'Unable to connect to Omkar Healthcare backend API. Check your network.';
     }
 
     if (!isSilentCheck && userFacingMessage) {

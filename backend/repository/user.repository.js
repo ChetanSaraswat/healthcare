@@ -30,20 +30,32 @@ class UserRepository extends BaseRepository {
   }
 
   async findAllCustomersWithMetrics(filters = {}) {
+    const {
+      search,
+      role,
+      segment,
+      page = 1,
+      limit = 10,
+    } = filters;
+
     const where = {};
-    if (filters.search) {
-      const searchPattern = `%${filters.search}%`;
+    if (search && search.trim()) {
+      const searchPattern = `%${search.trim()}%`;
       where[Op.or] = [
         { name: { [Op.iLike]: searchPattern } },
         { email: { [Op.iLike]: searchPattern } },
         { phone: { [Op.iLike]: searchPattern } },
       ];
     }
-    if (filters.role) {
-      where.role = filters.role;
+    if (role && role !== 'all') {
+      where.role = role;
     }
 
-    return await this.model.findAll({
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const offset = (pageNum - 1) * limitNum;
+
+    return await this.model.findAndCountAll({
       where,
       attributes: ['id', 'uuid', 'name', 'email', 'phone', 'role', 'created_at'],
       include: [
@@ -51,15 +63,20 @@ class UserRepository extends BaseRepository {
         {
           model: Order,
           as: 'orders',
+          required: segment === 'buyers',
           attributes: ['id', 'uuid', 'total_amount', 'status', 'created_at'],
         },
         {
           model: RentalOrder,
           as: 'rentals',
-          attributes: ['id', 'uuid', 'total_amount', 'status', 'created_at'],
+          required: segment === 'rentees',
+          attributes: ['id', 'uuid', 'deposit_amount', 'status', 'created_at'],
         },
       ],
       order: [['created_at', 'DESC']],
+      limit: limitNum,
+      offset,
+      distinct: true,
     });
   }
 

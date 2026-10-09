@@ -1,6 +1,6 @@
-# AarogyaMed Medical Equipment Platform (Buy & Rent)
+# Omkar Healthcare Medical Equipment Platform (Buy & Rent)
 
-This repository contains the full-stack codebase for the AarogyaMed platform, structured into **3 completely independent applications/services**:
+This repository contains the full-stack codebase for the Omkar Healthcare platform, structured into **3 completely independent applications/services**:
 
 ```text
 healthcare/

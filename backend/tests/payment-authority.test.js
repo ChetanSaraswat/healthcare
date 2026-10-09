@@ -59,10 +59,10 @@ async function setupFixtures() {
   [testProduct] = await Product.findOrCreate({
     where: { slug: 'test-oxygen-concentrator-unit' },
     defaults: {
-      name: 'AarogyaMed Oxygen Concentrator 5L Test Unit',
+      name: 'Omkar Healthcare Oxygen Concentrator 5L Test Unit',
       slug: 'test-oxygen-concentrator-unit',
       category_id: testCategory.id,
-      brand: 'AarogyaMed',
+      brand: 'Omkar Healthcare',
       description: 'Medical test oxygen concentrator',
       buy_price: 35000.0,
       buy_available: true,
@@ -76,7 +76,7 @@ async function setupFixtures() {
   if (!testUser) {
     testUser = await User.create({
       name: 'Dr. Test Patient',
-      email: `test.patient.${crypto.randomUUID().substring(0, 8)}@aarogyamed.test`,
+      email: `test.patient.${crypto.randomUUID().substring(0, 8)}@omkarhealthcare.test`,
       password_hash: '$2a$10$abcdefghijklmnopqrstuvwxyz1234567890',
       phone: '9876543210',
       role: 'customer',

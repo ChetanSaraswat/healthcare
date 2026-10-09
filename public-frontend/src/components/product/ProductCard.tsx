@@ -81,14 +81,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {hasRealRating ? (
             <>
               <div className={styles.stars}>
-                <Star size={14} fill="#ea580c" />
+                <Star size={14} fill="#B75932" />
               </div>
               <span className={styles.score}>{product.rating}</span>
               <span>({product.reviewsCount} {locale === 'hi' ? 'समीक्षाएं' : 'reviews'})</span>
             </>
           ) : (
-            <span style={{ color: '#005c55', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <ShieldCheck size={13} /> {locale === 'hi' ? 'चिकित्सकीय रूप से सत्यापित' : 'AarogyaMed Verified'}
+            <span style={{ color: '#16453A', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <ShieldCheck size={13} /> {locale === 'hi' ? 'चिकित्सकीय रूप से सत्यापित' : 'Omkar Healthcare Verified'}
             </span>
           )}
         </div>

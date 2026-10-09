@@ -1,6 +1,6 @@
 import { axiosInterceptorInstanceClient } from '@/config/axios';
 import { RentalItem, RentalOrder } from '@/types/entities/rental.entity';
-import { ListRentalsResponse } from './list-rentals.interface';
+import { ListRentalsFilterParams, ListRentalsResponse } from './list-rentals.interface';
 import { RentalPricingCalculator } from '@/types/services/rental-pricing.calculator';
 
 export function calculateRentalDays(startDateStr?: string, endDateStr?: string, fallbackDays = 0): number {
@@ -48,7 +48,7 @@ function mapBackendRental(raw: any): RentalOrder {
       rentalOrderId: String(raw.id),
       productId: String(it.product_id || prod.id || ''),
       productName: prod.name || '',
-      productImage: (Array.isArray(prod.images) && prod.images[0]) || '/images/hospital_bed.png',
+      productImage: (Array.isArray(prod.images) && prod.images[0]) || '/images/oxygen_concentrator.png',
       dailyRate: itemDailyRate,
       effectiveDailyRate: it.effective_daily_rate ? Number(it.effective_daily_rate) : calc.effectiveDailyRate,
       durationDays: itemDuration,
@@ -99,22 +99,61 @@ function mapBackendRental(raw: any): RentalOrder {
   };
 }
 
-export const listRentalsService = async (): Promise<ListRentalsResponse> => {
+export const listRentalsService = async (params?: ListRentalsFilterParams): Promise<ListRentalsResponse> => {
+  const queryParams: Record<string, any> = {
+    page: params?.page || 1,
+    limit: params?.limit || 10,
+  };
+  if (params?.status && params.status !== 'all') queryParams.status = params.status;
+  if (params?.deposit_status && params.deposit_status !== 'all') queryParams.deposit_status = params.deposit_status;
+  if (params?.search) queryParams.search = params.search;
+  if (params?.sortBy) queryParams.sortBy = params.sortBy;
+
   try {
-    const response = await axiosInterceptorInstanceClient.get('/rentals/all');
-    if (response.data && Array.isArray(response.data.data)) {
+    const response = await axiosInterceptorInstanceClient.get('/rentals/all', { params: queryParams });
+    if (response.data && response.data.data) {
+      const rawPayload = response.data.data;
+      const rawItems = Array.isArray(rawPayload.items)
+        ? rawPayload.items
+        : Array.isArray(rawPayload)
+        ? rawPayload
+        : [];
+      const rentals = rawItems.map(mapBackendRental);
+      const pagination = rawPayload.pagination;
+
       return {
         success: true,
-        data: response.data.data.map(mapBackendRental),
+        data: {
+          rentals,
+          total: pagination?.total ?? rentals.length,
+          page: pagination?.page ?? (params?.page || 1),
+          limit: pagination?.limit ?? (params?.limit || 10),
+          totalPages: pagination?.totalPages ?? 1,
+        },
       };
     }
   } catch (err) {
     try {
-      const fallbackRes = await axiosInterceptorInstanceClient.get('/rentals');
-      if (fallbackRes.data && Array.isArray(fallbackRes.data.data)) {
+      const fallbackRes = await axiosInterceptorInstanceClient.get('/rentals', { params: queryParams });
+      if (fallbackRes.data && fallbackRes.data.data) {
+        const rawPayload = fallbackRes.data.data;
+        const rawItems = Array.isArray(rawPayload.items)
+          ? rawPayload.items
+          : Array.isArray(rawPayload)
+          ? rawPayload
+          : [];
+        const rentals = rawItems.map(mapBackendRental);
+        const pagination = rawPayload.pagination;
+
         return {
           success: true,
-          data: fallbackRes.data.data.map(mapBackendRental),
+          data: {
+            rentals,
+            total: pagination?.total ?? rentals.length,
+            page: pagination?.page ?? (params?.page || 1),
+            limit: pagination?.limit ?? (params?.limit || 10),
+            totalPages: pagination?.totalPages ?? 1,
+          },
         };
       }
     } catch (e) {
@@ -124,7 +163,13 @@ export const listRentalsService = async (): Promise<ListRentalsResponse> => {
 
   return {
     success: true,
-    data: [],
+    data: {
+      rentals: [],
+      total: 0,
+      page: params?.page || 1,
+      limit: params?.limit || 10,
+      totalPages: 1,
+    },
   };
 };
 

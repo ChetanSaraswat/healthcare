@@ -303,14 +303,34 @@ class RentalService {
     return this.enrichRentalOrder(rental);
   }
 
-  async getUserRentals(userId) {
-    const rentals = await rentalRepository.findRentalsByUser(userId);
-    return rentals.map((r) => this.enrichRentalOrder(r));
+  async getUserRentals(userId, filter = {}) {
+    const { count, rows } = await rentalRepository.findRentalsByUser(userId, filter);
+    const page = Math.max(1, Number(filter.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(filter.limit || 10)));
+    return {
+      items: rows.map((r) => this.enrichRentalOrder(r)),
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    };
   }
 
   async getAllRentals(filter = {}) {
-    const rentals = await rentalRepository.findAllRentals(filter);
-    return rentals.map((r) => this.enrichRentalOrder(r));
+    const { count, rows } = await rentalRepository.findAllRentals(filter);
+    const page = Math.max(1, Number(filter.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(filter.limit || 10)));
+    return {
+      items: rows.map((r) => this.enrichRentalOrder(r)),
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    };
   }
 
   async updateStatus(uuid, updateData) {

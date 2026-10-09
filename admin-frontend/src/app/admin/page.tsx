@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
               gap: 8,
               padding: '9px 16px',
               borderRadius: 10,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               fontSize: '0.875rem',
               fontWeight: 700,
@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
             }}
           >
             <PlusCircle size={16} />
-            <span>Add Equipment</span>
+            <span>Add New Product</span>
           </Link>
           <Link
             href="/admin/rentals"
@@ -106,7 +106,7 @@ export default function AdminDashboardPage() {
               borderRadius: 10,
               background: '#ffffff',
               border: '1px solid #dae2fd',
-              color: '#006398',
+              color: '#B75932',
               fontSize: '0.875rem',
               fontWeight: 700,
               textDecoration: 'none',
@@ -139,12 +139,12 @@ export default function AdminDashboardPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#6e7977' }}>Hospital Catalog</span>
-            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#e8f5f3', color: '#005c55', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#e8f5f3', color: '#16453A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <PackageCheck size={18} />
             </div>
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e' }}>{totalProducts}</div>
-          <div style={{ fontSize: '0.75rem', color: '#005c55', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+          <div style={{ fontSize: '0.75rem', color: '#16453A', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
             <CheckCircle2 size={12} />
             <span>All products buy &amp; rent enabled</span>
           </div>
@@ -162,11 +162,11 @@ export default function AdminDashboardPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#6e7977' }}>Active Rentals at Home</span>
-            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#eaedff', color: '#006398', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#eaedff', color: '#B75932', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Truck size={18} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#006398' }}>{activeRentals.length}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B75932' }}>{activeRentals.length}</div>
           <div style={{ fontSize: '0.75rem', color: '#3e4947', marginTop: 4, fontWeight: 600 }}>
             {pendingRentals.length} rentals pending confirmation
           </div>
@@ -208,14 +208,14 @@ export default function AdminDashboardPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#6e7977' }}>Bilingual Catalog Health</span>
-            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#e8f5f3', color: '#005c55', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#e8f5f3', color: '#16453A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ShieldCheck size={18} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#005c55' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#16453A' }}>
             {totalProducts - missingHindiProducts.length} / {totalProducts}
           </div>
-          <div style={{ fontSize: '0.75rem', color: missingHindiProducts.length > 0 ? '#b94200' : '#005c55', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+          <div style={{ fontSize: '0.75rem', color: missingHindiProducts.length > 0 ? '#b94200' : '#16453A', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
             {missingHindiProducts.length > 0 ? (
               <>
                 <AlertTriangle size={12} />
@@ -232,7 +232,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Grid: Rental Queue (60%) + Translation Alerts (40%) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
         {/* Left Column: Recent Rental Action Queue */}
         <div
           style={{
@@ -257,7 +257,7 @@ export default function AdminDashboardPage() {
               style={{
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                color: '#006398',
+                color: '#B75932',
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -269,12 +269,12 @@ export default function AdminDashboardPage() {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 480, overflowY: 'auto', paddingRight: 4 }}>
             {rentals.slice(0, 4).map((rental) => {
               const statusColors = {
                 pending: { bg: '#fff4eb', text: '#913200', border: '#ffdbce' },
-                confirmed: { bg: '#eaedff', text: '#006398', border: '#cce5ff' },
-                active: { bg: '#e8f5f3', text: '#005c55', border: '#9cf2e8' },
+                confirmed: { bg: '#eaedff', text: '#B75932', border: '#cce5ff' },
+                active: { bg: '#e8f5f3', text: '#16453A', border: '#9cf2e8' },
                 returned: { bg: '#f2f3ff', text: '#3e4947', border: '#dae2fd' },
                 cancelled: { bg: '#ffdad6', text: '#ba1a1a', border: '#ffb4ab' },
               }[rental.status];
@@ -334,7 +334,7 @@ export default function AdminDashboardPage() {
                           style={{
                             padding: '4px 10px',
                             borderRadius: 6,
-                            background: '#006398',
+                            background: '#B75932',
                             color: '#ffffff',
                             border: 'none',
                             fontSize: '0.75rem',
@@ -352,7 +352,7 @@ export default function AdminDashboardPage() {
                           style={{
                             padding: '4px 10px',
                             borderRadius: 6,
-                            background: '#005c55',
+                            background: '#16453A',
                             color: '#ffffff',
                             border: 'none',
                             fontSize: '0.75rem',
@@ -364,7 +364,7 @@ export default function AdminDashboardPage() {
                         </button>
                       )}
                       {rental.status === 'active' && (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#005c55', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16453A', display: 'flex', alignItems: 'center', gap: 4 }}>
                           <CheckCircle2 size={12} /> Active in Care
                         </span>
                       )}
@@ -403,7 +403,7 @@ export default function AdminDashboardPage() {
             </div>
 
             {missingHindiProducts.length === 0 ? (
-              <div style={{ padding: '1rem', background: '#e8f5f3', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10, color: '#005c55' }}>
+              <div style={{ padding: '1rem', background: '#e8f5f3', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10, color: '#16453A' }}>
                 <CheckCircle2 size={20} />
                 <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>
                   Awesome! All products currently have complete Hindi clinical translations.
@@ -414,43 +414,68 @@ export default function AdminDashboardPage() {
                 <p style={{ fontSize: '0.8125rem', color: '#3e4947', margin: 0 }}>
                   The following equipment will fall back to English descriptions on the Hindi storefront until translated:
                 </p>
-                {missingHindiProducts.map((p) => (
-                  <div
-                    key={p.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '10px 12px',
-                      background: '#fff8f5',
-                      border: '1px solid #ffdbce',
-                      borderRadius: 10,
-                    }}
-                  >
-                    <div>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', display: 'block' }}>
-                        {p.name}
-                      </span>
-                      <span style={{ fontSize: '0.6875rem', color: '#913200' }}>
-                        Missing Hindi title, specs, &amp; warranty
-                      </span>
-                    </div>
-                    <Link
-                      href={`/admin/products`}
+                <div
+                  className="custom-scrollbar"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                    maxHeight: '340px',
+                    overflowY: 'auto',
+                    paddingRight: 6,
+                  }}
+                >
+                  {missingHindiProducts.map((p) => (
+                    <div
+                      key={p.id}
                       style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        color: '#005c55',
-                        padding: '4px 8px',
-                        background: '#e8f5f3',
-                        borderRadius: 6,
-                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        background: '#fff8f5',
+                        border: '1px solid #ffdbce',
+                        borderRadius: 10,
+                        gap: 12,
                       }}
                     >
-                      Edit &rarr;
-                    </Link>
-                  </div>
-                ))}
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            fontSize: '0.8125rem',
+                            fontWeight: 700,
+                            color: '#131b2e',
+                            display: 'block',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                          title={p.name}
+                        >
+                          {p.name}
+                        </span>
+                        <span style={{ fontSize: '0.6875rem', color: '#913200' }}>
+                          Missing Hindi title, specs, &amp; warranty
+                        </span>
+                      </div>
+                      <Link
+                        href={`/admin/products/${p.id}/edit`}
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          color: '#16453A',
+                          padding: '4px 10px',
+                          background: '#e8f5f3',
+                          borderRadius: 6,
+                          textDecoration: 'none',
+                          flexShrink: 0,
+                        }}
+                      >
+                        Edit &rarr;
+                      </Link>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -458,7 +483,7 @@ export default function AdminDashboardPage() {
           {/* Quick Operations Actions Box */}
           <div
             style={{
-              background: 'linear-gradient(135deg, #005c55 0%, #004b46 100%)',
+              background: 'linear-gradient(135deg, #16453A 0%, #004b46 100%)',
               borderRadius: 16,
               padding: '1.5rem',
               color: '#ffffff',
@@ -481,14 +506,14 @@ export default function AdminDashboardPage() {
                   padding: '8px 14px',
                   borderRadius: 8,
                   background: '#ffffff',
-                  color: '#005c55',
+                  color: '#16453A',
                   fontSize: '0.8125rem',
                   fontWeight: 700,
                   textDecoration: 'none',
                 }}
               >
                 <PlusCircle size={15} />
-                <span>New Product</span>
+                <span>Add New Product</span>
               </Link>
               <Link
                 href="/admin/products"

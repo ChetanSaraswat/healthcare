@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser } from '@/features/auth/login/login.action';
 import { registerUser } from '@/features/auth/register/register.action';
@@ -20,6 +21,7 @@ import {
   ArrowRight,
   AlertCircle,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -87,6 +89,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     handleSubmit: handleLoginSubmit,
     formState: { errors: loginErrors },
     reset: resetLogin,
+    setValue: setLoginValue,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
@@ -160,28 +163,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
+  const handleQuickFill = (email: string, pass: string) => {
+    setActiveTab('login');
+    setLoginValue('identifier', email, { shouldValidate: true });
+    setLoginValue('password', pass, { shouldValidate: true });
+  };
+
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
+    <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        {/* Close Button firmly pinned to the card top-right */}
         <button
           type="button"
           className={styles.closeBtn}
           onClick={onClose}
           aria-label="Close modal"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
         {/* Modal Header */}
         <div className={styles.modalHeader}>
-          <div className={styles.badge}>
+          <div className={styles.badgePill}>
             <ShieldCheck size={14} />
             {locale === 'hi' ? 'सुरक्षित बायोमेडिकल रोगी पोर्टल' : 'Clinical & Patient Verified Portal'}
           </div>
           <h2 className={styles.modalTitle}>
             {activeTab === 'login'
-              ? (locale === 'hi' ? 'आरोग्यमेड में प्रवेश करें' : 'Welcome to AarogyaMed')
+              ? (locale === 'hi' ? 'ओमकार हेल्थकेयर में प्रवेश करें' : 'Welcome to Omkar Healthcare')
               : (locale === 'hi' ? 'नया रोगी खाता बनाएं' : 'Create Patient Account')}
           </h2>
           <p className={styles.modalSubtitle}>
@@ -262,6 +271,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     className={styles.passwordToggle}
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -283,6 +293,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   : (locale === 'hi' ? 'लॉग इन करें' : 'Sign In to Account')}
                 <ArrowRight size={16} />
               </button>
+
+              {/* Demo Login Quick Fill */}
+              <div className={styles.demoBox}>
+                <div className={styles.demoTitle}>
+                  <Sparkles size={13} color="#16453A" />
+                  <span>{locale === 'hi' ? 'त्वरित परीक्षण (डेमो खाते):' : 'Quick Demo Test Accounts:'}</span>
+                </div>
+                <div className={styles.demoButtons}>
+                  <button
+                    type="button"
+                    className={styles.demoBtn}
+                    onClick={() => handleQuickFill('ramesh.verma@example.com', 'Admin@12345')}
+                  >
+                    {locale === 'hi' ? 'रोगी डेमो (रमेश)' : 'Patient Demo'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.demoBtn}
+                    onClick={() => handleQuickFill('admin@omkarhealthcare.com', 'Admin@12345')}
+                  >
+                    {locale === 'hi' ? 'एडमिन डेमो' : 'Admin Demo'}
+                  </button>
+                </div>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit(onRegister)} noValidate>
@@ -367,6 +401,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     className={styles.passwordToggle}
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -391,10 +426,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </form>
           )}
 
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <Link
+              href="/login"
+              onClick={onClose}
+              style={{
+                fontSize: '0.75rem',
+                color: '#16453A',
+                fontWeight: 600,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <span>{locale === 'hi' ? 'पूर्ण स्क्रीन साइन इन पोर्टल खोलें →' : 'Open dedicated sign in portal →'}</span>
+            </Link>
+          </div>
+
           <div className={styles.termsText}>
             {locale === 'hi'
-              ? 'साइन इन करके आप आरोग्यमेड के रेंटल एवं वारंटी नियमों से सहमत होते हैं।'
-              : 'By continuing, you agree to AarogyaMed Biomedical Terms of Rental & CDSCO Privacy Policy.'}
+              ? 'साइन इन करके आप ओमकार हेल्थकेयर के रेंटल एवं वारंटी नियमों से सहमत होते हैं।'
+              : 'By continuing, you agree to Omkar Biomedical Terms of Rental & CDSCO Privacy Policy.'}
           </div>
         </div>
       </div>

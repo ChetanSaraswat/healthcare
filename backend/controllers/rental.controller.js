@@ -33,7 +33,7 @@ class RentalController {
 
   async getMyRentals(req, res, next) {
     try {
-      const rentals = await rentalService.getUserRentals(req.user.id);
+      const rentals = await rentalService.getUserRentals(req.user.id, req.query);
       res.status(SUCCESS).json({ success: true, data: rentals });
     } catch (error) {
       next(error);

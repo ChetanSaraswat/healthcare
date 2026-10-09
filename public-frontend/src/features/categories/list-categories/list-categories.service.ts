@@ -15,8 +15,6 @@ export const listCategoriesService = async (): Promise<ListCategoriesResponse> =
         description: c.description || '',
         icon: c.slug.includes('respiratory')
           ? 'Wind'
-          : c.slug.includes('bed') || c.slug.includes('home-care')
-          ? 'Bed'
           : c.slug.includes('mobility')
           ? 'Accessibility'
           : c.slug.includes('clinical') || c.slug.includes('monitor')

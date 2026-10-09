@@ -8,8 +8,16 @@ class ProductRepository extends BaseRepository {
   }
 
   async findBySlug(slug) {
+    const isNum = !isNaN(Number(slug));
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const where = isNum
+      ? { [Op.or]: [{ slug }, { id: Number(slug) }] }
+      : isUuid
+      ? { [Op.or]: [{ slug }, { uuid: slug }] }
+      : { slug };
+
     return await this.model.findOne({
-      where: { slug, status: 'active' },
+      where,
       include: [
         { model: Category, as: 'category' },
         { model: Category, as: 'subcategory' },
@@ -141,12 +149,16 @@ class ProductRepository extends BaseRepository {
     }
 
     let order = [['created_at', 'DESC']];
-    if (sortBy === 'price_asc') {
+    if (sortBy === 'price_asc' || sortBy === 'price_low') {
       order = [['buy_price', 'ASC']];
-    } else if (sortBy === 'price_desc') {
+    } else if (sortBy === 'price_desc' || sortBy === 'price_high') {
       order = [['buy_price', 'DESC']];
     } else if (sortBy === 'popular') {
-      order = [['rating_avg', 'DESC']];
+      order = [['created_at', 'DESC']];
+    } else if (sortBy === 'name') {
+      order = [['name', 'ASC']];
+    } else if (sortBy === 'newest') {
+      order = [['created_at', 'DESC']];
     }
 
     const offset = (Number(page) - 1) * Number(limit);
@@ -187,11 +199,15 @@ class ProductRepository extends BaseRepository {
   }
 
   async updateWithAssociations(id, data, transaction = null) {
-    const product = await this.model.findByPk(id, transaction ? { transaction } : {});
+    const isNum = !isNaN(Number(id));
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const where = isNum ? { id: Number(id) } : isUuid ? { uuid: id } : { id };
+    const opt = transaction ? { transaction } : {};
+
+    const product = await this.model.findOne({ where, ...opt });
     if (!product) return null;
 
     const { tag_ids, translations, ...productData } = data;
-    const opt = transaction ? { transaction } : {};
 
     await product.update(productData, opt);
 
@@ -224,7 +240,11 @@ class ProductRepository extends BaseRepository {
   }
 
   async deleteById(id) {
-    const product = await this.model.findByPk(id);
+    const isNum = !isNaN(Number(id));
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const where = isNum ? { id: Number(id) } : isUuid ? { uuid: id } : { id };
+
+    const product = await this.model.findOne({ where });
     if (!product) return null;
     await product.destroy();
     return true;

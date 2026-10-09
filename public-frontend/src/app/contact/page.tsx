@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/locales';
+import { CONTACT_CONFIG } from '@/config/contact.config';
 
 import {
   PhoneCall,
@@ -17,16 +19,44 @@ import {
 } from 'lucide-react';
 
 export default function ContactPage() {
+  const { locale } = useTranslation();
   const [inquiryType, setInquiryType] = useState('emergency');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Delhi NCR');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [whatsappSentUrl, setWhatsappSentUrl] = useState('');
+
+  const inquiryLabels: Record<string, string> = {
+    emergency: 'Emergency Equipment Dispatch (4-Hour Response)',
+    demo: 'Book Studio Demonstration Trial',
+    'rental-ext': 'Rental Extension / Pickup Assistance',
+    prescription: 'Prescription & Equipment Advice',
+    bulk: 'Bulk Hospital / Clinic Solutions',
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+
+    const waText = [
+      `*New Clinical Care Request - Omkar Healthcare*`,
+      `• *Assistance Type:* ${inquiryLabels[inquiryType] || inquiryType}`,
+      `• *Caregiver Name:* ${name.trim()}`,
+      `• *Phone Number:* ${phone.trim()}`,
+      `• *Delivery Location:* ${city}`,
+      message.trim() ? `• *Requirements / Notes:* ${message.trim()}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const waUrl = CONTACT_CONFIG.getWhatsAppHref(locale, waText);
+    setWhatsappSentUrl(waUrl);
+
+    if (typeof window !== 'undefined') {
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -42,7 +72,7 @@ export default function ContactPage() {
                 padding: '4px 12px',
                 borderRadius: 999,
                 background: '#e8f5f3',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.8125rem',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -56,7 +86,7 @@ export default function ContactPage() {
               We Are Here to Support Your Family
             </h1>
             <p style={{ fontSize: '1rem', color: '#6e7977', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>
-              Whether you need rapid 4-hour emergency hospital bed dispatch, CPAP titration and pressure calibration assistance, or post-operative home care guidance.
+              Whether you need rapid 4-hour emergency oxygen concentrator dispatch, CPAP titration and pressure calibration assistance, or respiratory care guidance.
             </p>
           </div>
 
@@ -66,7 +96,7 @@ export default function ContactPage() {
               {/* Emergency Helpline Card */}
               <div
                 style={{
-                  background: 'linear-gradient(135deg, #005c55 0%, #004b46 100%)',
+                  background: 'linear-gradient(135deg, #16453A 0%, #004b46 100%)',
                   borderRadius: 20,
                   padding: '1.75rem',
                   color: '#ffffff',
@@ -87,7 +117,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <p style={{ fontSize: '0.875rem', opacity: 0.9, lineHeight: 1.5, margin: '0 0 16px' }}>
-                  Toll-free across all Indian networks. Direct priority line to clinical coordinators for ICU bed discharges and urgent respiratory support.
+                  Toll-free across all Indian networks. Direct priority line to clinical coordinators for urgent oxygen dispatch and respiratory support.
                 </p>
                 <a
                   href="tel:18008892273"
@@ -98,7 +128,7 @@ export default function ContactPage() {
                     padding: '10px 18px',
                     borderRadius: 10,
                     background: '#ffffff',
-                    color: '#005c55',
+                    color: '#16453A',
                     fontSize: '0.875rem',
                     fontWeight: 800,
                     textDecoration: 'none',
@@ -134,25 +164,27 @@ export default function ContactPage() {
                 <p style={{ fontSize: '0.875rem', color: '#3e4947', lineHeight: 1.5, margin: '0 0 16px' }}>
                   Send photos of doctor prescriptions, ask titration questions, or share location pins for rapid delivery coordination.
                 </p>
-                <a
-                  href="https://wa.me/919876543210?text=Hello%20AarogyaMed%2C%20I%20need%20assistance%20with%20medical%20equipment"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '10px 18px',
-                    borderRadius: 10,
-                    background: '#16a34a',
-                    color: '#ffffff',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                  }}
-                >
-                  <MessageCircle size={16} /> Open WhatsApp Specialist
-                </a>
+                {CONTACT_CONFIG.whatsappEnabled && (
+                  <a
+                    href={CONTACT_CONFIG.getWhatsAppHref(locale)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 18px',
+                      borderRadius: 10,
+                      background: '#16a34a',
+                      color: '#ffffff',
+                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <MessageCircle size={16} /> Open WhatsApp Specialist
+                  </a>
+                )}
               </div>
 
               {/* Delivery & Dispatch SLA Card */}
@@ -165,7 +197,7 @@ export default function ContactPage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <Truck size={20} color="#006398" />
+                  <Truck size={20} color="#B75932" />
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
                     Pan-India Home Delivery &amp; Setup
                   </h3>
@@ -178,7 +210,7 @@ export default function ContactPage() {
                   style={{
                     fontSize: '0.8125rem',
                     fontWeight: 700,
-                    color: '#006398',
+                    color: '#B75932',
                     textDecoration: 'none',
                   }}
                 >
@@ -199,23 +231,50 @@ export default function ContactPage() {
             >
               {submitted ? (
                 <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#e8f5f3', color: '#005c55', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#e8f5f3', color: '#16453A', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                     <CheckCircle2 size={32} />
                   </div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131b2e', margin: '0 0 8px' }}>
-                    Inquiry Received
+                    Clinical Request Submitted
                   </h3>
-                  <p style={{ fontSize: '0.875rem', color: '#3e4947', lineHeight: 1.6, margin: '0 0 20px' }}>
-                    A dedicated clinical care coordinator will call you at <strong>{phone}</strong> within 15 minutes.
+                  <p style={{ fontSize: '0.875rem', color: '#3e4947', lineHeight: 1.6, margin: '0 0 16px' }}>
+                    Your request details have been dispatched to our bio-medical coordinator via WhatsApp at <strong>{CONTACT_CONFIG.phoneDisplay}</strong>. A coordinator will also call you at <strong>{phone}</strong> within 15 minutes.
                   </p>
+                  {whatsappSentUrl && (
+                    <div style={{ marginBottom: 20 }}>
+                      <a
+                        href={whatsappSentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '10px 20px',
+                          borderRadius: 10,
+                          background: '#16a34a',
+                          color: '#ffffff',
+                          fontSize: '0.875rem',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)',
+                        }}
+                      >
+                        <MessageCircle size={17} /> Open in WhatsApp ({CONTACT_CONFIG.phoneDisplay})
+                      </a>
+                    </div>
+                  )}
                   <button
                     type="button"
-                    onClick={() => setSubmitted(false)}
+                    onClick={() => {
+                      setSubmitted(false);
+                      setMessage('');
+                    }}
                     style={{
                       padding: '8px 16px',
                       borderRadius: 8,
                       background: '#f2f3ff',
-                      color: '#006398',
+                      color: '#B75932',
                       border: 'none',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -338,7 +397,7 @@ export default function ContactPage() {
                       width: '100%',
                       padding: '14px',
                       borderRadius: 12,
-                      background: '#005c55',
+                      background: '#16453A',
                       color: '#ffffff',
                       fontSize: '1rem',
                       fontWeight: 800,

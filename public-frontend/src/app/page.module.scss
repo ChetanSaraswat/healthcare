@@ -3,7 +3,7 @@
 }
 
 .heroSection {
-  background: linear-gradient(135deg, #004741 0%, #005c55 50%, #006398 100%);
+  background: linear-gradient(135deg, #0F352C 0%, #16453A 50%, #B75932 100%);
   color: #ffffff;
   padding: 4.5rem 0 5rem;
   position: relative;
@@ -91,7 +91,7 @@
   margin-bottom: 2.5rem;
 
   .btnRentPrimary {
-    background: #ea580c;
+    background: #B75932;
     color: #ffffff;
     padding: 0.9rem 1.75rem;
     border-radius: 9999px;
@@ -112,7 +112,7 @@
 
   .btnBuySecondary {
     background: #ffffff;
-    color: #005c55;
+    color: #16453A;
     padding: 0.9rem 1.75rem;
     border-radius: 9999px;
     font-size: 1rem;
@@ -191,7 +191,7 @@
       height: 40px;
       border-radius: 50%;
       background: #eaf8f6;
-      color: #005c55;
+      color: #16453A;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -226,7 +226,7 @@
   .pretitle {
     font-size: 0.8125rem;
     font-weight: 700;
-    color: #006398;
+    color: #B75932;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 0.5rem;
@@ -266,7 +266,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    border-color: #005c55;
+    border-color: #16453A;
     box-shadow: 0 10px 24px rgba(0, 92, 85, 0.1);
   }
 
@@ -275,7 +275,7 @@
     height: 48px;
     border-radius: 12px;
     background: #eaf8f6;
-    color: #005c55;
+    color: #16453A;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -300,7 +300,7 @@
   .catFooter {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #006398;
+    color: #B75932;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -340,7 +340,7 @@
   .stepNum {
     font-size: 0.75rem;
     font-weight: 800;
-    color: #005c55;
+    color: #16453A;
     background: #eaf8f6;
     display: inline-block;
     padding: 2px 8px;
@@ -399,7 +399,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    border-color: #006398;
+    border-color: #B75932;
     box-shadow: 0 12px 28px rgba(0, 99, 152, 0.12);
   }
 
@@ -439,7 +439,7 @@
     .condLink {
       font-size: 0.8125rem;
       font-weight: 700;
-      color: #005c55;
+      color: #16453A;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -470,7 +470,7 @@
 
     &.activeSlideTab {
       background: #ffffff;
-      color: #005c55;
+      color: #16453A;
       font-weight: 700;
       border-color: #ffffff;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

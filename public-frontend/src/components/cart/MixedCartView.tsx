@@ -101,7 +101,7 @@ export const MixedCartView: React.FC = () => {
             height: 80,
             borderRadius: '50%',
             background: '#eaedff',
-            color: '#005c55',
+            color: '#16453A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -122,7 +122,7 @@ export const MixedCartView: React.FC = () => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '12px 28px',
             borderRadius: 9999,
@@ -150,7 +150,7 @@ export const MixedCartView: React.FC = () => {
             <div>
               <div className={styles.sectionHeader}>
                 <h3>
-                  <ShoppingBag size={20} color="#005c55" />
+                  <ShoppingBag size={20} color="#16453A" />
                   <span>{t.cart.purchaseSection}</span>
                 </h3>
                 <span className={styles.badge}>{buyItems.length} {t.cart.brandNew}</span>
@@ -222,7 +222,7 @@ export const MixedCartView: React.FC = () => {
                                 title: item.name,
                                 slug: item.slug,
                                 image: item.image,
-                                brand: 'AarogyaMed Certified',
+                                brand: 'Omkar Healthcare Certified',
                                 buyPrice: item.price,
                                 rentAvailable: false,
                                 preferredIntent: 'buy',
@@ -231,7 +231,7 @@ export const MixedCartView: React.FC = () => {
                             );
                             dispatch(removeFromCart(item.id));
                           }}
-                          style={{ color: '#005c55' }}
+                          style={{ color: '#16453A' }}
                           title={locale === 'hi' ? 'इच्छासूची में ले जाएं' : 'Save for Later'}
                         >
                           <Heart size={14} /> {locale === 'hi' ? 'सहेजें' : 'Save for Later'}
@@ -257,7 +257,7 @@ export const MixedCartView: React.FC = () => {
             <div>
               <div className={styles.sectionHeader}>
                 <h3>
-                  <RefreshCw size={20} color="#ea580c" />
+                  <RefreshCw size={20} color="#B75932" />
                   <span>{t.cart.rentalSection}</span>
                 </h3>
                 <span className={styles.rentBadge}>{rentItems.length} {t.cart.hospitalSanitized}</span>
@@ -364,7 +364,7 @@ export const MixedCartView: React.FC = () => {
                                   title: item.name,
                                   slug: item.slug,
                                   image: item.image,
-                                  brand: 'AarogyaMed Certified',
+                                  brand: 'Omkar Healthcare Certified',
                                   buyPrice: item.dailyRate * 30,
                                   rentDailyRate: item.dailyRate,
                                   rentAvailable: true,
@@ -374,7 +374,7 @@ export const MixedCartView: React.FC = () => {
                               );
                               dispatch(removeFromCart(item.id));
                             }}
-                            style={{ color: '#005c55' }}
+                            style={{ color: '#16453A' }}
                             title={locale === 'hi' ? 'इच्छासूची में ले जाएं' : 'Save for Later'}
                           >
                             <Heart size={14} /> {locale === 'hi' ? 'सहेजें' : 'Save for Later'}
@@ -425,7 +425,7 @@ export const MixedCartView: React.FC = () => {
 
             <div className={styles.summaryRow}>
               <span>{t.cart.setupFee}</span>
-              <strong style={{ color: '#005c55' }}>
+              <strong style={{ color: '#16453A' }}>
                 {pricing.shippingFee === 0 ? t.cart.freeDelivery : `₹${pricing.shippingFee}`}
               </strong>
             </div>
@@ -470,15 +470,15 @@ export const MixedCartView: React.FC = () => {
 
             <div className={styles.guaranteeBadges}>
               <div className={styles.badgeItem}>
-                <ShieldCheck size={16} color="#005c55" />
+                <ShieldCheck size={16} color="#16453A" />
                 <span>{t.common.certifiedBadge}</span>
               </div>
               <div className={styles.badgeItem}>
-                <Truck size={16} color="#005c55" />
+                <Truck size={16} color="#16453A" />
                 <span>{t.common.dispatchPill}</span>
               </div>
               <div className={styles.badgeItem}>
-                <RotateCcw size={16} color="#005c55" />
+                <RotateCcw size={16} color="#16453A" />
                 <span>{t.common.depositGuarantee}</span>
               </div>
             </div>

@@ -55,7 +55,7 @@ export function CheckoutOrderSummary({ items, pricing }: CheckoutOrderSummaryPro
               <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', lineHeight: 1.3 }}>
                 {item.name}
               </div>
-              <div style={{ fontSize: '0.75rem', color: item.type === 'buy' ? '#005c55' : '#ea580c', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.75rem', color: item.type === 'buy' ? '#16453A' : '#B75932', fontWeight: 600 }}>
                 {item.type === 'buy'
                   ? (locale === 'hi' ? 'खरीद (नया)' : 'Purchase (New)')
                   : (locale === 'hi' ? `रेंटल (${item.rentalDays} दिन)` : `Rental (${item.rentalDays} Days)`)}{' '}
@@ -80,21 +80,21 @@ export function CheckoutOrderSummary({ items, pricing }: CheckoutOrderSummaryPro
           </div>
         )}
         {pricing.refundableDepositTotal > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#005c55', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16453A', fontWeight: 700 }}>
             <span>{t.cart.securityDeposit}:</span>
             <span>+ ₹{pricing.refundableDepositTotal.toLocaleString('en-IN')}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ color: '#6e7977' }}>{t.cart.setupFee}:</span>
-          <strong style={{ color: '#005c55' }}>{t.cart.freeDelivery}</strong>
+          <strong style={{ color: '#16453A' }}>{t.cart.freeDelivery}</strong>
         </div>
 
         <div style={{ borderTop: '1px solid #dae2fd', margin: '8px 0' }} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <strong style={{ fontSize: '1rem', color: '#131b2e' }}>{t.cart.totalPayable}:</strong>
-          <strong style={{ fontSize: '1.5rem', color: '#005c55' }}>
+          <strong style={{ fontSize: '1.5rem', color: '#16453A' }}>
             ₹{pricing.totalPayableNow.toLocaleString('en-IN')}
           </strong>
         </div>
@@ -106,7 +106,7 @@ export function CheckoutOrderSummary({ items, pricing }: CheckoutOrderSummaryPro
               borderRadius: 8,
               padding: 8,
               fontSize: '0.75rem',
-              color: '#005c55',
+              color: '#16453A',
               marginTop: 6,
             }}
           >

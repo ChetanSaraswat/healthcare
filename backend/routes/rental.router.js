@@ -8,6 +8,7 @@ const {
   updateRentalStatusSchema,
   extendRentalSchema,
   scheduleReturnSchema,
+  listRentalsSchema,
 } = require('../schema/rental/rental.schema');
 
 // Public quotation calculation
@@ -20,7 +21,7 @@ router.post('/', authenticate, validate(createRentalSchema), (req, res, next) =>
   rentalController.create(req, res, next)
 );
 
-router.get('/my', authenticate, (req, res, next) =>
+router.get('/my', authenticate, validate(listRentalsSchema), (req, res, next) =>
   rentalController.getMyRentals(req, res, next)
 );
 
@@ -38,6 +39,7 @@ router.get(
   '/all',
   authenticate,
   authorize('super_admin'),
+  validate(listRentalsSchema),
   (req, res, next) => rentalController.getAllRentals(req, res, next)
 );
 
@@ -45,6 +47,7 @@ router.get(
   '/',
   authenticate,
   authorize('super_admin'),
+  validate(listRentalsSchema),
   (req, res, next) => rentalController.getAllRentals(req, res, next)
 );
 

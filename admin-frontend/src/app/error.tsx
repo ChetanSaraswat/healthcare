@@ -12,7 +12,7 @@ export default function AdminError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[AarogyaMed Operations Hub Error]:', error);
+    console.error('[Omkar Healthcare Operations Hub Error]:', error);
   }, [error]);
 
   return (
@@ -104,7 +104,7 @@ export default function AdminError({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 20px',
               borderRadius: 8,

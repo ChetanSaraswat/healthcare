@@ -17,7 +17,7 @@ export default function WarrantyTermsPage() {
                 padding: '4px 12px',
                 borderRadius: 999,
                 background: '#e8f5f3',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.8125rem',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -54,7 +54,7 @@ export default function WarrantyTermsPage() {
                 1. Manufacturer Warranty on Outright Purchases
               </h2>
               <p style={{ margin: 0 }}>
-                All brand-new medical devices purchased through AarogyaMed carry the official comprehensive OEM warranty (typically 2 to 3 years for ResMed, Philips, and accredited manufacturers). AarogyaMed serves as your authorized medical liaison for warranty registration, servicing, and spare parts procurement.
+                All brand-new medical devices purchased through Omkar Healthcare carry the official comprehensive OEM warranty (typically 2 to 3 years for ResMed, Philips, and accredited manufacturers). Omkar Healthcare serves as your authorized medical liaison for warranty registration, servicing, and spare parts procurement.
               </p>
             </section>
 
@@ -63,7 +63,7 @@ export default function WarrantyTermsPage() {
                 2. Zero-Downtime Rental Replacement Guarantee
               </h2>
               <p style={{ margin: 0 }}>
-                In the rare event that a rented medical machine reports an error code, power variance, or pressure drop, AarogyaMed guarantees a <strong>same-day machine replacement</strong> dispatched from the nearest city hub at zero additional fee. Critical respiratory and life-support devices are treated with 4-hour emergency SLA priority.
+                In the rare event that a rented medical machine reports an error code, power variance, or pressure drop, Omkar Healthcare guarantees a <strong>same-day machine replacement</strong> dispatched from the nearest city hub at zero additional fee. Critical respiratory and life-support devices are treated with 4-hour emergency SLA priority.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function WarrantyTermsPage() {
                 3. Doorstep Bio-Medical Calibration
               </h2>
               <p style={{ margin: 0 }}>
-                Our technician visits your home with clinical calibration instruments to verify CPAP 95th percentile pressure delivery, oxygen concentrator molecular sieve purity (&gt;93% O2 at rated LPM), and motorized bed actuator limit switches.
+                Our technician visits your home with clinical calibration instruments to verify CPAP 95th percentile pressure delivery, oxygen concentrator molecular sieve purity (&gt;93% O2 at rated LPM), and device motor safety calibrations.
               </p>
             </section>
           </div>

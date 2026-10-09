@@ -98,7 +98,7 @@ function OrderConfirmationContent() {
             <Link
               href="/checkout"
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 padding: '12px 24px',
                 borderRadius: 12,
@@ -113,7 +113,7 @@ function OrderConfirmationContent() {
               href="/shop"
               style={{
                 background: '#faf8ff',
-                color: '#00201d',
+                color: '#0C2E27',
                 padding: '12px 24px',
                 borderRadius: 12,
                 fontWeight: 700,
@@ -148,12 +148,12 @@ function OrderConfirmationContent() {
             height: 72,
             borderRadius: '50%',
             background: '#eaf8f6',
-            color: '#005c55',
+            color: '#16453A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            border: '2px solid #005c55',
+            border: '2px solid #16453A',
           }}
         >
           <CheckCircle2 size={44} />
@@ -162,7 +162,7 @@ function OrderConfirmationContent() {
         <span
           style={{
             background: '#eaf8f6',
-            color: '#005c55',
+            color: '#16453A',
             fontSize: '0.8125rem',
             fontWeight: 700,
             padding: '4px 12px',
@@ -201,7 +201,7 @@ function OrderConfirmationContent() {
               <div style={{ fontSize: '0.75rem', color: '#6e7977', textTransform: 'uppercase', fontWeight: 700 }}>
                 {locale === 'hi' ? 'उपकरण खरीद संदर्भ:' : 'Equipment Purchase Ref:'}
               </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#005c55' }}>{orderNum}</div>
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16453A' }}>{orderNum}</div>
             </div>
           )}
           {latestRental && (
@@ -209,7 +209,7 @@ function OrderConfirmationContent() {
               <div style={{ fontSize: '0.75rem', color: '#6e7977', textTransform: 'uppercase', fontWeight: 700 }}>
                 {locale === 'hi' ? 'रेंटल अनुबंध संदर्भ:' : 'Rental Agreement Ref:'}
               </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#ea580c' }}>{rentalNum}</div>
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#B75932' }}>{rentalNum}</div>
             </div>
           )}
           {!latestOrder && !latestRental && (
@@ -217,7 +217,7 @@ function OrderConfirmationContent() {
               <div style={{ fontSize: '0.75rem', color: '#6e7977', textTransform: 'uppercase', fontWeight: 700 }}>
                 {locale === 'hi' ? 'संदर्भ संख्या:' : 'Reference Number:'}
               </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#005c55' }}>ARM-2026-CONFIRMED</div>
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16453A' }}>ARM-2026-CONFIRMED</div>
             </div>
           )}
         </div>
@@ -231,8 +231,8 @@ function OrderConfirmationContent() {
                 alignItems: 'center',
                 gap: 8,
                 background: '#eaf8f6',
-                border: '1.5px solid #005c55',
-                color: '#005c55',
+                border: '1.5px solid #16453A',
+                color: '#16453A',
                 padding: '8px 18px',
                 borderRadius: 9999,
                 fontSize: '0.875rem',
@@ -256,9 +256,9 @@ function OrderConfirmationContent() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 8,
-                background: '#fff0eb',
-                border: '1.5px solid #ea580c',
-                color: '#ea580c',
+                background: '#FBF2ED',
+                border: '1.5px solid #B75932',
+                color: '#B75932',
                 padding: '8px 18px',
                 borderRadius: 9999,
                 fontSize: '0.875rem',
@@ -290,9 +290,9 @@ function OrderConfirmationContent() {
             textAlign: 'left',
           }}
         >
-          <Clock size={28} color="#005c55" style={{ flexShrink: 0 }} />
+          <Clock size={28} color="#16453A" style={{ flexShrink: 0 }} />
           <div>
-            <div style={{ fontWeight: 700, color: '#00201d', fontSize: '0.9375rem' }}>
+            <div style={{ fontWeight: 700, color: '#0C2E27', fontSize: '0.9375rem' }}>
               {locale === 'hi' ? 'अनुमानित डोरस्टेप डिलीवरी: आज 4 घंटे के भीतर' : 'Estimated Doorstep Arrival: Today within 4 Hours'}
             </div>
             <div style={{ fontSize: '0.8125rem', color: '#52605d', marginTop: 2 }}>
@@ -309,7 +309,7 @@ function OrderConfirmationContent() {
             type="button"
             onClick={() => setIsInvoiceOpen(true)}
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '12px 24px',
               borderRadius: 12,
@@ -331,7 +331,7 @@ function OrderConfirmationContent() {
             href="/account/orders"
             style={{
               background: '#faf8ff',
-              color: '#00201d',
+              color: '#0C2E27',
               padding: '12px 24px',
               borderRadius: 12,
               fontWeight: 700,
@@ -390,7 +390,7 @@ function OrderConfirmationContent() {
                 height: 36,
                 borderRadius: '50%',
                 background: '#eaf8f6',
-                color: '#005c55',
+                color: '#16453A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -418,7 +418,7 @@ function OrderConfirmationContent() {
                 height: 36,
                 borderRadius: '50%',
                 background: '#eaf8f6',
-                color: '#005c55',
+                color: '#16453A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -446,7 +446,7 @@ function OrderConfirmationContent() {
                 height: 36,
                 borderRadius: '50%',
                 background: '#eaf8f6',
-                color: '#005c55',
+                color: '#16453A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

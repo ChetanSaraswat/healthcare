@@ -79,7 +79,7 @@ export default function PolicyDetailPage({
       <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 1.5rem' }}>
         {/* Navigation Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8125rem', color: '#6e7977', marginBottom: 20 }}>
-          <Link href="/" style={{ color: '#005c55', textDecoration: 'none', fontWeight: 600 }}>Home</Link>
+          <Link href="/" style={{ color: '#16453A', textDecoration: 'none', fontWeight: 600 }}>Home</Link>
           <ChevronRight size={14} />
           <span>Policies &amp; Legal Trust</span>
         </div>
@@ -94,7 +94,7 @@ export default function PolicyDetailPage({
               padding: '4px 12px',
               borderRadius: 999,
               background: '#e8f5f3',
-              color: '#005c55',
+              color: '#16453A',
               fontSize: '0.8125rem',
               fontWeight: 800,
               textTransform: 'uppercase',
@@ -102,7 +102,7 @@ export default function PolicyDetailPage({
               marginBottom: 8,
             }}
           >
-            <ShieldCheck size={16} /> CDSCO &amp; ISO 13485 Registered Healthcare Systems
+            <ShieldCheck size={16} /> Certified Clinical Healthcare Systems
           </span>
           <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#131b2e', margin: '0 0 10px', letterSpacing: '-0.02em' }}>
             {policy ? policy.title : 'Healthcare Trust & Operational Policies'}
@@ -119,7 +119,7 @@ export default function PolicyDetailPage({
                   })
                 : 'Current Standard (Active)'}
             </span>
-            <span>• Managed in Real-Time by AarogyaMed Compliance Bureau</span>
+            <span>• Managed in Real-Time by Omkar Healthcare Compliance Bureau</span>
           </div>
         </div>
 
@@ -151,8 +151,8 @@ export default function PolicyDetailPage({
                   fontWeight: 700,
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
-                  border: isActive ? '2px solid #005c55' : '1px solid #dae2fd',
-                  background: isActive ? '#005c55' : '#ffffff',
+                  border: isActive ? '2px solid #16453A' : '1px solid #dae2fd',
+                  background: isActive ? '#16453A' : '#ffffff',
                   color: isActive ? '#ffffff' : '#334155',
                   transition: 'all 0.15s ease',
                   boxShadow: isActive ? '0 4px 12px rgba(0, 92, 85, 0.2)' : 'none',
@@ -207,9 +207,9 @@ export default function PolicyDetailPage({
             }}
           >
             <span>
-              AarogyaMed Healthcare Systems Pvt. Ltd. • CIN: U85110DL2026PTC099881
+              Omkar Healthcare Systems Pvt. Ltd. • CIN: U85110DL2026PTC099881
             </span>
-            <span style={{ color: '#005c55', fontWeight: 600 }}>
+            <span style={{ color: '#16453A', fontWeight: 600 }}>
               Official Active Policy Version (Live)
             </span>
           </div>

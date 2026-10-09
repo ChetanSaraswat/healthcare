@@ -68,3 +68,14 @@ const { scheduleReturnSchema } = require('./schedule-return.schema');
 exports.extendRentalSchema = extendRentalSchema;
 exports.scheduleReturnSchema = scheduleReturnSchema;
 
+exports.listRentalsSchema = z.object({
+  query: z.object({
+    status: z.enum(['all', 'pending', 'confirmed', 'active', 'returned', 'cancelled']).optional().default('all'),
+    deposit_status: z.enum(['all', 'held', 'refunded', 'partially_refunded', 'forfeited']).optional().default('all'),
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    search: z.string().optional(),
+    sortBy: z.enum(['newest', 'oldest']).optional().default('newest'),
+  }),
+});
+

@@ -42,7 +42,7 @@ export function PaymentMethodSection({
           <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#131b2e', margin: 0 }}>
             {t.checkout.paymentSection}
           </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: '#005c55', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: '#16453A', fontWeight: 600 }}>
             <ShieldCheck size={16} />
             <span>100% CDSCO Compliant &amp; 256-bit Encrypted</span>
           </div>
@@ -57,7 +57,7 @@ export function PaymentMethodSection({
               gap: 14,
               padding: '16px 16px',
               borderRadius: 12,
-              border: selectedPaymentMethod === RAZORPAY_METHOD_ONLINE ? '2px solid #005c55' : '1px solid #dae2fd',
+              border: selectedPaymentMethod === RAZORPAY_METHOD_ONLINE ? '2px solid #16453A' : '1px solid #dae2fd',
               background: selectedPaymentMethod === RAZORPAY_METHOD_ONLINE ? '#eaf8f6' : '#ffffff',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
@@ -69,7 +69,7 @@ export function PaymentMethodSection({
               value={RAZORPAY_METHOD_ONLINE}
               checked={selectedPaymentMethod === RAZORPAY_METHOD_ONLINE}
               onChange={() => onSelectPaymentMethod(RAZORPAY_METHOD_ONLINE)}
-              style={{ marginTop: 4, accentColor: '#005c55', width: 18, height: 18 }}
+              style={{ marginTop: 4, accentColor: '#16453A', width: 18, height: 18 }}
             />
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
@@ -78,7 +78,7 @@ export function PaymentMethodSection({
                 </strong>
                 <span
                   style={{
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontSize: '0.6875rem',
                     fontWeight: 700,
@@ -94,15 +94,15 @@ export function PaymentMethodSection({
                   ? 'यूपीआई क्यूआर (Google Pay, PhonePe, Paytm, BHIM), सभी बैंकों के क्रेडिट/डेबिट कार्ड और नेट बैंकिंग।'
                   : 'UPI QR (Google Pay, PhonePe, Paytm, BHIM), Credit/Debit Cards, Net Banking & Wallets in Razorpay Secure UI.'}
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '0.75rem', color: '#005c55', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '0.75rem', color: '#16453A', fontWeight: 600 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <CheckCircle2 size={13} color="#005c55" /> Zero Surcharge
+                  <CheckCircle2 size={13} color="#16453A" /> Zero Surcharge
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <CheckCircle2 size={13} color="#005c55" /> Instant Order Verification
+                  <CheckCircle2 size={13} color="#16453A" /> Instant Order Verification
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <Lock size={12} color="#005c55" /> Razorpay Verified
+                  <Lock size={12} color="#16453A" /> Razorpay Verified
                 </span>
               </div>
             </div>
@@ -116,7 +116,7 @@ export function PaymentMethodSection({
               gap: 14,
               padding: '16px 16px',
               borderRadius: 12,
-              border: selectedPaymentMethod === RAZORPAY_METHOD_COD ? '2px solid #005c55' : '1px solid #dae2fd',
+              border: selectedPaymentMethod === RAZORPAY_METHOD_COD ? '2px solid #16453A' : '1px solid #dae2fd',
               background: selectedPaymentMethod === RAZORPAY_METHOD_COD ? '#eaf8f6' : '#ffffff',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
@@ -128,7 +128,7 @@ export function PaymentMethodSection({
               value={RAZORPAY_METHOD_COD}
               checked={selectedPaymentMethod === RAZORPAY_METHOD_COD}
               onChange={() => onSelectPaymentMethod(RAZORPAY_METHOD_COD)}
-              style={{ marginTop: 4, accentColor: '#005c55', width: 18, height: 18 }}
+              style={{ marginTop: 4, accentColor: '#16453A', width: 18, height: 18 }}
             />
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
@@ -168,7 +168,7 @@ export function PaymentMethodSection({
         disabled={isSubmitting}
         style={{
           width: '100%',
-          background: '#005c55',
+          background: '#16453A',
           color: '#ffffff',
           padding: '16px 24px',
           borderRadius: 12,

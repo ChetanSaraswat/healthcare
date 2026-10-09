@@ -118,7 +118,7 @@ ${addressBlock}`;
   }
 
   /**
-   * Formats a rich, responsive HTML email matching AarogyaMed's Warm Clinical Trust design.
+   * Formats a rich, responsive HTML email matching Omkar Healthcare's Warm Clinical Trust design.
    */
   static formatEmailHtml(data) {
     const isBuy = data.transactionType === 'BUY';
@@ -214,7 +214,7 @@ ${addressBlock}`;
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td>
-                    <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">AarogyaMed Operations</h1>
+                    <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">Omkar Healthcare Operations</h1>
                     <p style="margin: 4px 0 0; font-size: 12px; color: #94a3b8;">Admin Transaction Alert System</p>
                   </td>
                   <td align="right">
@@ -296,7 +296,7 @@ ${addressBlock}`;
           <tr>
             <td style="background: #f8fafc; padding: 16px 28px; border-top: 1px solid #e2e8f0; text-align: center;">
               <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                Automated Transaction Alert — AarogyaMed Healthcare & Emergency Supplies<br>
+                Automated Transaction Alert — Omkar Healthcare & Emergency Supplies<br>
                 This internal message was automatically generated upon successful order confirmation.
               </p>
             </td>

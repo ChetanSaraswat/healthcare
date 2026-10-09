@@ -67,7 +67,7 @@ export default function AdminBlogPage() {
       summary: '',
       body: '',
       coverImage: '/images/caregiver.png',
-      authorName: 'AarogyaMed Biomedical Team',
+      authorName: 'Omkar Biomedical Team',
       status: 'published',
       category: 'Home Healthcare Protocol',
       equipmentTag: 'Clinical Equipment',
@@ -174,7 +174,7 @@ export default function AdminBlogPage() {
             gap: 8,
             padding: '10px 18px',
             borderRadius: 10,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             border: 'none',
             fontSize: '0.875rem',
@@ -208,12 +208,12 @@ export default function AdminBlogPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#6e7977' }}>Total Articles</span>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eaf8f6', color: '#005c55', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eaf8f6', color: '#16453A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <BookOpen size={18} />
             </div>
           </div>
           <div style={{ fontSize: '1.875rem', fontWeight: 800, color: '#131b2e' }}>{totalArticles}</div>
-          <span style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600 }}>{publishedCount} Active Storefront</span>
+          <span style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600 }}>{publishedCount} Active Storefront</span>
         </div>
 
         <div

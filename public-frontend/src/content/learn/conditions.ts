@@ -19,7 +19,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
         en: 'Illustration showing common nighttime and daytime sleep apnea symptoms including breathing pauses, snoring, and restlessness',
         hi: 'स्लीप एप्निया के सामान्य रात्रि और दिन के लक्षणों जैसे सांस रुकना, खर्राटे और बेचैनी को दर्शाने वाला चित्र',
       },
-      sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+      sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
     },
     contentBlocks: [
       {
@@ -50,7 +50,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             en: 'Full-body medical anatomical infographic depicting how obstructive sleep apnea causes airway collapse and systemic oxygen deprivation',
             hi: 'पूर्ण शरीर की चिकित्सा शारीरिक रचना इन्फोग्राफिक जो दर्शाती है कि ऑब्सट्रक्टिव स्लीप एप्निया कैसे वायुमार्ग को अवरुद्ध करता है',
           },
-          sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+          sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
         },
       },
       {
@@ -85,7 +85,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             en: 'Infographic poster illustrating long-term cardiovascular risks and effects of untreated sleep apnea on the heart',
             hi: 'अनउपचारित स्लीप एप्निया के हृदय पर पड़ने वाले दीर्घकालिक जोखिमों और प्रभावों को दर्शाने वाला इन्फोग्राफिक पोस्टर',
           },
-          sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+          sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
         },
       },
       {
@@ -129,7 +129,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             en: 'Modern medical anatomical illustration showing the systemic impact of sleep apnea on the brain and nervous system',
             hi: 'मस्तिष्क और तंत्रिका तंत्र पर स्लीप एप्निया के प्रणालीगत प्रभाव को दर्शाने वाला आधुनिक मेडिकल इन्फोग्राफिक चित्र',
           },
-          sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+          sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
         },
       },
       {
@@ -165,7 +165,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             en: 'Patient education infographic illustrating the metabolic and hormonal effects of sleep apnea including insulin resistance, weight gain, and cortisol disruption',
             hi: 'स्लीप एप्निया के चयापचय और हार्मोनल प्रभावों जैसे इंसुलिन प्रतिरोध, वजन बढ़ना और कोर्टिसोल असंतुलन को दर्शाने वाला रोगी शिक्षा इन्फोग्राफिक',
           },
-          sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+          sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
         },
       },
     ],
@@ -214,7 +214,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Full-body medical anatomical infographic depicting how obstructive sleep apnea causes airway collapse and systemic oxygen deprivation',
                 hi: 'पूर्ण शरीर की चिकित्सा शारीरिक रचना इन्फोग्राफिक जो दर्शाती है कि ऑब्सट्रक्टिव स्लीप एप्निया कैसे वायुमार्ग को अवरुद्ध करता है',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -249,7 +249,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Infographic poster illustrating long-term cardiovascular risks and effects of untreated sleep apnea on the heart',
                 hi: 'अनउपचारित स्लीप एप्निया के हृदय पर पड़ने वाले दीर्घकालिक जोखिमों और प्रभावों को दर्शाने वाला इन्फोग्राफिक पोस्टर',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -293,7 +293,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Modern medical anatomical illustration showing the systemic impact of sleep apnea on the brain and nervous system',
                 hi: 'मस्तिष्क और तंत्रिका तंत्र पर स्लीप एप्निया के प्रणालीगत प्रभाव को दर्शाने वाला आधुनिक मेडिकल इन्फोग्राफिक चित्र',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -329,7 +329,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Patient education infographic illustrating the metabolic and hormonal effects of sleep apnea including insulin resistance, weight gain, and cortisol disruption',
                 hi: 'स्लीप एप्निया के चयापचय और हार्मोनल प्रभावों जैसे इंसुलिन प्रतिरोध, वजन बढ़ना और कोर्टिसोल असंतुलन को दर्शाने वाला रोगी शिक्षा इन्फोग्राफिक',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
         ],
@@ -377,7 +377,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Full-body medical anatomical infographic depicting how obstructive sleep apnea causes airway collapse and systemic oxygen deprivation',
                 hi: 'पूर्ण शरीर की चिकित्सा शारीरिक रचना इन्फोग्राफिक जो दर्शाती है कि ऑब्सट्रक्टिव स्लीप एप्निया कैसे वायुमार्ग को अवरुद्ध करता है',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -412,7 +412,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Infographic poster illustrating long-term cardiovascular risks and effects of untreated sleep apnea on the heart',
                 hi: 'अनउपचारित स्लीप एप्निया के हृदय पर पड़ने वाले दीर्घकालिक जोखिमों और प्रभावों को दर्शाने वाला इन्फोग्राफिक पोस्टर',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -456,7 +456,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Modern medical anatomical illustration showing the systemic impact of sleep apnea on the brain and nervous system',
                 hi: 'मस्तिष्क और तंत्रिका तंत्र पर स्लीप एप्निया के प्रणालीगत प्रभाव को दर्शाने वाला आधुनिक मेडिकल इन्फोग्राफिक चित्र',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
           {
@@ -492,7 +492,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
                 en: 'Patient education infographic illustrating the metabolic and hormonal effects of sleep apnea including insulin resistance, weight gain, and cortisol disruption',
                 hi: 'स्लीप एप्निया के चयापचय और हार्मोनल प्रभावों जैसे इंसुलिन प्रतिरोध, वजन बढ़ना और कोर्टिसोल असंतुलन को दर्शाने वाला रोगी शिक्षा इन्फोग्राफिक',
               },
-              sourceAttribution: 'Original illustration commissioned for AarogyaMed',
+              sourceAttribution: 'Original illustration commissioned for Omkar Healthcare',
             },
           },
         ],
@@ -715,38 +715,38 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
     shortDescription: 'Comprehensive protocols for transitioning critical care patients from hospital ICU to home clinical setup.',
     heroImage: '/images/caregiver.png',
     symptoms: [
-      { title: 'Muscle Atrophy & Immobility', description: 'Severe weakness and inability to reposition independently, risking decubitus ulcers.' },
+      { title: 'Muscle Atrophy & Generalized Weakness', description: 'Severe respiratory muscle fatigue and immobility requiring structured rehabilitation.' },
       { title: 'Tracheostomy or Airway Clearance', description: 'Copious secretions needing scheduled suctioning and humidification.' },
       { title: 'Vital Sign Fluctuations', description: 'Frequent blood pressure, heart rate, and oxygen saturation shifts.' },
     ],
     caregiverTips: [
-      { title: 'Systematic 2-Hour Repositioning', detail: 'Rotate patient lateral positions every 2 hours; ensure alternating ripple mattress is active.' },
-      { title: 'Elevate Head of Bed (30°–45°)', detail: 'Use 5-function electric bed backrest elevation to prevent aspiration pneumonia during feeds.' },
+      { title: 'Systematic 2-Hour Repositioning', detail: 'Rotate patient lateral positions every 2 hours to maintain circulation and comfort.' },
+      { title: 'Elevate Upper Body (30°–45°)', detail: 'Maintain backrest elevation to prevent pulmonary aspiration pneumonia during enteral feeds.' },
       { title: 'Disinfect Suction Canisters Daily', detail: 'Sterilize collection jars and replace suction catheters using aseptic no-touch technique.' },
     ],
-    recommendedEquipmentCategories: ['hospital-beds-icu', 'respiratory-care', 'patient-monitoring'],
+    recommendedEquipmentCategories: ['respiratory-care', 'patient-monitoring'],
     contentBlocks: [
       {
-        id: 'block-icu-decubitus',
-        slug: 'decubitus-ulcer-pathogenesis',
-        title: 'Decubitus Ulcer Pathogenesis & Shear Strain',
-        reversibilityNote: 'Utilizing alternating pressure ripple mattresses with 6-minute cycle times and keeping head-of-bed elevations under 30° except during feeds prevents 90% of hospital-acquired stage I/II skin breakdown.',
+        id: 'block-icu-respiratory',
+        slug: 'respiratory-rehab-oxygen-titration',
+        title: 'Respiratory Rehabilitation & Continuous Oxygen Titration',
+        reversibilityNote: 'Structured daily oxygen weaning protocols alongside low-resistance incentive spirometry help 80% of step-down patients safely regain functional lung volumes.',
         items: [
           {
-            title: 'Microvascular Perfusion Occlusion',
-            description: 'Continuous interface pressure over bony sacral and heel prominences exceeding 32 mmHg completely halts capillary flow, precipitating deep tissue ischemia within 120 minutes.',
+            title: 'Ventilator Deconditioning & Diaphragmatic Weakness',
+            description: 'Prolonged mechanical ventilation weakens diaphragmatic musculature, necessitating calibrated non-invasive ventilation (BiPAP) or high-flow oxygen support.',
           },
           {
-            title: 'Shear Force Dermal Micro-Tears',
-            description: 'Elevating the backrest without raising knee contours forces the patient’s pelvis downward, twisting and tearing subcutaneous micro-capillaries.',
+            title: 'Microvascular Perfusion & Hypoxemia',
+            description: 'Post-critical illness hypoxemia damages peripheral capillary beds; continuous pulse oximetry and titrated oxygen delivery maintain vital organ perfusion.',
           },
           {
-            title: 'Moisture-Associated Barrier Breakdown (MASD)',
-            description: 'Unmanaged perspiration or urinary leakage macerates the stratum corneum, reducing mechanical pressure tolerance by over 60%.',
+            title: 'Secretory Stasis & Pulmonary Atelectasis',
+            description: 'Reduced tidal volume leads to dependent alveolar collapse; regular repositioning and airway suctioning prevent recurrent nosocomial infections.',
           },
           {
-            title: 'Non-Blanching Erythema (Stage I)',
-            description: 'Persistent localized redness that does not turn white when pressed is a medical emergency requiring immediate complete pressure relief.',
+            title: 'Monitoring Work of Breathing',
+            description: 'Tachypnea (>25 breaths/min) or intercostal retractions indicate respiratory fatigue requiring immediate physician review and flow adjustments.',
           },
         ],
       },
@@ -754,7 +754,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
         id: 'block-icu-airway',
         slug: 'airway-clearance-aspiration-prevention',
         title: 'Airway Clearance & Silent Aspiration Prevention',
-        reversibilityNote: 'With motorized 45° Fowler’s bed positioning during enteral feeds and routine subglottic suctioning, post-ICU aspiration pneumonia incidence is reduced by up to 85%.',
+        reversibilityNote: 'With semi-upright 45° Fowler’s positioning during enteral feeds and routine subglottic suctioning, post-ICU aspiration pneumonia incidence is reduced by up to 85%.',
         items: [
           {
             title: 'Laryngeal Sensory Blunting Post-Extubation',
@@ -766,7 +766,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
           },
           {
             title: 'Recumbent Atelectasis',
-            description: 'Continuous flat bed rest causes abdominal organs to press against the diaphragm, collapsing the lower lung alveoli and creating stagnant mucus traps.',
+            description: 'Continuous flat recumbent positioning causes abdominal organs to press against the diaphragm, collapsing the lower lung alveoli and creating stagnant mucus traps.',
           },
           {
             title: 'Secretory Plugging & Tracheostomy Hygiene',
@@ -781,37 +781,37 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
         name: 'Post-ICU & Step-Down Home Care',
         shortDescription: 'Comprehensive protocols for transitioning critical care patients from hospital ICU to home clinical setup.',
         symptoms: [
-          { title: 'Muscle Atrophy & Immobility', description: 'Severe weakness and inability to reposition independently, risking decubitus ulcers.' },
+          { title: 'Muscle Atrophy & Generalized Weakness', description: 'Severe respiratory muscle fatigue and immobility requiring structured rehabilitation.' },
           { title: 'Tracheostomy or Airway Clearance', description: 'Copious secretions needing scheduled suctioning and humidification.' },
           { title: 'Vital Sign Fluctuations', description: 'Frequent blood pressure, heart rate, and oxygen saturation shifts.' },
         ],
         caregiverTips: [
-          { title: 'Systematic 2-Hour Repositioning', detail: 'Rotate patient lateral positions every 2 hours; ensure alternating ripple mattress is active.' },
-          { title: 'Elevate Head of Bed (30°–45°)', detail: 'Use 5-function electric bed backrest elevation to prevent aspiration pneumonia during feeds.' },
+          { title: 'Systematic 2-Hour Repositioning', detail: 'Rotate patient lateral positions every 2 hours to maintain circulation and comfort.' },
+          { title: 'Elevate Upper Body (30°–45°)', detail: 'Maintain backrest elevation to prevent pulmonary aspiration during enteral feeds.' },
           { title: 'Disinfect Suction Canisters Daily', detail: 'Sterilize collection jars and replace suction catheters using aseptic no-touch technique.' },
         ],
         contentBlocks: [
           {
-            id: 'block-icu-decubitus',
-            slug: 'decubitus-ulcer-pathogenesis',
-            title: 'Decubitus Ulcer Pathogenesis & Shear Strain',
-            reversibilityNote: 'Utilizing alternating pressure ripple mattresses with 6-minute cycle times and keeping head-of-bed elevations under 30° except during feeds prevents 90% of hospital-acquired stage I/II skin breakdown.',
+            id: 'block-icu-respiratory',
+            slug: 'respiratory-rehab-oxygen-titration',
+            title: 'Respiratory Rehabilitation & Continuous Oxygen Titration',
+            reversibilityNote: 'Structured daily oxygen weaning protocols alongside low-resistance incentive spirometry help 80% of step-down patients safely regain functional lung volumes.',
             items: [
               {
-                title: 'Microvascular Perfusion Occlusion',
-                description: 'Continuous interface pressure over bony sacral and heel prominences exceeding 32 mmHg completely halts capillary flow, precipitating deep tissue ischemia within 120 minutes.',
+                title: 'Ventilator Deconditioning & Diaphragmatic Weakness',
+                description: 'Prolonged mechanical ventilation weakens diaphragmatic musculature, necessitating calibrated non-invasive ventilation (BiPAP) or high-flow oxygen support.',
               },
               {
-                title: 'Shear Force Dermal Micro-Tears',
-                description: 'Elevating the backrest without raising knee contours forces the patient’s pelvis downward, twisting and tearing subcutaneous micro-capillaries.',
+                title: 'Microvascular Perfusion & Hypoxemia',
+                description: 'Post-critical illness hypoxemia damages peripheral capillary beds; continuous pulse oximetry and titrated oxygen delivery maintain vital organ perfusion.',
               },
               {
-                title: 'Moisture-Associated Barrier Breakdown (MASD)',
-                description: 'Unmanaged perspiration or urinary leakage macerates the stratum corneum, reducing mechanical pressure tolerance by over 60%.',
+                title: 'Secretory Stasis & Pulmonary Atelectasis',
+                description: 'Reduced tidal volume leads to dependent alveolar collapse; regular repositioning and airway suctioning prevent recurrent nosocomial infections.',
               },
               {
-                title: 'Non-Blanching Erythema (Stage I)',
-                description: 'Persistent localized redness that does not turn white when pressed is a medical emergency requiring immediate complete pressure relief.',
+                title: 'Monitoring Work of Breathing',
+                description: 'Tachypnea (>25 breaths/min) or intercostal retractions indicate respiratory fatigue requiring immediate physician review and flow adjustments.',
               },
             ],
           },
@@ -819,7 +819,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             id: 'block-icu-airway',
             slug: 'airway-clearance-aspiration-prevention',
             title: 'Airway Clearance & Silent Aspiration Prevention',
-            reversibilityNote: 'With motorized 45° Fowler’s bed positioning during enteral feeds and routine subglottic suctioning, post-ICU aspiration pneumonia incidence is reduced by up to 85%.',
+            reversibilityNote: 'With semi-upright 45° Fowler’s positioning during enteral feeds and routine subglottic suctioning, post-ICU aspiration pneumonia incidence is reduced by up to 85%.',
             items: [
               {
                 title: 'Laryngeal Sensory Blunting Post-Extubation',
@@ -831,7 +831,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
               },
               {
                 title: 'Recumbent Atelectasis',
-                description: 'Continuous flat bed rest causes abdominal organs to press against the diaphragm, collapsing the lower lung alveoli and creating stagnant mucus traps.',
+                description: 'Continuous flat recumbent positioning causes abdominal organs to press against the diaphragm, collapsing the lower lung alveoli and creating stagnant mucus traps.',
               },
               {
                 title: 'Secretory Plugging & Tracheostomy Hygiene',
@@ -846,37 +846,37 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
         name: 'पोस्ट-आईसीयू और स्टेप-डाउन होम केयर',
         shortDescription: 'क्रिटिकल केयर मरीजों को अस्पताल के आईसीयू से सुरक्षित घरेलू नैदानिक सेटअप में स्थानांतरित करने के संपूर्ण प्रोटोकॉल।',
         symptoms: [
-          { title: 'मांसपेशियों की कमजोरी और गतिहीनता', description: 'मरीज का खुद से हिलने-डुलने में असमर्थ होना, जिससे बेडसोर (प्रेशर अल्सर) का गंभीर जोखिम रहता है।' },
+          { title: 'मांसपेशियों की कमजोरी और थकान', description: 'सांस लेने में अत्यधिक थकान और कमजोरी जिसके लिए संरचित पुनर्वास और श्वसन निगरानी की आवश्यकता होती है।' },
           { title: 'ट्रेकियोस्टॉमी या एयरवे क्लीयरेंस', description: 'श्वसन नली में कफ जमा होना जिसके लिए निर्धारित अंतराल पर सक्शनिंग और ह्यूमिडिफिकेशन की आवश्यकता होती है।' },
           { title: 'वाइटल संकेतों में उतार-चढ़ाव', description: 'ब्लड प्रेशर, पल्स रेट और ऑक्सीजन सेचुरेशन में बार-बार होने वाले बदलाव।' },
         ],
         caregiverTips: [
-          { title: 'हर 2 घंटे में मरीज की करवट बदलें', detail: 'मरीज की स्थिति हर 2 घंटे में बदलें; यह सुनिश्चित करें कि अल्टरनेटिंग प्रेशर रिपल गद्दे की मोटर चालू है।' },
-          { title: 'बिस्तर का सिर 30° से 45° ऊपर रखें', detail: 'भोजन और दवाओं के समय एस्पिरेशन निमोनिया से बचाव के लिए 5-फंक्शन इलेक्ट्रिक बेड का हेडरेस्ट ऊपर उठाएं।' },
+          { title: 'हर 2 घंटे में मरीज की स्थिति बदलें', detail: 'मरीज की करवट हर 2 घंटे में बदलें ताकि रक्त संचार और आराम बना रहे।' },
+          { title: 'ऊपरी शरीर को 30° से 45° ऊपर रखें', detail: 'भोजन और दवाओं के समय फेफड़ों में खाना जाने (एस्पिरेशन) से बचाव के लिए मरीज को अर्ध-बैठी स्थिति में रखें।' },
           { title: 'सक्शन जार को रोजाना स्टेरलाइज करें', detail: 'कलेक्शन जार को रोज साफ करें और संक्रमण से बचाव के लिए एसेप्टिक नो-टच तकनीक का उपयोग करें।' },
         ],
         contentBlocks: [
           {
-            id: 'block-icu-decubitus',
-            slug: 'decubitus-ulcer-pathogenesis',
-            title: 'बेडसोर (प्रेशर अल्सर) और त्वचा पर खिंचाव का प्रभाव',
-            reversibilityNote: '6-मिनट के चक्र वाले रिपल एयर गद्दे का उपयोग करने और भोजन के अलावा बिस्तर का हेडरेस्ट 30° से नीचे रखने से 90% बेडसोर की रोकथाम संभव है।',
+            id: 'block-icu-respiratory',
+            slug: 'respiratory-rehab-oxygen-titration',
+            title: 'श्वसन पुनर्वास और निरंतर ऑक्सीजन नियंत्रण',
+            reversibilityNote: 'संरचित दैनिक ऑक्सीजन वीनिंग प्रोटोकॉल और स्पाइरोमेट्री के उपयोग से 80% मरीज फेफड़ों की कार्यक्षमता सुरक्षित रूप से पुनः प्राप्त कर लेते हैं।',
             items: [
               {
-                title: 'रक्त प्रवाह में रुकावट (इस्केमिया)',
-                description: 'कूल्हे या एड़ी की हड्डियों पर 32 mmHg से अधिक दबाव पड़ने से रक्त वाहिकाएं बंद हो जाती हैं, जिससे 2 घंटे में गहरे ऊतकों को नुकसान पहुंचता है।',
+                title: 'वेंटिलेटर के बाद डायाफ्राम की कमजोरी',
+                description: 'लंबे समय तक आईसीयू वेंटिलेटर पर रहने से श्वसन मांसपेशियां कमजोर हो जाती हैं, जिसके लिए बाईपैप (BiPAP) या कंसंट्रेटर से निरंतर ऑक्सीजन सहायता जरूरी होती है।',
               },
               {
-                title: 'बिस्तर पर फिसलने से खिंचाव (शीयर स्ट्रेन)',
-                description: 'बिना घुटनों को ऊपर उठाए सिर का हिस्सा उठाने से मरीज नीचे फिसलता है, जिससे त्वचा के नीचे की सूक्ष्म रक्त कोशिकाएं फट जाती हैं।',
+                title: 'हाइपोक्सिमिया और सूक्ष्म रक्त संचार',
+                description: 'ऑक्सीजन की कमी से अंगों को नुकसान पहुंच सकता है; निरंतर पल्स ऑक्सीमीटर निगरानी और सही ऑक्सीजन फ्लो महत्वपूर्ण अंगों की सुरक्षा करता है।',
               },
               {
-                title: 'नमी और पसीने से त्वचा का कटना',
-                description: 'पसीने या मूत्र के संपर्क में रहने से त्वचा की बाहरी सुरक्षात्मक परत कमजोर हो जाती है, जिससे घाव तेजी से बनते हैं।',
+                title: 'कफ का जमाव और फेफड़ों का सिकुड़ना',
+                description: 'कम सांस लेने से फेफड़े के निचले हिस्से सिकुड़ सकते हैं; समय पर स्थिति बदलना और सक्शन मशीन से कफ निकालना संक्रमण से बचाता है।',
               },
               {
-                title: 'त्वचा का लाल होना (स्टेज I संकेत)',
-                description: 'दबाने पर भी त्वचा का लाल रहना एक आपात स्थिति है, जिसके लिए तुरंत उस स्थान से दबाव हटाना अनिवार्य है।',
+                title: 'सांस लेने की गति पर निगरानी',
+                description: 'प्रति मिनट 25 से अधिक सांसें लेना या सांस लेने में जोर लगना फेफड़ों की थकान का संकेत है, जिस पर तुरंत डॉक्टर से परामर्श लेना चाहिए।',
               },
             ],
           },
@@ -884,7 +884,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
             id: 'block-icu-airway',
             slug: 'airway-clearance-aspiration-prevention',
             title: 'श्वसन नली की सफाई और भोजन फेफड़ों में जाने से बचाव',
-            reversibilityNote: 'ट्यूब से भोजन देते समय 5-फंक्शन बेड से मरीज को 45° पर बिठाने और नियमित सक्शनिंग से निमोनिया का खतरा 85% तक कम हो जाता है।',
+            reversibilityNote: 'ट्यूब से भोजन देते समय मरीज को 45° कोण पर रखने और नियमित सक्शनिंग से निमोनिया का खतरा 85% तक कम हो जाता है।',
             items: [
               {
                 title: 'गले की संवेदनशीलता में कमी (साइलेंट एस्पिरेशन)',
@@ -915,9 +915,9 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
     slug: 'stroke-rehab',
     tag: 'stroke-rehab',
     shortDescription: 'Empowering caregivers with ergonomic equipment and rehabilitation aids for neuro-recovery and mobility restoration.',
-    heroImage: '/images/hospital_bed.png',
+    heroImage: '/images/caregiver.png',
     symptoms: [
-      { title: 'Unilateral Muscle Weakness', description: 'Hemiparesis affecting safe bed-to-chair transfers and balance.' },
+      { title: 'Unilateral Muscle Weakness', description: 'Hemiparesis affecting safe seated transfers, posture, and balance.' },
       { title: 'Difficulty Swallowing (Dysphagia)', description: 'Risk of aspiration requiring specialized upright seated positioning.' },
       { title: 'Dependent Mobility', description: 'Requires wheelchair or assisted gait support for all activities of daily living.' },
     ],
@@ -926,14 +926,14 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
       { title: 'Lock Wheelchair Brakes Every Time', detail: 'Engage both caster brakes before initiating any sit-to-stand movement.' },
       { title: 'Encourage Affected Side Engagement', detail: 'Position nightstand and caregiver interaction on the patient’s hemiplegic side.' },
     ],
-    recommendedEquipmentCategories: ['mobility-ortho', 'hospital-beds-icu'],
+    recommendedEquipmentCategories: ['mobility-ortho', 'respiratory-care'],
     translations: {
       en: {
         locale: 'en',
         name: 'Stroke Rehabilitation & Hemiplegia',
         shortDescription: 'Empowering caregivers with ergonomic equipment and rehabilitation aids for neuro-recovery and mobility restoration.',
         symptoms: [
-          { title: 'Unilateral Muscle Weakness', description: 'Hemiparesis affecting safe bed-to-chair transfers and balance.' },
+          { title: 'Unilateral Muscle Weakness', description: 'Hemiparesis affecting safe seated transfers, posture, and balance.' },
           { title: 'Difficulty Swallowing (Dysphagia)', description: 'Risk of aspiration requiring specialized upright seated positioning.' },
           { title: 'Dependent Mobility', description: 'Requires wheelchair or assisted gait support for all activities of daily living.' },
         ],
@@ -948,7 +948,7 @@ export const STATIC_LEARN_CONDITIONS: Condition[] = [
         name: 'स्ट्रोक पुनर्वास और हेमिप्लेजिया (लकवा)',
         shortDescription: 'न्यूरोलॉजिकल रिकवरी और शारीरिक गतिशीलता की बहाली हेतु एर्गोनॉमिक उपकरण और केयरगिवर गाइड।',
         symptoms: [
-          { title: 'शरीर के एक तरफ मांसपेशियों की कमजोरी', description: 'एक तरफ लकवा (हेमिपेरेसिस) जिसके कारण बिस्तर से व्हीलचेयर पर स्थानांतरण में संतुलन की समस्या होती है।' },
+          { title: 'शरीर के एक तरफ मांसपेशियों की कमजोरी', description: 'एक तरफ लकवा (हेमिपेरेसिस) जिसके कारण सुरक्षित बैठने और स्थानांतरण में संतुलन की समस्या होती है।' },
           { title: 'निगलने में कठिनाई (डिस्फेगिया)', description: 'खाना या पानी फेफड़ों में जाने का खतरा, जिसके लिए विशेष रूप से सीधे बैठकर खिलाना अनिवार्य है।' },
           { title: 'दैनिक कार्यों के लिए निर्भरता', description: 'दैनिक क्रियाकलापों के लिए व्हीलचेयर या वॉकर सहायता की अनिवार्य आवश्यकता।' },
         ],

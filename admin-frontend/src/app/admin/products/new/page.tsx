@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ArrowLeft,
   Save,
@@ -11,16 +14,20 @@ import {
   Package,
   Layers,
   IndianRupee,
-  ShieldCheck,
-  Sparkles,
   RefreshCw,
+  UploadCloud,
+  ImageIcon,
+  X,
 } from 'lucide-react';
 import { LanguageTabs } from '@/components/admin/LanguageTabs';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addProduct } from '@/features/products/products.slice';
 import { listCategories } from '@/features/categories/list-categories/list-categories.action';
-import { axiosInterceptorInstanceClient } from '@/config/axios';
-import { Product } from '@/domain/entities/product.entity';
+import { showToast } from '@/features/ui/ui.slice';
+import { axiosInterceptorInstanceClient, extractApiErrorMessage } from '@/config/axios';
+import { Product, ProductSpecification } from '@/domain/entities/product.entity';
+import { productFormSchema, ProductFormValues } from '@/features/products/product-form.schema';
+import { getProductImageUrl } from '@/utils/image';
 
 export default function NewProductAdminPage() {
   const router = useRouter();
@@ -31,10 +38,41 @@ export default function NewProductAdminPage() {
   // Active language tab in admin
   const [selectedLocale, setSelectedLocale] = useState<'en' | 'hi'>('en');
 
-  // Base product fields (Language-agnostic)
-  const [brand, setBrand] = useState('');
-  const [slug, setSlug] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  // React Hook Form with Zod validation
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      brand: 'Omkar Healthcare Clinical',
+      categoryId: '',
+      description: '',
+      buyPrice: 45000,
+      buyMrp: 51750,
+      isAvailableForBuy: true,
+      isAvailableForRent: true,
+      rentalDailyRate: 350,
+      rentalSecurityDeposit: 10000,
+      stock: 15,
+      warrantyInfo: '2 Years Comprehensive Manufacturer Warranty + Omkar Healthcare Replacement Guarantee',
+      tagsInput: 'respiratory, sleep-apnea, hospital-grade',
+      status: 'active',
+      nameHi: '',
+      descHi: '',
+      warrantyHi: '2 वर्ष की संपूर्ण निर्माता वारंटी + ओमकार हेल्थकेयर प्रतिस्थापन गारंटी',
+    },
+  });
+
+  const nameHiValue = watch('nameHi');
+  const descHiValue = watch('descHi');
+  const buyPriceValue = watch('buyPrice');
+  const hasHindiTranslation = Boolean(nameHiValue?.trim() && descHiValue?.trim());
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -43,43 +81,127 @@ export default function NewProductAdminPage() {
   }, [dispatch, categories.length]);
 
   useEffect(() => {
-    if (categories.length > 0 && !categoryId) {
-      setCategoryId(categories[0].id);
+    if (categories.length > 0) {
+      const currentCat = watch('categoryId');
+      if (!currentCat) {
+        setValue('categoryId', categories[0].id);
+      }
     }
-  }, [categories, categoryId]);
+  }, [categories, setValue, watch]);
 
-  const [buyPrice, setBuyPrice] = useState<number>(45000);
-  const [rentDailyRate, setRentDailyRate] = useState<number>(350);
-  const [securityDeposit, setSecurityDeposit] = useState<number>(10000);
-  const [stock, setStock] = useState<number>(15);
-  const [tagsInput, setTagsInput] = useState('respiratory, sleep-apnea, hospital-grade');
-  const [imageUrl, setImageUrl] = useState(
-    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800'
-  );
+  // Dynamic MRP adjustment based on buyPrice
+  useEffect(() => {
+    if (buyPriceValue && Number(buyPriceValue) > 0) {
+      setValue('buyMrp', Math.round(Number(buyPriceValue) * 1.15));
+    }
+  }, [buyPriceValue, setValue]);
 
-  // English content
-  const [nameEn, setNameEn] = useState('');
-  const [descEn, setDescEn] = useState('');
-  const [warrantyEn, setWarrantyEn] = useState('2 Years Comprehensive Manufacturer Warranty + AarogyaMed Replacement Guarantee');
-  const [specsEn, setSpecsEn] = useState<{ label: string; value: string }[]>([
+  // Images state
+  const [images, setImages] = useState<string[]>([
+    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800',
+  ]);
+  const [urlInput, setUrlInput] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFiles = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]);
+      }
+
+      const res = await axiosInterceptorInstanceClient.post('/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const uploadedUrls: string[] =
+        res.data?.data?.urls || (res.data?.data?.url ? [res.data.data.url] : []);
+      if (uploadedUrls.length > 0) {
+        setImages((prev) => [...prev, ...uploadedUrls]);
+      }
+    } catch (err: any) {
+      console.warn('Backend upload fallback to FileReader DataURL:', err);
+      const newPreviews: string[] = [];
+      const readPromises = Array.from(files).map((file) => {
+        return new Promise<void>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (e.target?.result) {
+              newPreviews.push(e.target.result as string);
+            }
+            resolve();
+          };
+          reader.onerror = () => resolve();
+          reader.readAsDataURL(file);
+        });
+      });
+
+      await Promise.all(readPromises);
+      if (newPreviews.length > 0) {
+        setImages((prev) => [...prev, ...newPreviews]);
+      } else {
+        setUploadError(err?.response?.data?.message || err?.message || 'Failed to upload images');
+      }
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleFiles(e.target.files);
+    }
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleAddImageUrl = () => {
+    const trimmed = urlInput.trim();
+    if (!trimmed) return;
+    setImages((prev) => [...prev, trimmed]);
+    setUrlInput('');
+  };
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  const handleSetPrimaryImage = (indexToPrimary: number) => {
+    setImages((prev) => {
+      const target = prev[indexToPrimary];
+      const rest = prev.filter((_, i) => i !== indexToPrimary);
+      return [target, ...rest];
+    });
+  };
+
+  // Specifications
+  const [specsEn, setSpecsEn] = useState<ProductSpecification[]>([
     { label: 'Sound Level', value: '26.6 dBA (Whisper Quiet)' },
     { label: 'Operating Pressure', value: '4 to 20 cm H2O' },
     { label: 'Weight', value: '1.24 kg' },
   ]);
-
-  // Hindi content
-  const [nameHi, setNameHi] = useState('');
-  const [descHi, setDescHi] = useState('');
-  const [warrantyHi, setWarrantyHi] = useState('2 वर्ष की संपूर्ण निर्माता वारंटी + आरोग्यमेड प्रतिस्थापन गारंटी');
-  const [specsHi, setSpecsHi] = useState<{ label: string; value: string }[]>([
+  const [specsHi, setSpecsHi] = useState<ProductSpecification[]>([
     { label: 'ध्वनि स्तर', value: '26.6 dBA (शांत संचालन)' },
     { label: 'दबाव सीमा', value: '4 से 20 cm H2O' },
     { label: 'वजन', value: '1.24 किग्रा' },
   ]);
 
-  const hasHindiTranslation = Boolean(nameHi.trim() && descHi.trim());
-
-  // Spec row helpers
   const handleAddSpec = () => {
     if (selectedLocale === 'en') {
       setSpecsEn([...specsEn, { label: '', value: '' }]);
@@ -108,51 +230,63 @@ export default function NewProductAdminPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nameEn.trim()) {
-      alert('Please enter a product name in English.');
-      return;
-    }
-
+  const onSubmit = async (values: ProductFormValues) => {
     const generatedSlug =
-      slug.trim() ||
-      nameEn
+      values.slug?.trim() ||
+      values.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
 
-    const tags = tagsInput
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const tags = values.tagsInput
+      ? values.tagsInput
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
 
     setSubmitting(true);
     try {
-      const selectedCat = categories.find((c) => c.id === categoryId || c.slug === categoryId);
-      const parsedCatId = Number(categoryId) || (selectedCat?.id ? Number(selectedCat.id) : 1);
+      const selectedCat = categories.find((c) => c.id === values.categoryId || c.slug === values.categoryId);
+      const parsedCatId = Number(values.categoryId) || (selectedCat?.id ? Number(selectedCat.id) : 1);
       const validCatId = !isNaN(parsedCatId) && parsedCatId > 0 ? parsedCatId : 1;
 
+      const productImages = images.filter(Boolean);
+      const primaryImage =
+        productImages[0] || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800';
+
+      const translationsPayload: any[] = [];
+      if (values.nameHi?.trim()) {
+        translationsPayload.push({
+          locale: 'hi',
+          name: values.nameHi.trim(),
+          description: values.descHi || '',
+          warranty_info: values.warrantyHi || '',
+          specifications: specsHi.filter((s) => s.label.trim() && s.value.trim()),
+        });
+      }
+
       const backendPayload = {
-        name: nameEn,
+        name: values.name,
         slug: generatedSlug,
         category_id: validCatId,
-        brand: brand || 'AarogyaMed Clinical',
-        description: descEn,
-        images: [imageUrl],
-        specifications: specsEn,
-        buy_price: Number(buyPrice),
-        buy_mrp: Math.round(Number(buyPrice) * 1.15),
-        buy_available: true,
-        rent_price_daily: Number(rentDailyRate),
-        rent_price_weekly: Number(rentDailyRate) * 6,
-        rent_price_monthly: Number(rentDailyRate) * 25,
-        rent_deposit: Number(securityDeposit),
+        brand: values.brand || 'Omkar Healthcare Clinical',
+        description: values.description,
+        images: productImages.length > 0 ? productImages : [primaryImage],
+        specifications: specsEn.filter((s) => s.label.trim() && s.value.trim()),
+        buy_price: Number(values.buyPrice),
+        buy_mrp: Number(values.buyMrp) || Math.round(Number(values.buyPrice) * 1.15),
+        buy_available: values.isAvailableForBuy,
+        rent_price_daily: Number(values.rentalDailyRate),
+        rent_price_weekly: Number(values.rentalDailyRate) * 6,
+        rent_price_monthly: Number(values.rentalDailyRate) * 25,
+        rent_deposit: Number(values.rentalSecurityDeposit),
         rent_min_period_days: 1,
-        rent_available: true,
-        stock_quantity: Number(stock),
-        warranty_info: warrantyEn,
-        status: 'active',
+        rent_available: values.isAvailableForRent,
+        stock_quantity: Number(values.stock),
+        warranty_info: values.warrantyInfo || '',
+        status: values.status || 'active',
+        translations: translationsPayload,
       };
 
       const response = await axiosInterceptorInstanceClient.post('/products', backendPayload);
@@ -161,37 +295,38 @@ export default function NewProductAdminPage() {
       const newProd: Product = {
         id: String(saved?.uuid || saved?.id || `prod-${Date.now()}`),
         uuid: saved?.uuid,
-        name: nameEn,
+        name: values.name,
         slug: generatedSlug,
         sku: generatedSlug.toUpperCase(),
-        brand: brand || 'AarogyaMed Clinical',
+        brand: values.brand || 'Omkar Healthcare Clinical',
         categoryId: String(validCatId),
         categoryName: selectedCat?.name || 'Medical Equipment',
-        description: descEn,
-        primaryImage: imageUrl,
-        images: [imageUrl],
-        buyPrice: Number(buyPrice),
-        mrp: Math.round(Number(buyPrice) * 1.15),
-        stock: Number(stock),
-        isAvailableForBuy: true,
-        isAvailableForRent: true,
-        rentalDailyRate: Number(rentDailyRate),
-        rentalMonthlyRate: Number(rentDailyRate) * 25,
-        rentalSecurityDeposit: Number(securityDeposit),
+        description: values.description,
+        primaryImage: primaryImage,
+        images: productImages.length > 0 ? productImages : [primaryImage],
+        buyPrice: Number(values.buyPrice),
+        mrp: backendPayload.buy_mrp,
+        stock: Number(values.stock),
+        isAvailableForBuy: values.isAvailableForBuy,
+        isAvailableForRent: values.isAvailableForRent,
+        rentalDailyRate: Number(values.rentalDailyRate),
+        rentalMonthlyRate: Number(values.rentalDailyRate) * 25,
+        rentalSecurityDeposit: Number(values.rentalSecurityDeposit),
         rentalMinDays: 1,
-        specifications: specsEn,
-        warrantyInfo: warrantyEn,
+        specifications: backendPayload.specifications,
+        warrantyInfo: values.warrantyInfo,
         conditionTags: tags,
         rating: 5.0,
         reviewsCount: 1,
       };
 
       dispatch(addProduct(newProd));
-      alert('Equipment successfully created and persisted to database!');
+      dispatch(showToast({ type: 'success', message: `Product "${values.name}" created successfully!` }));
       router.push('/admin/products');
     } catch (err: any) {
+      const msg = extractApiErrorMessage(err, 'Failed to create product in backend database');
       console.error('[NewProductAdminPage] Submit error:', err);
-      alert(err?.response?.data?.message || err?.message || 'Failed to create product in backend database');
+      dispatch(showToast({ type: 'error', message: msg }));
     } finally {
       setSubmitting(false);
     }
@@ -209,7 +344,7 @@ export default function NewProductAdminPage() {
             gap: 6,
             fontSize: '0.8125rem',
             fontWeight: 700,
-            color: '#006398',
+            color: '#B75932',
             textDecoration: 'none',
             marginBottom: '0.75rem',
           }}
@@ -218,89 +353,170 @@ export default function NewProductAdminPage() {
           <span>Back to Products</span>
         </Link>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
-          Add Medical Equipment
+          Add New Product
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: '4px 0 0' }}>
           Create hospital-grade equipment with bilingual Hindi/English specifications and buy/rent terms.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        {/* Top Language Tabs Component */}
-        <LanguageTabs
-          selectedLocale={selectedLocale}
-          onSelectLocale={setSelectedLocale}
-          hasHindiTranslation={hasHindiTranslation}
-          onAutoTranslate={() => {
-            if (!nameHi) setNameHi(`आरोग्यमेड ${nameEn}`);
-            if (!descHi) setDescHi(`क्लिनिकल ग्रेड चिकित्सा उपकरण - ${descEn}`);
-          }}
-        />
+      {/* Language Switcher */}
+      <LanguageTabs
+        selectedLocale={selectedLocale}
+        onSelectLocale={setSelectedLocale}
+        hasHindiTranslation={hasHindiTranslation}
+      />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '1.5rem' }}>
-          {/* LEFT: Localized Content Section */}
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: 16,
-              padding: '1.5rem',
-              border: '1px solid #dae2fd',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.25rem',
-            }}
-          >
-            <div style={{ borderBottom: '1px solid #f2f3ff', paddingBottom: 10 }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#005c55', letterSpacing: '0.06em' }}>
-                {selectedLocale === 'en' ? 'English (Primary)' : 'हिन्दी (Hindi Translation)'}
-              </span>
-              <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: '4px 0 0' }}>
-                {selectedLocale === 'en' ? 'Clinical Descriptions & Specifications' : 'विवरण एवं तकनीकी विशिष्टता'}
-              </h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* SECTION 1: Product Identity */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid #dae2fd',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1.25rem' }}>
+            <Package size={20} color="#16453A" />
+            <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
+              {selectedLocale === 'en' ? 'Product Identity & Classification' : 'उत्पाद पहचान और वर्गीकरण'}
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {/* Name */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                {selectedLocale === 'en' ? 'Product Name (English) *' : 'उत्पाद का नाम (हिंदी)'}
+              </label>
+              {selectedLocale === 'en' ? (
+                <>
+                  <input
+                    type="text"
+                    {...register('name')}
+                    placeholder="e.g. Philips EverFlo 5L Oxygen Concentrator"
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 8,
+                      border: `1px solid ${errors.name ? '#ba1a1a' : '#dae2fd'}`,
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                    }}
+                  />
+                  {errors.name && (
+                    <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                      {errors.name.message}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <input
+                  type="text"
+                  {...register('nameHi')}
+                  placeholder="उदा. फिलिप्स एवरफ्लो 5 लीटर ऑक्सीजन कंसंट्रेटर"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    border: '1px solid #dae2fd',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                  }}
+                />
+              )}
             </div>
 
-            {/* Product Title */}
+            {/* Slug */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                {selectedLocale === 'en' ? 'Product Title *' : 'उपकरण का नाम (हिन्दी)'}
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                URL Slug (Optional - auto-generated from name)
               </label>
               <input
                 type="text"
-                required={selectedLocale === 'en'}
-                placeholder={selectedLocale === 'en' ? 'e.g., ResMed AirSense 10 AutoSet CPAP' : 'उदा., रेसमेड एयरसेंस 10 ऑटोसेट सीपैक'}
-                value={selectedLocale === 'en' ? nameEn : nameHi}
-                onChange={(e) =>
-                  selectedLocale === 'en' ? setNameEn(e.target.value) : setNameHi(e.target.value)
-                }
+                {...register('slug')}
+                placeholder="philips-everflo-5l-oxygen-concentrator"
                 style={{
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: 8,
-                  border: '1px solid #dae2fd',
+                  border: `1px solid ${errors.slug ? '#ba1a1a' : '#dae2fd'}`,
                   fontSize: '0.875rem',
                   outline: 'none',
                 }}
               />
+              {errors.slug && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.slug.message}
+                </span>
+              )}
             </div>
 
-            {/* Clinical Description */}
+            {/* Brand */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                {selectedLocale === 'en' ? 'Clinical Description *' : 'क्लिनिकल विवरण (हिन्दी)'}
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Brand / Manufacturer *
               </label>
-              <textarea
-                rows={4}
-                required={selectedLocale === 'en'}
-                placeholder={
-                  selectedLocale === 'en'
-                    ? 'Enter clinical summary, hospital certifications, and patient benefits...'
-                    : 'चिकित्सकीय विवरण, अस्पताल प्रमाणन एवं मरीज के लाभ दर्ज करें...'
-                }
-                value={selectedLocale === 'en' ? descEn : descHi}
-                onChange={(e) =>
-                  selectedLocale === 'en' ? setDescEn(e.target.value) : setDescHi(e.target.value)
-                }
+              <input
+                type="text"
+                {...register('brand')}
+                placeholder="e.g. Philips Respironics, ResMed"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.brand ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.brand && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.brand.message}
+                </span>
+              )}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Category *
+              </label>
+              <select
+                {...register('categoryId')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.categoryId ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  background: '#ffffff',
+                }}
+              >
+                <option value="">Select Category...</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              {errors.categoryId && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.categoryId.message}
+                </span>
+              )}
+            </div>
+
+            {/* Status */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Catalog Status
+              </label>
+              <select
+                {...register('status')}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -308,98 +524,416 @@ export default function NewProductAdminPage() {
                   border: '1px solid #dae2fd',
                   fontSize: '0.875rem',
                   outline: 'none',
-                  fontFamily: 'inherit',
+                  background: '#ffffff',
                 }}
-              />
+              >
+                <option value="active">Active (Visible on Storefront)</option>
+                <option value="draft">Draft (Hidden)</option>
+                <option value="out_of_stock">Out of Stock</option>
+              </select>
             </div>
+          </div>
+        </div>
 
-            {/* Dynamic Specifications Builder */}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e' }}>
-                  {selectedLocale === 'en' ? 'Technical Specifications (JSONB)' : 'तकनीकी विशिष्टता (JSONB)'}
-                </label>
-                <button
-                  type="button"
-                  onClick={handleAddSpec}
+        {/* SECTION 2: Product Images */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid #dae2fd',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <ImageIcon size={20} color="#16453A" />
+              <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
+                Product Images
+              </h2>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>
+              First image is designated as primary cover photo
+            </span>
+          </div>
+
+          {/* Upload Dropzone */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDrop={handleFileDrop}
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              border: '2px dashed #16453A',
+              borderRadius: 12,
+              padding: '1.75rem 1rem',
+              textAlign: 'center',
+              background: '#f8fbfc',
+              cursor: 'pointer',
+              marginBottom: '1.25rem',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              multiple
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+            <UploadCloud size={32} color="#16453A" style={{ margin: '0 auto 8px' }} />
+            <p style={{ margin: '0 0 4px', fontSize: '0.875rem', fontWeight: 700, color: '#131b2e' }}>
+              {isUploading ? 'Uploading files to storage...' : 'Click or drag & drop images here to upload'}
+            </p>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#6e7977' }}>
+              Supports JPG, PNG, WEBP, SVG up to 10MB each
+            </p>
+          </div>
+
+          {uploadError && (
+            <div
+              style={{
+                padding: '8px 12px',
+                background: '#fdf2f2',
+                border: '1px solid #fecaca',
+                borderRadius: 8,
+                color: '#b91c1c',
+                fontSize: '0.8125rem',
+                marginBottom: '1rem',
+              }}
+            >
+              {uploadError}
+            </div>
+          )}
+
+          {/* Direct URL Add Option */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: '1.25rem' }}>
+            <input
+              type="url"
+              placeholder="Or paste external image URL (https://...)"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddImageUrl();
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                borderRadius: 8,
+                border: '1px solid #dae2fd',
+                fontSize: '0.8125rem',
+                outline: 'none',
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleAddImageUrl}
+              style={{
+                padding: '8px 14px',
+                borderRadius: 8,
+                background: '#f2f3ff',
+                color: '#B75932',
+                border: '1px solid #dae2fd',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Add URL
+            </button>
+          </div>
+
+          {/* Image Previews */}
+          {images.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12 }}>
+              {images.map((img, idx) => (
+                <div
+                  key={`${img}-${idx}`}
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: '#005c55',
-                    background: '#e8f5f3',
-                    border: 'none',
-                    padding: '4px 10px',
-                    borderRadius: 6,
-                    cursor: 'pointer',
+                    position: 'relative',
+                    aspectRatio: '1',
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    border: idx === 0 ? '2px solid #16453A' : '1px solid #dae2fd',
+                    background: '#f8f9ff',
                   }}
                 >
-                  <Plus size={14} />
-                  <span>Add Spec Row</span>
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {(selectedLocale === 'en' ? specsEn : specsHi).map((spec, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="text"
-                      placeholder="Parameter (e.g. Sound Level)"
-                      value={spec.label}
-                      onChange={(e) => handleSpecChange(idx, 'label', e.target.value)}
+                  <Image
+                    src={getProductImageUrl(img)}
+                    alt={`Preview ${idx + 1}`}
+                    fill
+                    unoptimized
+                    sizes="130px"
+                    style={{ objectFit: 'cover' }}
+                  />
+                  {idx === 0 && (
+                    <span
                       style={{
-                        flex: 1,
-                        padding: '8px 10px',
-                        borderRadius: 6,
-                        border: '1px solid #dae2fd',
-                        fontSize: '0.8125rem',
+                        position: 'absolute',
+                        top: 4,
+                        left: 4,
+                        background: '#16453A',
+                        color: '#ffffff',
+                        fontSize: '0.625rem',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: 4,
                       }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Value (e.g. 26.6 dBA)"
-                      value={spec.value}
-                      onChange={(e) => handleSpecChange(idx, 'value', e.target.value)}
-                      style={{
-                        flex: 1,
-                        padding: '8px 10px',
-                        borderRadius: 6,
-                        border: '1px solid #dae2fd',
-                        fontSize: '0.8125rem',
-                      }}
-                    />
+                    >
+                      PRIMARY
+                    </span>
+                  )}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 4,
+                      right: 4,
+                      display: 'flex',
+                      gap: 4,
+                    }}
+                  >
+                    {idx !== 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetPrimaryImage(idx)}
+                        title="Set as Primary Cover"
+                        style={{
+                          background: 'rgba(0,0,0,0.65)',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: 4,
+                          padding: '3px 5px',
+                          fontSize: '0.625rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Cover
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => handleRemoveSpec(idx)}
+                      onClick={() => handleRemoveImage(idx)}
+                      title="Remove image"
                       style={{
-                        padding: 6,
+                        background: 'rgba(186, 26, 26, 0.85)',
+                        color: '#ffffff',
                         border: 'none',
-                        background: '#fff0ee',
-                        color: '#ba1a1a',
-                        borderRadius: 6,
+                        borderRadius: 4,
+                        padding: '3px 5px',
                         cursor: 'pointer',
                       }}
                     >
-                      <Trash2 size={14} />
+                      <X size={12} />
                     </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '1rem', color: '#6e7977', fontSize: '0.8125rem' }}>
+              No images added yet. Add at least one image for display on the storefront.
+            </div>
+          )}
+        </div>
 
-            {/* Warranty Info */}
+        {/* SECTION 3: Pricing, Stock & Terms */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid #dae2fd',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1.25rem' }}>
+            <IndianRupee size={20} color="#16453A" />
+            <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
+              Pricing, Inventory &amp; Rental Terms
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {/* Buy Price */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                {selectedLocale === 'en' ? 'Warranty / Guarantee Info' : 'वारंटी / गारंटी विवरण'}
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Outright Buy Price (₹) *
               </label>
               <input
-                type="text"
-                value={selectedLocale === 'en' ? warrantyEn : warrantyHi}
-                onChange={(e) =>
-                  selectedLocale === 'en' ? setWarrantyEn(e.target.value) : setWarrantyHi(e.target.value)
-                }
+                type="number"
+                {...register('buyPrice')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.buyPrice ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.buyPrice && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.buyPrice.message}
+                </span>
+              )}
+            </div>
+
+            {/* MRP */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                MRP Price (₹)
+              </label>
+              <input
+                type="number"
+                {...register('buyMrp')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.buyMrp ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.buyMrp && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.buyMrp.message}
+                </span>
+              )}
+            </div>
+
+            {/* Daily Rental Rate */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Daily Rental Rate (₹/day) *
+              </label>
+              <input
+                type="number"
+                {...register('rentalDailyRate')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.rentalDailyRate ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.rentalDailyRate && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.rentalDailyRate.message}
+                </span>
+              )}
+            </div>
+
+            {/* Security Deposit */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Refundable Security Deposit (₹) *
+              </label>
+              <input
+                type="number"
+                {...register('rentalSecurityDeposit')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.rentalSecurityDeposit ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.rentalSecurityDeposit && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.rentalSecurityDeposit.message}
+                </span>
+              )}
+            </div>
+
+            {/* Stock Quantity */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                Stock / Inventory Count *
+              </label>
+              <input
+                type="number"
+                {...register('stock')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${errors.stock ? '#ba1a1a' : '#dae2fd'}`,
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.stock && (
+                <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                  {errors.stock.message}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 4: Description & Clinical Specifications */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid #dae2fd',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1.25rem' }}>
+            <Layers size={20} color="#16453A" />
+            <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
+              {selectedLocale === 'en'
+                ? 'Clinical Description & Technical Specifications'
+                : 'चिकित्सकीय विवरण और तकनीकी विनिर्देश'}
+            </h2>
+          </div>
+
+          {/* Description */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+              {selectedLocale === 'en' ? 'Detailed Description (English) *' : 'विस्तृत विवरण (हिंदी)'}
+            </label>
+            {selectedLocale === 'en' ? (
+              <>
+                <textarea
+                  rows={4}
+                  {...register('description')}
+                  placeholder="Provide comprehensive medical specifications, sterilization status, and clinical indications..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    border: `1px solid ${errors.description ? '#ba1a1a' : '#dae2fd'}`,
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                    lineHeight: 1.5,
+                  }}
+                />
+                {errors.description && (
+                  <span style={{ color: '#ba1a1a', fontSize: '0.75rem', marginTop: 4, display: 'block' }}>
+                    {errors.description.message}
+                  </span>
+                )}
+              </>
+            ) : (
+              <textarea
+                rows={4}
+                {...register('descHi')}
+                placeholder="विस्तृत चिकित्सा विनिर्देश, नसबंदी प्रोटोकॉल, और नैदानिक ​​उपयोग प्रदान करें..."
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -407,252 +941,196 @@ export default function NewProductAdminPage() {
                   border: '1px solid #dae2fd',
                   fontSize: '0.875rem',
                   outline: 'none',
+                  lineHeight: 1.5,
                 }}
               />
-            </div>
+            )}
           </div>
 
-          {/* RIGHT: Base Settings (Price, Rent, Stock, Category) */}
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: 16,
-              padding: '1.5rem',
-              border: '1px solid #dae2fd',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.25rem',
-            }}
-          >
-            <div style={{ borderBottom: '1px solid #f2f3ff', paddingBottom: 10 }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#006398', letterSpacing: '0.06em' }}>
-                Inventory &amp; Commerce Rules
-              </span>
-              <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: '4px 0 0' }}>
-                Buy &amp; Rent Equal Footing
-              </h2>
+          {/* Warranty & Tags */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: '1.25rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                {selectedLocale === 'en' ? 'Warranty Information' : 'वारंटी की जानकारी (हिंदी)'}
+              </label>
+              {selectedLocale === 'en' ? (
+                <input
+                  type="text"
+                  {...register('warrantyInfo')}
+                  placeholder="e.g. 2 Years Manufacturer Warranty"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    border: '1px solid #dae2fd',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                  }}
+                />
+              ) : (
+                <input
+                  type="text"
+                  {...register('warrantyHi')}
+                  placeholder="उदा. 2 वर्ष की निर्माता वारंटी"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    border: '1px solid #dae2fd',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                  }}
+                />
+              )}
             </div>
 
-            {/* Brand & Category */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {selectedLocale === 'en' && (
               <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                  Brand Name * (Untranslated)
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947', marginBottom: 6 }}>
+                  Condition &amp; Health Category Tags
                 </label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g., ResMed, Philips"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
+                  {...register('tagsInput')}
+                  placeholder="comma separated: respiratory, sleep-apnea, hospital-grade"
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
+                    padding: '10px 14px',
                     borderRadius: 8,
                     border: '1px solid #dae2fd',
                     fontSize: '0.875rem',
+                    outline: 'none',
                   }}
                 />
               </div>
+            )}
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                  Category *
-                </label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    background: '#ffffff',
-                  }}
-                >
-                  {categories.length === 0 ? (
-                    <option value="">Loading categories...</option>
-                  ) : (
-                    categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-            </div>
-
-            {/* Buy Price & Rent Daily Rate */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#005c55', marginBottom: 6 }}>
-                  Buy Price (₹) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min={100}
-                  value={buyPrice}
-                  onChange={(e) => setBuyPrice(Number(e.target.value))}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#006398', marginBottom: 6 }}>
-                  Daily Rent Rate (₹/day) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min={10}
-                  value={rentDailyRate}
-                  onChange={(e) => setRentDailyRate(Number(e.target.value))}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Security Deposit & Stock */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#913200', marginBottom: 6 }}>
-                  Refundable Deposit (₹) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min={0}
-                  value={securityDeposit}
-                  onChange={(e) => setSecurityDeposit(Number(e.target.value))}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                  Stock Quantity (Units) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min={0}
-                  value={stock}
-                  onChange={(e) => setStock(Number(e.target.value))}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1px solid #dae2fd',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Tags (for Condition Linking) */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                Tags for Condition Linking (Comma separated)
+          {/* Specifications Key-Value Builder */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#3e4947' }}>
+                {selectedLocale === 'en' ? 'Technical Specifications (Key - Value Pairs)' : 'तकनीकी विनिर्देश (कुंजी - मूल्य)'}
               </label>
-              <input
-                type="text"
-                placeholder="sleep-apnea, respiratory, cpap"
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 8,
-                  border: '1px solid #dae2fd',
-                  fontSize: '0.875rem',
-                }}
-              />
-              <span style={{ fontSize: '0.6875rem', color: '#6e7977', display: 'block', marginTop: 4 }}>
-                Matches tags on `/learn/[slug]` condition pages for tag-based linking.
-              </span>
-            </div>
-
-            {/* Image URL */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: '#131b2e', marginBottom: 6 }}>
-                Product Image URL
-              </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 8,
-                  border: '1px solid #dae2fd',
-                  fontSize: '0.875rem',
-                }}
-              />
-            </div>
-
-            {/* Submit Action */}
-            <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #f2f3ff' }}>
               <button
-                type="submit"
-                disabled={submitting}
+                type="button"
+                onClick={handleAddSpec}
                 style={{
-                  width: '100%',
-                  padding: '14px',
-                  borderRadius: 12,
-                  background: submitting ? '#94a3b8' : 'linear-gradient(135deg, #005c55 0%, #004b46 100%)',
-                  color: '#ffffff',
-                  fontSize: '0.9375rem',
-                  fontWeight: 800,
-                  border: 'none',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  boxShadow: submitting ? 'none' : '0 4px 12px rgba(0,92,85,0.3)',
-                  transition: 'all 0.2s ease',
+                  gap: 4,
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: '#16453A',
+                  background: '#e8f5f3',
+                  border: 'none',
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  cursor: 'pointer',
                 }}
               >
-                {submitting ? (
-                  <>
-                    <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                    <span>Saving Equipment to Database...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} />
-                    <span>Save Equipment to Catalog</span>
-                  </>
-                )}
+                <Plus size={14} /> Add Row
               </button>
             </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {(selectedLocale === 'en' ? specsEn : specsHi).map((spec, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    placeholder="Attribute (e.g. Oxygen Output)"
+                    value={spec.label}
+                    onChange={(e) => handleSpecChange(idx, 'label', e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #dae2fd',
+                      fontSize: '0.8125rem',
+                      outline: 'none',
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Value (e.g. 5 Liters / min)"
+                    value={spec.value}
+                    onChange={(e) => handleSpecChange(idx, 'value', e.target.value)}
+                    style={{
+                      flex: 2,
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #dae2fd',
+                      fontSize: '0.8125rem',
+                      outline: 'none',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSpec(idx)}
+                    style={{
+                      background: '#fff0ee',
+                      color: '#ba1a1a',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: 8,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+
+        {/* Submit Actions */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+          <Link
+            href="/admin/products"
+            style={{
+              padding: '11px 22px',
+              borderRadius: 10,
+              background: '#f2f3ff',
+              color: '#3e4947',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              textDecoration: 'none',
+            }}
+          >
+            Cancel
+          </Link>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '11px 26px',
+              borderRadius: 10,
+              background: submitting ? '#6e7977' : '#16453A',
+              color: '#ffffff',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              border: 'none',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              boxShadow: '0 2px 8px rgba(0,92,85,0.25)',
+            }}
+          >
+            {submitting ? (
+              <>
+                <RefreshCw size={16} className="animate-spin" />
+                <span>Saving Product to Database...</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>Save Product</span>
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>

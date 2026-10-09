@@ -39,7 +39,17 @@ exports.updateOrderStatusSchema = z.object({
     id: z.string(),
   }),
   body: z.object({
-    status: z.enum(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']).optional(),
+    status: z.enum(['pending', 'confirmed', 'paid', 'shipped', 'delivered', 'cancelled']).optional(),
     payment_status: z.enum(['pending', 'paid', 'failed', 'refunded']).optional(),
+  }),
+});
+
+exports.listOrdersSchema = z.object({
+  query: z.object({
+    status: z.enum(['all', 'pending', 'paid', 'shipped', 'delivered', 'cancelled', 'refunded']).optional().default('all'),
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    search: z.string().optional(),
+    sortBy: z.enum(['newest', 'oldest', 'amount_high', 'amount_low']).optional().default('newest'),
   }),
 });

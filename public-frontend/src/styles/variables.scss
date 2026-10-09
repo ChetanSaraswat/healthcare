@@ -1,26 +1,34 @@
-// Warm Clinical Trust Design Tokens (AarogyaMed)
+// Omkar Healthcare Design Tokens (Extracted from Brand Logo)
 
-// Colors - Primary (Deep Clinical Emerald)
-$primary: #005c55;
+// Colors - Primary (Deep Sacred Emerald Green - Wordmark & Healing Palm)
+$primary: #16453a;
 $on-primary: #ffffff;
-$primary-container: #0f766e;
-$on-primary-container: #a3faef;
-$primary-fixed: #9cf2e8;
-$primary-fixed-dim: #80d5cb;
-$on-primary-fixed: #00201d;
+$primary-container: #20544c;
+$on-primary-container: #c4e8e0;
+$primary-fixed: #cce7e1;
+$primary-fixed-dim: #9ecbc1;
+$on-primary-fixed: #0c2e27;
 
-// Colors - Secondary (Oceanic Trust Blue)
-$secondary: #006398;
+// Colors - Secondary (Copper / Terracotta - Om Symbol & Flexible Rental CTAs)
+$secondary: #b75932;
 $on-secondary: #ffffff;
-$secondary-container: #5bb8fe;
-$on-secondary-container: #00476e;
-$secondary-fixed: #cce5ff;
-$secondary-fixed-dim: #93ccff;
+$secondary-container: #903418;
+$on-secondary-container: #ffdcd0;
+$secondary-fixed: #ffdbce;
+$secondary-fixed-dim: #f5b198;
+$secondary-surface: #fbf2ed;
 
-// Colors - Tertiary (Warm Terracotta Accent)
-$tertiary: #913200;
+// Colors - Accent (Warm Gold - Protective Aureole & Quality Seals)
+$accent: #e0b478;
+$accent-container: #faf5ec;
+$accent-border: #d4a264;
+$on-accent: #5a3c10;
+$gold: #e0b478;
+
+// Colors - Tertiary (Deep Earth Trust / Medical Anchor)
+$tertiary: #903418;
 $on-tertiary: #ffffff;
-$tertiary-container: #b94200;
+$tertiary-container: #b75932;
 $on-tertiary-container: #ffe5dc;
 $tertiary-fixed: #ffdbce;
 
@@ -29,9 +37,9 @@ $surface: #faf8ff;
 $surface-dim: #d2d9f4;
 $surface-bright: #faf8ff;
 $surface-container-lowest: #ffffff;
-$surface-container-low: #f2f3ff;
-$surface-container: #eaedff;
-$surface-container-high: #e2e7ff;
+$surface-container-low: #f4f6f8;
+$surface-container: #edf1f3;
+$surface-container-high: #e4e9ec;
 $surface-container-highest: #dae2fd;
 $on-surface: #131b2e;
 $on-surface-variant: #3e4947;
@@ -58,7 +66,7 @@ $radius-full: 9999px;
 $shadow-sm: 0 1px 3px rgba(19, 27, 46, 0.08);
 $shadow-md: 0 4px 12px rgba(19, 27, 46, 0.08);
 $shadow-lg: 0 8px 24px rgba(19, 27, 46, 0.12);
-$shadow-hover: 0 12px 32px rgba(0, 92, 85, 0.14);
+$shadow-hover: 0 12px 32px rgba(22, 69, 58, 0.16);
 
 // Transitions
 $transition-fast: 0.15s ease-in-out;

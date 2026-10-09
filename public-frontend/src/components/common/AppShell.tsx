@@ -17,9 +17,9 @@ export function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (token) {
-        localStorage.setItem('aarogyamed_auth_token', token);
+        localStorage.setItem('omkar_auth_token', token);
       } else {
-        localStorage.removeItem('aarogyamed_auth_token');
+        localStorage.removeItem('omkar_auth_token');
       }
     }
   }, [token]);

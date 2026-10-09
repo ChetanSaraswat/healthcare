@@ -101,12 +101,12 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <Award size={18} color="#005c55" />
+            <Award size={18} color="#16453A" />
             <span
               style={{
                 fontSize: '0.8125rem',
                 fontWeight: 800,
-                color: '#005c55',
+                color: '#16453A',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
               }}
@@ -128,7 +128,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
             gap: 8,
             padding: '10px 18px',
             borderRadius: 10,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             border: 'none',
             fontSize: '0.875rem',
@@ -168,16 +168,16 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
               paddingRight: '1rem',
             }}
           >
-            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#005c55', lineHeight: 1 }}>
+            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#16453A', lineHeight: 1 }}>
               {currentAvg.toFixed(1)}
             </div>
-            <div style={{ display: 'flex', gap: 4, margin: '8px 0 4px', color: '#ea580c' }}>
+            <div style={{ display: 'flex', gap: 4, margin: '8px 0 4px', color: '#B75932' }}>
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
                   key={s}
                   size={18}
-                  fill={s <= Math.round(currentAvg) ? '#ea580c' : 'none'}
-                  color="#ea580c"
+                  fill={s <= Math.round(currentAvg) ? '#B75932' : 'none'}
+                  color="#B75932"
                 />
               ))}
             </div>
@@ -196,10 +196,10 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
               <div key={idx}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: 4 }}>
                   <span style={{ color: '#3e4947', fontWeight: 600 }}>{item.label}</span>
-                  <strong style={{ color: '#005c55' }}>{item.score}</strong>
+                  <strong style={{ color: '#16453A' }}>{item.score}</strong>
                 </div>
                 <div style={{ height: 6, width: '100%', background: '#eaedff', borderRadius: 999, overflow: 'hidden' }}>
-                  <div style={{ width: item.score, height: '100%', background: '#005c55', borderRadius: 999 }} />
+                  <div style={{ width: item.score, height: '100%', background: '#16453A', borderRadius: 999 }} />
                 </div>
               </div>
             ))}
@@ -228,7 +228,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
               height: 56,
               borderRadius: '50%',
               background: '#e8f5f3',
-              color: '#005c55',
+              color: '#16453A',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -240,7 +240,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
             No Reviews Yet for this Equipment
           </h3>
           <p style={{ color: '#6e7977', fontSize: '0.875rem', maxWidth: 440, margin: 0, lineHeight: 1.5 }}>
-            All reviews on AarogyaMed are from verified caregivers and hospitals. Be the first to share your experience with this device.
+            All reviews on Omkar Healthcare are from verified caregivers and hospitals. Be the first to share your experience with this device.
           </p>
           <button
             type="button"
@@ -249,9 +249,9 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
               marginTop: 8,
               padding: '8px 18px',
               borderRadius: 8,
-              border: '1.5px solid #005c55',
+              border: '1.5px solid #16453A',
               background: 'transparent',
-              color: '#005c55',
+              color: '#16453A',
               fontWeight: 700,
               fontSize: '0.875rem',
               cursor: 'pointer',
@@ -283,7 +283,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                       height: 38,
                       borderRadius: '50%',
                       background: '#e8f5f3',
-                      color: '#005c55',
+                      color: '#16453A',
                       fontWeight: 800,
                       fontSize: '0.875rem',
                       display: 'flex',
@@ -298,7 +298,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                       <strong style={{ fontSize: '0.9375rem', color: '#131b2e' }}>{rev.author}</strong>
                       <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>• {rev.location}</span>
                     </div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#005c55', fontSize: '0.6875rem', fontWeight: 700 }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#16453A', fontSize: '0.6875rem', fontWeight: 700 }}>
                       <CheckCircle2 size={12} />
                       {rev.verifiedType}
                     </div>
@@ -306,9 +306,9 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ display: 'flex', gap: 2, color: '#ea580c' }}>
+                  <div style={{ display: 'flex', gap: 2, color: '#B75932' }}>
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={14} fill={s <= rev.rating ? '#ea580c' : 'none'} color="#ea580c" />
+                      <Star key={s} size={14} fill={s <= rev.rating ? '#B75932' : 'none'} color="#B75932" />
                     ))}
                   </div>
                   <span style={{ fontSize: '0.75rem', color: '#6e7977' }}>{rev.date}</span>
@@ -368,7 +368,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                       onClick={() => setRating(s)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}
                     >
-                      <Star size={24} fill={s <= rating ? '#ea580c' : 'none'} color="#ea580c" />
+                      <Star size={24} fill={s <= rating ? '#B75932' : 'none'} color="#B75932" />
                     </button>
                   ))}
                 </div>
@@ -476,7 +476,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                     padding: '8px 20px',
                     borderRadius: 8,
                     border: 'none',
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontWeight: 700,
                     cursor: 'pointer',

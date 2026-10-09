@@ -96,12 +96,34 @@ class OrderService {
     return order;
   }
 
-  async getUserOrders(userId) {
-    return await orderRepository.findOrdersByUser(userId);
+  async getUserOrders(userId, filter = {}) {
+    const { count, rows } = await orderRepository.findOrdersByUser(userId, filter);
+    const page = Math.max(1, Number(filter.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(filter.limit || 10)));
+    return {
+      items: rows,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    };
   }
 
   async getAllOrders(filter = {}) {
-    return await orderRepository.findAllOrders(filter);
+    const { count, rows } = await orderRepository.findAllOrders(filter);
+    const page = Math.max(1, Number(filter.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(filter.limit || 10)));
+    return {
+      items: rows,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    };
   }
 
   async updateStatus(uuid, updateData) {

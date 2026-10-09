@@ -13,6 +13,10 @@ export interface RentalsState {
   loading: boolean;
   submitting: boolean;
   error: string | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: RentalsState = {
@@ -22,6 +26,10 @@ const initialState: RentalsState = {
   loading: false,
   submitting: false,
   error: null,
+  total: 0,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 export const rentalsSlice = createAppSlice({
@@ -53,7 +61,11 @@ export const rentalsSlice = createAppSlice({
       })
       .addCase(listRentals.fulfilled, (state, action) => {
         state.loading = false;
-        state.rentals = action.payload.data;
+        state.rentals = action.payload.data.rentals;
+        state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.limit = action.payload.data.limit;
+        state.totalPages = action.payload.data.totalPages;
       })
       .addCase(listRentals.rejected, (state, action) => {
         state.loading = false;

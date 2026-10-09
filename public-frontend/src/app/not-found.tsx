@@ -31,7 +31,7 @@ export default function NotFound() {
           style={{
             fontSize: '4.5rem',
             fontWeight: 900,
-            color: '#005c55',
+            color: '#16453A',
             lineHeight: 1,
             marginBottom: '0.75rem',
             letterSpacing: '-0.04em',
@@ -69,7 +69,7 @@ export default function NotFound() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '11px 22px',
               borderRadius: 10,
@@ -110,7 +110,7 @@ export default function NotFound() {
               alignItems: 'center',
               gap: 6,
               fontSize: '0.85rem',
-              color: '#005c55',
+              color: '#16453A',
               fontWeight: 600,
               textDecoration: 'none',
             }}

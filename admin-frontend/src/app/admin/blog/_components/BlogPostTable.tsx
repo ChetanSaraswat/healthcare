@@ -81,8 +81,8 @@ export function BlogPostTable({
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 border: '1px solid',
-                borderColor: statusFilter === status ? '#005c55' : '#cbd5e1',
-                background: statusFilter === status ? '#005c55' : '#ffffff',
+                borderColor: statusFilter === status ? '#16453A' : '#cbd5e1',
+                background: statusFilter === status ? '#16453A' : '#ffffff',
                 color: statusFilter === status ? '#ffffff' : '#475569',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
@@ -115,15 +115,23 @@ export function BlogPostTable({
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div
+          className="custom-scrollbar"
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 310px)',
+            minHeight: 380,
+          }}
+        >
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
-            <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #edf2f7', color: '#475569', fontWeight: 700 }}>
-                <th style={{ padding: '14px 20px' }}>Article Details</th>
-                <th style={{ padding: '14px 20px' }}>Category &amp; Tag</th>
-                <th style={{ padding: '14px 20px' }}>Bilingual Coverage</th>
-                <th style={{ padding: '14px 20px' }}>Status</th>
-                <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+              <tr style={{ background: '#f8fafc', color: '#475569', fontWeight: 700 }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Article Details</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Category &amp; Tag</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Bilingual Coverage</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Status</th>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '14px 20px', textAlign: 'right', boxShadow: 'inset 0 -1px 0 #edf2f7' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -162,7 +170,7 @@ export function BlogPostTable({
 
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontWeight: 600, color: '#005c55', fontSize: '0.8125rem' }}>
+                        <span style={{ fontWeight: 600, color: '#16453A', fontSize: '0.8125rem' }}>
                           {post.category || 'General Home Care'}
                         </span>
                         {post.equipmentTag && (
@@ -286,7 +294,7 @@ export function BlogPostTable({
                             borderRadius: 8,
                             fontSize: '0.8125rem',
                             fontWeight: 700,
-                            background: '#005c55',
+                            background: '#16453A',
                             border: 'none',
                             color: '#ffffff',
                             cursor: 'pointer',

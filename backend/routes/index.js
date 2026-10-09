@@ -4,13 +4,13 @@ const router = require('express').Router();
 router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    service: 'aarogyamed-backend',
+    service: 'omkar-healthcare-backend',
     timestamp: new Date().toISOString(),
   });
 });
 
 router.get('/', (req, res) => {
-  res.send('AarogyaMed Healthcare API Service is running');
+  res.send('Omkar Healthcare API Service is running');
 });
 
 // Domain sub-routers
@@ -28,5 +28,7 @@ router.use('/blog', require('./blog.router'));
 router.use('/email', require('./email.router'));
 router.use('/pages', require('./static-page.router'));
 router.use('/policies', require('./static-page.router'));
+router.use('/uploads', require('./upload.router'));
+router.use('/upload', require('./upload.router'));
 
 module.exports = router;

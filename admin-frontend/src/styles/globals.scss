@@ -9,6 +9,11 @@
   --secondary: #{$secondary};
   --on-secondary: #{$on-secondary};
   --secondary-container: #{$secondary-container};
+  --secondary-surface: #{$secondary-surface};
+  --accent: #{$accent};
+  --accent-container: #{$accent-container};
+  --accent-border: #{$accent-border};
+  --gold: #{$gold};
   --tertiary: #{$tertiary};
   --surface: #{$surface};
   --surface-container-lowest: #{$surface-container-lowest};
@@ -55,4 +60,29 @@ input,
 select,
 textarea {
   font-family: inherit;
+}
+
+/* Custom Scrollbars across Admin Console */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }

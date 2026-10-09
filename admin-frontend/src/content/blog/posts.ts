@@ -3,64 +3,51 @@ import { BlogPost } from '@/domain/entities/blog.entity';
 export const STATIC_BLOG_POSTS: BlogPost[] = [
   {
     id: 1,
-    title: 'How to Set Up a Hospital-Grade Home ICU: The 7 Essential Devices',
-    slug: 'home-icu-setup-essential-devices',
+    title: 'BiPAP vs. CPAP Therapy: Choosing the Right Positive Airway Pressure Support',
+    slug: 'bipap-vs-cpap-therapy-guide',
     summary:
-      'Transitioning a patient from hospital ICU to home requires strict adherence to infection control, back-up oxygen, motorized 5-function positioning, and continuous vitals monitoring.',
-    body: `Transitioning a patient from a hospital intensive care unit (ICU) to home care is a critical milestone that requires precision, clinical vigilance, and reliable biomedical equipment.
+      'Understand the key clinical differences between continuous CPAP and bi-level BiPAP therapy for COPD, sleep apnea, and chronic respiratory insufficiency.',
+    body: `Positive Airway Pressure (PAP) therapy is the frontline clinical intervention for obstructive sleep apnea, neuromuscular weakness, and acute-on-chronic respiratory failure.
 
-### 1. 5-Function Motorized Hospital ICU Bed
-A 5-function motorized bed provides cardiac chair positioning, Trendelenburg, reverse Trendelenburg, height elevation, and back/knee rest adjustments. These postures reduce pulmonary aspiration risk, assist in venous return, and facilitate daily nursing maneuvers.
+### CPAP (Continuous Positive Airway Pressure)
+CPAP delivers a constant, single preset pressure level throughout both inhalation and exhalation. It acts as a pneumatic splint keeping upper airway walls patent during sleep.
 
-### 2. High-Flow Oxygen Concentrator (10L Dual Flow)
-For patients with compromised respiratory drive, continuous medical-grade oxygen purity (>93% ± 3%) is essential. Dual-flow ports permit concurrent nebulization or two-point delivery.
+### BiPAP (Bi-Level Positive Airway Pressure)
+BiPAP delivers two distinct pressure levels:
+- **IPAP (Inspiratory Positive Airway Pressure)**: Higher pressure during inhalation to assist ventilation and improve oxygen uptake.
+- **EPAP (Expiratory Positive Airway Pressure)**: Lower baseline pressure during exhalation to keep airways open with minimal exhalation resistance.
 
-### 3. Medical Suction Machine (Continuous & Intermittent)
-Clearing bronchial secretions in tracheostomy or stroke patients prevents fatal airway occlusion and aspiration pneumonia.
+### When is BiPAP Indicated?
+BiPAP is prescribed when patients suffer from COPD with hypercapnia (elevated CO2), ALS/MND, obesity hypoventilation syndrome, or inability to tolerate high continuous CPAP pressures.
 
-### 4. Multi-Parameter Patient Vitals Monitor
-Continuous tracking of ECG, SpO2, Non-Invasive Blood Pressure (NIBP), respiratory rate, and core body temperature ensures early warning of septic or respiratory decompensation.
-
-### 5. Alternating Pressure Ripple Bubble Mattress
-Essential for patients immobile for over 12 hours a day to prevent stage 3 and 4 pressure decubitus ulcers.
-
-### 6. Emergency Oxygen Cylinder Backup (B-Type / D-Type)
-A loaded oxygen cylinder with preset regulator must be kept on standby to counter unexpected power outages or concentrator maintenance periods.
-
-### 7. Portable Emergency Resuscitation & AMBU Bag
-Essential bedside emergency equipment for immediate manual ventilation support.`,
-    coverImage: '/images/hospital_bed.png',
+### Clinical Titration Protocol
+All machines provided by Omkar Healthcare are calibrated by certified biomedical engineers and set precisely to your pulmonologist's titration prescription.`,
+    coverImage: '/images/elderly_couple.png',
     authorName: 'Dr. Arvind Sharma (Clinical Critical Care Specialist)',
     status: 'published',
     publishedAt: '2026-09-15T10:00:00.000Z',
-    category: 'Home ICU Setup',
-    equipmentTag: 'Hospital Beds & ICU',
-    shopLink: '/shop?category=cat-icu-beds',
-    readTime: '6 min read',
-    readTimeMinutes: 6,
+    category: 'Respiratory Care',
+    equipmentTag: 'CPAP & BiPAP',
+    shopLink: '/shop?category=5',
+    readTime: '5 min read',
+    readTimeMinutes: 5,
     hasHindiTranslation: true,
     translations: {
       hi: {
         locale: 'hi',
-        title: 'होम आईसीयू कैसे सेटअप करें: 7 अनिवार्य जीवनरक्षक चिकित्सा उपकरण',
+        title: 'बाईपैप बनाम सीपैप थेरेपी: सही श्वसन सहायता उपकरण का चयन',
         summary:
-          'अस्पताल आईसीयू से मरीज को घर स्थानांतरित करते समय संक्रमण नियंत्रण, बैकअप ऑक्सीजन, 5-फंक्शन मोटराइज्ड बेड और निरंतर वाइटल्स मॉनिटरिंग का कड़ाई से पालन आवश्यक है।',
-        body: `अस्पताल के आईसीयू से मरीज को घर की देखभाल में स्थानांतरित करना एक महत्वपूर्ण चरण है जिसके लिए पूर्ण सटीकता और प्रमाणित बायोमेडिकल उपकरणों की आवश्यकता होती है।
+          'सीओपीडी, स्लीप एप्निया और श्वसन विफलता के लिए निरंतर सीपैप और बाई-लेवल बाईपैप थेरेपी के बीच महत्वपूर्ण क्लीनिकल अंतर समझें।',
+        body: `पॉजिटिव एयरवे प्रेशर (PAP) थेरेपी स्लीप एप्निया और सांस की बीमारियों के लिए सबसे प्रभावी उपचार है।
 
-### 1. 5-फंक्शन मोटराइज्ड आईसीयू अस्पताल बेड
-कार्डिएक चेयर, ट्रेंडेलेनबर्ग और पीठ/घुटने के कोण नियंत्रण से फेफड़ों में भोजन जाने का खतरा न्यूनतम होता है।
+### सीपैप (CPAP)
+सांस लेने और छोड़ने के दौरान एक समान निरंतर दबाव प्रदान करता है ताकि सांस की नली खुली रहे।
 
-### 2. 10 लीटर हाई-फ्लो ऑक्सीजन कंसंट्रेटर
-निरंतर 93% शुद्धता वाली ऑक्सीजन की आपूर्ति श्वसन विफलता से ग्रस्त मरीजों के लिए अनिवार्य है।
+### बाईपैप (BiPAP)
+सांस लेते समय उच्च दबाव (IPAP) और सांस छोड़ते समय कम दबाव (EPAP) प्रदान करता है, जिससे फेफड़ों पर दबाव कम पड़ता है।
 
-### 3. सक्शन मशीन
-ट्रेकियोस्टॉमी या लकवाग्रस्त मरीजों के श्वसन मार्ग से कफ साफ करने के लिए।
-
-### 4. मल्टी-पैरामीटर पेशेंट मॉनिटर
-ईसीजी, ऑक्सीजन संतृप्ति (SpO2), रक्तचाप और श्वसन दर की निरंतर निगरानी।
-
-### 5. अल्टरनेटिंग एयर प्रेशर मैट्रेस (एंटी-बेडसोर गद्दा)
-लगातार लेटे रहने वाले मरीजों में दबाव के छालों (बेड सोर) की रोकथाम हेतु।`,
+### डॉक्टर की सलाह
+ओमकार हेल्थकेयर से मिलने वाली सभी मशीनें प्रमाणित बायोमेडिकल इंजीनियरों द्वारा सटीक डॉक्टर पर्चे के अनुसार कैलिब्रेट की जाती हैं।`,
       },
     },
   },
@@ -79,7 +66,7 @@ An oxygen concentrator extracts ambient room air, runs it through synthetic zeol
 - **Concentrators**: Higher initial acquisition or rental cost, but zero refill logistics. Highly economical for patients requiring >15 hours of daily therapy.
 - **Cylinders**: Low unit rental cost, but recurring logistics charges and frequent refills (a B-type cylinder lasts only 3-5 hours at 4 LPM).
 
-### Recommended AarogyaMed Protocol
+### Recommended Omkar Healthcare Protocol
 Use an electrically powered 10L/5L concentrator as the primary source with an emergency B-type or D-type cylinder kept charged as a failsafe during power anomalies.`,
     coverImage: '/images/oxygen_concentrator.png',
     authorName: 'Biomedical Engineering Review Board',
@@ -87,7 +74,7 @@ Use an electrically powered 10L/5L concentrator as the primary source with an em
     publishedAt: '2026-09-18T14:30:00.000Z',
     category: 'Respiratory Care',
     equipmentTag: 'Respiratory & Oxygen',
-    shopLink: '/shop?category=cat-respiratory',
+    shopLink: '/shop?category=6',
     readTime: '5 min read',
     readTimeMinutes: 5,
     hasHindiTranslation: true,
@@ -110,43 +97,50 @@ Use an electrically powered 10L/5L concentrator as the primary source with an em
   },
   {
     id: 3,
-    title: 'Preventing Decubitus Pressure Ulcers (Bed Sores): Clinical Guidelines',
-    slug: 'preventing-bed-sores-clinical-nursing-protocol',
+    title: 'Medical Suction Machine Operation & Airway Care: Home Nursing Guidelines',
+    slug: 'suction-machine-airway-clearing-nursing-protocol',
     summary:
-      'Stage I and II pressure ulcers can develop within 48 hours of bed rest. Discover how 6-minute alternating ripple bubble air mattresses protect fragile skin.',
-    body: `Pressure ulcers (decubitus ulcers or bed sores) represent one of the most preventable yet devastating complications in bedbound home healthcare.
+      'Proper vacuum pressure settings, aseptic catheter handling, and secretion clearance techniques to prevent airway occlusion in tracheostomy and stroke care.',
+    body: `Airway clearance via medical high-vacuum suction machines is life-saving for patients with impaired cough reflexes, tracheostomies, or post-stroke dysphagia.
 
-### Mechanism of Tissue Breakdown
-When external pressure over a bony prominence (sacrum, heels, ischial tuberosities) exceeds normal capillary arteriolar pressure (32 mmHg), localized ischemia ensues. If sustained for as little as 2 hours, cellular necrosis triggers ulceration.
+### 1. Calibrated Vacuum Pressure Guidelines
+- Adults: 100 to 120 mmHg (never exceed 150 mmHg to protect delicate mucosal membranes).
+- Children/Pediatric: 80 to 100 mmHg.
+- Verify gauge accuracy on the suction regulator before catheter insertion.
 
-### The 4-Pillar Prevention Protocol
-1. **Alternating Pressure Therapy**: Medical-grade alternating air mattresses cycle inflate/deflate cells every 6 to 10 minutes, relieving peak capillary pressure points.
-2. **2-Hour Q2H Repositioning**: Turn the patient 30 degrees obliquely left and right every 2 hours using slide sheets.
-3. **Moisture & Shear Management**: Use silicone barrier creams and breathable drawsheets.
-4. **Nutrition & Hydration**: High-protein enteral nutritional support accelerates skin barrier integrity.`,
+### 2. Aseptic Technique
+- Always use sterile disposable suction catheters with thumb-control valves.
+- Lubricate tip only with sterile water-soluble gel.
+- Limit each suction pass to 10-15 seconds to prevent hypoxemia.
+
+### 3. Canister Sanitization
+Empty and disinfect the anti-overflow collection canister daily using hospital-grade antimicrobial solutions to prevent bacterial aerosolization.`,
     coverImage: '/images/caregiver.png',
     authorName: 'Sister Maya Verghese (Senior Palliative Nurse)',
     status: 'published',
     publishedAt: '2026-09-20T08:15:00.000Z',
-    category: 'Geriatric Care',
-    equipmentTag: 'Anti-Decubitus Care',
-    shopLink: '/shop?category=cat-icu-beds',
+    category: 'Airway Management',
+    equipmentTag: 'Nebulizers & Suction',
+    shopLink: '/shop?category=10',
     readTime: '4 min read',
     readTimeMinutes: 4,
     hasHindiTranslation: true,
     translations: {
       hi: {
         locale: 'hi',
-        title: 'बेड सोर (दबाव के छालों) की रोकथाम: क्लीनिकल नर्सिंग दिशानिर्देश',
+        title: 'सक्शन मशीन संचालन एवं श्वसन नली सफाई: घरेलू नर्सिंग दिशानिर्देश',
         summary:
-          'लंबे समय तक बिस्तर पर रहने वाले मरीजों में 48 घंटे के भीतर बेड सोर विकसित हो सकते हैं। जानें कैसे 6-मिनट का एयर गद्दा त्वचा की सुरक्षा करता है।',
-        body: `बिस्तर पर निर्भर मरीजों के लिए बेड सोर की रोकथाम प्राथमिक प्राथमिकता है।
+          'ट्रेकियोस्टॉमी और स्ट्रोक मरीजों में श्वसन मार्ग खुला रखने के लिए वैक्यूम दबाव नियंत्रण और रोगाणुरहित कैथेटर उपयोग के क्लीनिकल नियम।',
+        body: `श्वसन मार्ग से कफ साफ करने के लिए मेडिकल सक्शन मशीन का सही उपयोग मरीज के जीवन की सुरक्षा के लिए अत्यंत महत्वपूर्ण है।
 
-### 4-स्तंभ रोकथाम प्रोटोकॉल
-1. **अल्टरनेटिंग प्रेशर गद्दा**: हवा के कक्ष बारी-बारी से फूलते और खाली होते हैं जिससे त्वचा पर लगातार दबाव नहीं बनता।
-2. **हर 2 घंटे में करवट बदलना**: मरीज की स्थिति 30 डिग्री कोण पर बदलें।
-3. **नमी नियंत्रण**: त्वचा को सूखा और साफ रखें।
-4. **उच्च प्रोटीन आहार**: ऊतकों के पुनर्निर्माण के लिए।`,
+### 1. वैक्यूम दबाव मानक
+वयस्कों के लिए 100-120 mmHg का सुरक्षित दबाव रखें ताकि श्वासनली की आंतरिक परत सुरक्षित रहे।
+
+### 2. स्वच्छता नियम
+प्रत्येक सक्शन के लिए स्वच्छ कैथेटर का उपयोग करें और एक बार में 10-15 सेकंड से अधिक सक्शन न करें।
+
+### 3. कैनिस्टर की सफाई
+कलेक्शन जार को रोजाना कीटाणुनाशक घोल से साफ करें।`,
       },
     },
   },
@@ -171,7 +165,7 @@ Target at least 4 hours of consecutive nightly use for >70% of nights within the
     publishedAt: '2026-09-22T11:45:00.000Z',
     category: 'Sleep & Pulmonology',
     equipmentTag: 'CPAP & BiPAP',
-    shopLink: '/shop?category=cat-respiratory',
+    shopLink: '/shop?category=5',
     readTime: '5 min read',
     readTimeMinutes: 5,
     hasHindiTranslation: true,

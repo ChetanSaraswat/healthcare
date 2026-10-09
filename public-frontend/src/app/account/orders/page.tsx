@@ -75,7 +75,7 @@ export default function AccountOrdersPage() {
         <Link
           href="/shop"
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '8px 18px',
             borderRadius: 9999,
@@ -134,7 +134,7 @@ export default function AccountOrdersPage() {
           <Link
             href="/shop"
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 22px',
               borderRadius: 9999,
@@ -209,7 +209,7 @@ export default function AccountOrdersPage() {
                       onClick={() => handleDownloadInvoice(order)}
                       style={{
                         background: '#faf8ff',
-                        color: '#005c55',
+                        color: '#16453A',
                         border: '1px solid #dae2fd',
                         padding: '5px 12px',
                         borderRadius: 8,
@@ -255,7 +255,7 @@ export default function AccountOrdersPage() {
                           {locale === 'hi' ? 'बिल्कुल नया उपकरण • मात्रा:' : 'Brand New OEM Unit • Qty:'}{' '}
                           <strong>{item.quantity}</strong> • ₹{item.unitPrice.toLocaleString('en-IN')} / unit
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
                           <ShieldCheck size={13} />
                           <span>
                             {locale === 'hi'
@@ -266,7 +266,7 @@ export default function AccountOrdersPage() {
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-                        <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#005c55' }}>
+                        <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#16453A' }}>
                           ₹{item.totalPrice.toLocaleString('en-IN')}
                         </div>
 
@@ -276,7 +276,7 @@ export default function AccountOrdersPage() {
                           onClick={() => handleReorder(item)}
                           style={{
                             background: '#eaf8f6',
-                            color: '#005c55',
+                            color: '#16453A',
                             border: '1px solid #9cf2e8',
                             padding: '4px 10px',
                             borderRadius: 6,

@@ -110,7 +110,7 @@ class AdminNotificationService {
     // 1. WhatsApp Dispatch Task (Admin)
     const sendWhatsAppTask = async () => {
       if (!adminWhatsAppNumber) {
-        return { channel: 'whatsapp', skipped: true, reason: 'ADMIN_WHATSAPP_NUMBER not configured' };
+        return { channel: 'whatsapp', skipped: true, reason: 'ADMIN_ALERT_PHONE (or ADMIN_WHATSAPP_NUMBER) not configured' };
       }
 
       // Check idempotency

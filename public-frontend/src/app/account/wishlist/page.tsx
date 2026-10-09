@@ -84,7 +84,7 @@ export default function AccountWishlistPage() {
             bottom: 24,
             right: 24,
             zIndex: 9999,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '12px 20px',
             borderRadius: 12,
@@ -130,7 +130,7 @@ export default function AccountWishlistPage() {
           <span
             style={{
               background: '#eaf8f6',
-              color: '#005c55',
+              color: '#16453A',
               fontWeight: 700,
               fontSize: '0.8125rem',
               padding: '6px 14px',
@@ -140,7 +140,7 @@ export default function AccountWishlistPage() {
               gap: 6,
             }}
           >
-            <Heart size={14} fill="#005c55" color="#005c55" />
+            <Heart size={14} fill="#16453A" color="#16453A" />
             <span>
               {wishlistItems.length} {locale === 'hi' ? 'उपकरण सहेजे गए' : 'Items Saved'}
             </span>
@@ -149,7 +149,7 @@ export default function AccountWishlistPage() {
           <Link
             href="/shop"
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '8px 18px',
               borderRadius: 9999,
@@ -205,7 +205,7 @@ export default function AccountWishlistPage() {
             <Link
               href="/shop"
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 padding: '10px 22px',
                 borderRadius: 9999,
@@ -220,7 +220,7 @@ export default function AccountWishlistPage() {
               href="/assessment"
               style={{
                 background: '#f2f3ff',
-                color: '#005c55',
+                color: '#16453A',
                 border: '1px solid #dae2fd',
                 padding: '10px 22px',
                 borderRadius: 9999,
@@ -266,7 +266,7 @@ export default function AccountWishlistPage() {
                       left: 12,
                       background: 'rgba(255, 255, 255, 0.92)',
                       backdropFilter: 'blur(4px)',
-                      color: '#005c55',
+                      color: '#16453A',
                       fontSize: '0.6875rem',
                       fontWeight: 800,
                       padding: '3px 8px',
@@ -341,7 +341,7 @@ export default function AccountWishlistPage() {
                         style={{
                           fontSize: '1.125rem',
                           fontWeight: 800,
-                          color: !isRentPreferred ? '#005c55' : '#131b2e',
+                          color: !isRentPreferred ? '#16453A' : '#131b2e',
                         }}
                       >
                         ₹{item.buyPrice.toLocaleString('en-IN')}
@@ -357,7 +357,7 @@ export default function AccountWishlistPage() {
                           style={{
                             fontSize: '1.125rem',
                             fontWeight: 800,
-                            color: isRentPreferred ? '#005c55' : '#131b2e',
+                            color: isRentPreferred ? '#16453A' : '#131b2e',
                           }}
                         >
                           ₹{item.rentDailyRate.toLocaleString('en-IN')}
@@ -375,7 +375,7 @@ export default function AccountWishlistPage() {
                       onClick={() => handleMoveToCart(item)}
                       style={{
                         width: '100%',
-                        background: '#005c55',
+                        background: '#16453A',
                         color: '#ffffff',
                         border: 'none',
                         padding: '10px 14px',
@@ -406,7 +406,7 @@ export default function AccountWishlistPage() {
                       href={`/product/${item.slug}`}
                       style={{
                         textAlign: 'center',
-                        color: '#005c55',
+                        color: '#16453A',
                         fontSize: '0.8125rem',
                         fontWeight: 700,
                         textDecoration: 'none',

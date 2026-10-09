@@ -57,8 +57,8 @@ try {
 
 if (openapiSpec) {
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
-    customSiteTitle: 'AarogyaMed API Documentation',
-    customCss: '.swagger-ui .topbar { background-color: #005c55; }',
+    customSiteTitle: 'Omkar Healthcare API Documentation',
+    customCss: '.swagger-ui .topbar { background-color: #16453A; }',
   }));
 
   app.get(['/api/docs.yaml', '/api/docs/openapi.yaml'], (req, res) => {
@@ -71,6 +71,9 @@ if (openapiSpec) {
     res.json(openapiSpec);
   });
 }
+
+// Static Uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes (Supports both standard root and /api/v1 versioned prefix)
 app.use('/api/v1', require('./routes'));
@@ -104,13 +107,13 @@ if (process.env.NODE_ENV !== 'test') {
     .then(() => {
       scheduler.start();
       app.listen(port, () => {
-        console.log(`[${process.env.NODE_ENV || 'development'}] AarogyaMed API Server is listening on port ${port}`);
+        console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port}`);
       });
     })
     .catch((err) => {
       console.error('Database connection failed. Starting server in degraded mode for development:', err.message);
       app.listen(port, () => {
-        console.log(`[${process.env.NODE_ENV || 'development'}] AarogyaMed API Server is listening on port ${port} (DB disconnected)`);
+        console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port} (DB disconnected)`);
       });
     });
 }

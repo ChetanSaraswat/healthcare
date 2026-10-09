@@ -13,6 +13,7 @@ import {
   MapPin,
   Eye,
 } from 'lucide-react';
+import { PaginationControl } from '@/components/common/PaginationControl';
 
 interface CustomerTableProps {
   customers: CustomerSummary[];
@@ -24,6 +25,13 @@ interface CustomerTableProps {
   activeRenteesCount: number;
   buyersCount: number;
   onOpenHistory: (customer: CustomerSummary) => void;
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  isLoading: boolean;
 }
 
 export function CustomerTable({
@@ -36,6 +44,13 @@ export function CustomerTable({
   activeRenteesCount,
   buyersCount,
   onOpenHistory,
+  currentPage,
+  totalPages,
+  totalItems,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  isLoading,
 }: CustomerTableProps) {
   return (
     <>
@@ -131,7 +146,7 @@ export function CustomerTable({
               cursor: 'pointer',
               border: 'none',
               background: segmentFilter === 'buyers' ? '#ffffff' : 'transparent',
-              color: segmentFilter === 'buyers' ? '#006398' : '#6e7977',
+              color: segmentFilter === 'buyers' ? '#B75932' : '#6e7977',
               boxShadow: segmentFilter === 'buyers' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
               transition: 'all 0.15s ease',
             }}
@@ -151,26 +166,34 @@ export function CustomerTable({
           boxShadow: '0 2px 8px rgba(19, 27, 46, 0.04)',
         }}
       >
-        <div style={{ overflowX: 'auto' }}>
+        <div
+          className="custom-scrollbar"
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 310px)',
+            minHeight: 380,
+          }}
+        >
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 850 }}>
-            <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #dce4e8' }}>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+              <tr style={{ background: '#f8fafc' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Patient / Caregiver
                 </th>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Contact Information
                 </th>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Care Location
                 </th>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Equipment Activity
                 </th>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Total Spend
                 </th>
-                <th style={{ padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>
+                <th style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10, padding: '12px 18px', fontSize: '0.75rem', fontWeight: 700, color: '#6e7977', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right', boxShadow: 'inset 0 -1px 0 #dce4e8' }}>
                   Action
                 </th>
               </tr>
@@ -203,7 +226,7 @@ export function CustomerTable({
                             width: 40,
                             height: 40,
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #005c55 0%, #006398 100%)',
+                            background: 'linear-gradient(135deg, #16453A 0%, #B75932 100%)',
                             color: '#ffffff',
                             fontWeight: 700,
                             fontSize: '0.9375rem',
@@ -231,7 +254,7 @@ export function CustomerTable({
                                 borderRadius: 12,
                                 fontWeight: 700,
                                 background: 'rgba(0, 92, 85, 0.08)',
-                                color: '#005c55',
+                                color: '#16453A',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: 3,
@@ -262,7 +285,7 @@ export function CustomerTable({
                     {/* Care Location */}
                     <td style={{ padding: '16px 18px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8125rem', color: '#131b2e' }}>
-                        <MapPin size={14} style={{ color: '#006398', flexShrink: 0 }} />
+                        <MapPin size={14} style={{ color: '#B75932', flexShrink: 0 }} />
                         <span>{customer.primaryCity || 'Not Specified'}</span>
                       </div>
                       {customer.addresses?.[0]?.pincode && (
@@ -283,7 +306,7 @@ export function CustomerTable({
                               borderRadius: 6,
                               fontWeight: 700,
                               background: 'rgba(0, 99, 152, 0.08)',
-                              color: '#006398',
+                              color: '#B75932',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: 4,
@@ -321,7 +344,7 @@ export function CustomerTable({
 
                     {/* Total Spend */}
                     <td style={{ padding: '16px 18px' }}>
-                      <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#005c55' }}>
+                      <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#16453A' }}>
                         ₹{customer.totalSpend.toLocaleString('en-IN')}
                       </div>
                       <div style={{ fontSize: '0.6875rem', color: '#8b9695', marginTop: 2 }}>
@@ -341,14 +364,14 @@ export function CustomerTable({
                           borderRadius: 6,
                           fontSize: '0.8125rem',
                           fontWeight: 700,
-                          background: '#005c55',
+                          background: '#16453A',
                           color: '#ffffff',
                           border: 'none',
                           cursor: 'pointer',
                           transition: 'background 0.15s ease',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = '#004741')}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = '#005c55')}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = '#0F352C')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = '#16453A')}
                       >
                         <Eye size={14} />
                         View Care History
@@ -359,6 +382,18 @@ export function CustomerTable({
               )}
             </tbody>
           </table>
+        </div>
+
+        <div style={{ borderTop: '1px solid #dce4e8', background: '#fafbff' }}>
+          <PaginationControl
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </>

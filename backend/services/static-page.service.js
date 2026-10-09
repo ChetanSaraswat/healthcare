@@ -8,24 +8,24 @@ const DEFAULT_POLICIES = {
     en: {
       title: 'Terms & Conditions of Healthcare Service',
       body: `## 1. Introduction & Acceptance
-Welcome to AarogyaMed. By using our platform, mobile site, or clinical fulfillment services, you agree to comply with and be bound by these Terms & Conditions. All critical care devices provided (CPAP, BiPAP, Oxygen Concentrators, ICU Beds, Wheelchairs) are regulated biomedical equipment governed by CDSCO standards.
+Welcome to Omkar Healthcare. By using our platform, mobile site, or clinical fulfillment services, you agree to comply with and be bound by these Terms & Conditions. All critical care devices provided (CPAP, BiPAP, Oxygen Concentrators, Suction Units, Wheelchairs) are regulated biomedical equipment governed by CDSCO standards.
 
 ## 2. Equipment Quality & Clinical Verification
 Every item dispatched for rental or sale undergoes a verified 10-step sterilization and clinical calibration protocol performed by certified biomedical engineers prior to doorstep delivery. Equipment rented or purchased must be operated in accordance with the user manual and physician prescription where applicable.
 
 ## 3. Account & Responsibilities
-Users must provide accurate patient and caregiver contact details, delivery address, and emergency contact information. Customers agree to exercise reasonable care with all rented equipment and notify AarogyaMed immediately in the event of device malfunction.
+Users must provide accurate patient and caregiver contact details, delivery address, and emergency contact information. Customers agree to exercise reasonable care with all rented equipment and notify Omkar Healthcare immediately in the event of device malfunction.
 
 ## 4. Limitation of Medical Liability
-AarogyaMed provides verified medical equipment and doorstep setup assistance. Our technicians and staff do not dispense primary medical advice or prescribe therapy. Always consult your attending pulmonologist or physician regarding clinical treatment decisions.
+Omkar Healthcare provides verified medical equipment and doorstep setup assistance. Our technicians and staff do not dispense primary medical advice or prescribe therapy. Always consult your attending pulmonologist or physician regarding clinical treatment decisions.
 
 ## 5. Contact & Grievance Redressal
-For grievances or clinical inquiries, contact our 24/7 Helpline at 1800-889-2273 or email clinical-support@aarogyamed.com.`,
+For grievances or clinical inquiries, contact our 24/7 Helpline at 1800-889-2273 or email clinical-support@omkarhealthcare.com.`,
     },
     hi: {
       title: 'नियम एवं शर्तें (Healthcare Terms & Conditions)',
       body: `## 1. सेवा की शर्तें
-आरोग्यमेड में आपका स्वागत है। हमारे प्लेटफॉर्म का उपयोग करके आप इन नियमों और शर्तों का पालन करने के लिए सहमत होते हैं। हमारे द्वारा उपलब्ध कराए जाने वाले सभी क्रिटिकल केयर उपकरण (सीपैप, बाईपैप, ऑक्सीजन कंसंट्रेटर, आईसीयू बेड) सीडीएससीओ मानकों के अनुरूप हैं।
+ओमकार हेल्थकेयर में आपका स्वागत है। हमारे प्लेटफॉर्म का उपयोग करके आप इन नियमों और शर्तों का पालन करने के लिए सहमत होते हैं। हमारे द्वारा उपलब्ध कराए जाने वाले सभी क्रिटिकल केयर उपकरण (सीपैप, बाईपैप, ऑक्सीजन कंसंट्रेटर, सक्शन मशीनें) सीडीएससीओ मानकों के अनुरूप हैं।
 
 ## 2. गुणवत्ता एवं 10-चरणीय सैनिटाइजेशन
 रेंटल या खरीद के लिए भेजा जाने वाला प्रत्येक उपकरण डिलीवरी से पहले प्रमाणित बायोमेडिकल इंजीनियरों द्वारा 10-चरणीय स्टेरलाइजेशन से गुजरता है।
@@ -48,7 +48,7 @@ We adhere to stringent data privacy guidelines (including DISHA principles). Pat
 All transactions and refundable security deposits are processed via RBI-compliant payment gateways with PCI-DSS Level 1 encryption. No card details or UPI PINs are stored on our servers.
 
 ## 4. Data Access & Rights
-You have the right to request deletion or modification of your stored profile information and delivery addresses at any time by contacting privacy@aarogyamed.com.`,
+You have the right to request deletion or modification of your stored profile information and delivery addresses at any time by contacting privacy@omkarhealthcare.com.`,
     },
     hi: {
       title: 'गोपनीयता नीति (Privacy Policy)',
@@ -64,7 +64,7 @@ You have the right to request deletion or modification of your stored profile in
     en: {
       title: 'Medical Equipment Rental Agreement & Escrow Policy',
       body: `## 1. Flexible Rental Periods
-AarogyaMed offers transparent rental plans for 7 days, 15 days, 30 days, or customized recovery durations (up to 180 days). Progressive tiered discounts automatically apply for extended home recovery.
+Omkar Healthcare offers transparent rental plans for 7 days, 15 days, 30 days, or customized recovery durations (up to 180 days). Progressive tiered discounts automatically apply for extended home recovery.
 
 ## 2. Escrow-Protected Refundable Security Deposit
 - A refundable security deposit is collected upon order placement to safeguard medical hardware.
@@ -81,7 +81,7 @@ Rentals can be extended seamlessly online from the Active Rentals dashboard befo
     hi: {
       title: 'रेंटल नीति एवं एस्क्रो सुरक्षा जमा गारंटी',
       body: `## 1. लचीली रेंटल अवधि
-आरोग्यमेड 7 दिन, 15 दिन, 30 दिन या कस्टम दिनों के लिए रेंटल योजनाएं प्रदान करता है।
+ओमकार हेल्थकेयर 7 दिन, 15 दिन, 30 दिन या कस्टम दिनों के लिए रेंटल योजनाएं प्रदान करता है।
 
 ## 2. 100% सुरक्षा जमा रिफंड गारंटी
 उपकरण वापसी और तकनीशियन निरीक्षण के 24 घंटे के भीतर आपकी संपूर्ण सुरक्षा जमा राशि आपके खाते में वापस कर दी जाती है।
@@ -102,7 +102,7 @@ For rental equipment, 100% of the security deposit is initiated for refund withi
 - Cancellation after technician dispatch or during transit: nominal transit fee may be deducted; remaining balance refunded in full.
 
 ## 3. Dead on Arrival (DOA) / Device Replacement
-If any device arrives with functional variance or pressure irregularity, AarogyaMed guarantees immediate free replacement within 4 hours in metro coverage areas.
+If any device arrives with functional variance or pressure irregularity, Omkar Healthcare guarantees immediate free replacement within 4 hours in metro coverage areas.
 
 ## 4. Purchase Equipment Returns
 Brand new purchased items in sealed, unopened packaging can be returned within 7 calendar days of delivery for a full refund or replacement. Due to clinical hygiene regulations, opened medical consumable products (masks, tubing, filters) cannot be returned once unsealed unless defective.`,

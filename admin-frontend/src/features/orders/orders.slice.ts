@@ -10,6 +10,10 @@ export interface OrdersState {
   loading: boolean;
   submitting: boolean;
   error: string | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: OrdersState = {
@@ -19,6 +23,10 @@ const initialState: OrdersState = {
   loading: false,
   submitting: false,
   error: null,
+  total: 0,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 export const ordersSlice = createAppSlice({
@@ -50,7 +58,11 @@ export const ordersSlice = createAppSlice({
       })
       .addCase(listOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.data;
+        state.orders = action.payload.data.orders;
+        state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.limit = action.payload.data.limit;
+        state.totalPages = action.payload.data.totalPages;
       })
       .addCase(listOrders.rejected, (state, action) => {
         state.loading = false;

@@ -68,9 +68,11 @@ class UserService {
   }
 
   async getAllCustomers(filters = {}) {
-    const rawCustomers = await userRepository.findAllCustomersWithMetrics(filters);
+    const { count, rows } = await userRepository.findAllCustomersWithMetrics(filters);
+    const page = Math.max(1, Number(filters.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(filters.limit || 10)));
 
-    return rawCustomers.map((c) => {
+    const items = rows.map((c) => {
       const customer = c.toJSON ? c.toJSON() : c;
       const orders = customer.orders || [];
       const rentals = customer.rentals || [];
@@ -82,7 +84,7 @@ class UserService {
 
       const rentTotal = rentals
         .filter((r) => r.status !== 'cancelled')
-        .reduce((sum, r) => sum + (parseFloat(r.total_amount) || 0), 0);
+        .reduce((sum, r) => sum + (parseFloat(r.deposit_amount) || 0), 0);
 
       const defaultAddress = addresses.find((a) => a.is_default) || addresses[0];
       const primaryCity = defaultAddress ? `${defaultAddress.city}, ${defaultAddress.state}` : 'Not Specified';
@@ -111,6 +113,16 @@ class UserService {
         addresses,
       };
     });
+
+    return {
+      items,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit) || 1,
+      },
+    };
   }
 
   async getCustomerCareHistory(userId) {

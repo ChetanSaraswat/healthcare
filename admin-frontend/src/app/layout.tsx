@@ -11,8 +11,12 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'AarogyaMed Operations Hub | Biomedical & Clinical Admin Console',
-  description: 'Administrative portal for managing AarogyaMed medical equipment catalog, rentals, purchase orders, conditions, and operations.',
+  title: 'Omkar Healthcare Operations Hub | Biomedical & Clinical Admin Console',
+  description: 'Administrative portal for managing Omkar Healthcare medical equipment catalog, rentals, purchase orders, conditions, and operations.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({

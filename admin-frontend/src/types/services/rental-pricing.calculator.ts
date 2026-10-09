@@ -18,7 +18,7 @@ export interface RentalCalculationResult {
 
 export class RentalPricingCalculator {
   /**
-   * AarogyaMed Progressive Tiered Rental Discounting:
+   * Omkar Healthcare Progressive Tiered Rental Discounting:
    * 1-6 days: 0% discount
    * 7-14 days: 10% daily rate discount
    * 15-29 days: 18% daily rate discount

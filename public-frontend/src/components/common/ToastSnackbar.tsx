@@ -16,8 +16,8 @@ export function ToastSnackbar() {
         dispatch(showToast(customEvent.detail));
       }
     };
-    window.addEventListener('aarogyamed:toast', handleCustomToast);
-    return () => window.removeEventListener('aarogyamed:toast', handleCustomToast);
+    window.addEventListener('omkar:toast', handleCustomToast);
+    return () => window.removeEventListener('omkar:toast', handleCustomToast);
   }, [dispatch]);
 
   useEffect(() => {
@@ -35,9 +35,9 @@ export function ToastSnackbar() {
   const config = {
     success: {
       bg: '#eaf8f6',
-      border: '#005c55',
-      text: '#005c55',
-      icon: <CheckCircle2 size={20} color="#005c55" />,
+      border: '#16453A',
+      text: '#16453A',
+      icon: <CheckCircle2 size={20} color="#16453A" />,
     },
     error: {
       bg: '#fdf2f2',

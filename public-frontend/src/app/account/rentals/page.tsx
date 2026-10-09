@@ -80,7 +80,7 @@ export default function AccountRentalsPage() {
             bottom: 24,
             right: 24,
             zIndex: 9999,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '14px 22px',
             borderRadius: 12,
@@ -113,7 +113,7 @@ export default function AccountRentalsPage() {
         <Link
           href="/shop"
           style={{
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '8px 18px',
             borderRadius: 9999,
@@ -172,7 +172,7 @@ export default function AccountRentalsPage() {
           <Link
             href="/assessment"
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 22px',
               borderRadius: 9999,
@@ -246,7 +246,7 @@ export default function AccountRentalsPage() {
                     <span
                       style={{
                         background: rental.paymentStatus === 'deposit_refunded' ? '#f2f3ff' : '#eaf8f6',
-                        color: rental.paymentStatus === 'deposit_refunded' ? '#006398' : '#005c55',
+                        color: rental.paymentStatus === 'deposit_refunded' ? '#B75932' : '#16453A',
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         padding: '4px 10px',
@@ -278,7 +278,7 @@ export default function AccountRentalsPage() {
                       }}
                     >
                       <img
-                        src={item.productImage || '/images/hospital_bed.png'}
+                        src={item.productImage || '/images/oxygen_concentrator.png'}
                         alt={item.productName}
                         style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }}
                       />
@@ -291,7 +291,7 @@ export default function AccountRentalsPage() {
                           <strong>{item.durationDays} {locale === 'hi' ? 'दिन' : 'Days'}</strong> •{' '}
                           {locale === 'hi' ? 'दैनिक दर' : 'Daily Rate'}: ₹{item.dailyRate}/{locale === 'hi' ? 'दिन' : 'day'}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 2 }}>
+                        <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 2 }}>
                           {locale === 'hi' ? 'सक्रिय अवधि:' : 'Active Range:'} {item.startDate} &rarr; {item.endDate}
                         </div>
                       </div>
@@ -336,7 +336,7 @@ export default function AccountRentalsPage() {
                         onClick={() => setExtensionRental(rental)}
                         style={{
                           background: '#fff7f2',
-                          color: '#ea580c',
+                          color: '#B75932',
                           border: '1px solid #ffd8c8',
                           padding: '8px 16px',
                           borderRadius: 8,
@@ -360,7 +360,7 @@ export default function AccountRentalsPage() {
                         onClick={() => setReturnRental(rental)}
                         style={{
                           background: '#f2f3ff',
-                          color: '#005c55',
+                          color: '#16453A',
                           border: '1px solid #dae2fd',
                           padding: '8px 16px',
                           borderRadius: 8,
@@ -380,7 +380,7 @@ export default function AccountRentalsPage() {
                     <a
                       href="tel:18008892273"
                       style={{
-                        background: '#005c55',
+                        background: '#16453A',
                         color: '#ffffff',
                         border: 'none',
                         padding: '8px 16px',
@@ -441,7 +441,7 @@ export default function AccountRentalsPage() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <CalendarClock size={20} color="#ea580c" />
+                <CalendarClock size={20} color="#B75932" />
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
                   {locale === 'hi' ? 'रेंटल अवधि का विस्तार' : 'Extend Rental Duration'}
                 </h3>
@@ -478,9 +478,9 @@ export default function AccountRentalsPage() {
                       style={{
                         padding: '12px 8px',
                         borderRadius: 10,
-                        border: extensionDays === days ? '2px solid #ea580c' : '1px solid #dae2fd',
+                        border: extensionDays === days ? '2px solid #B75932' : '1px solid #dae2fd',
                         background: extensionDays === days ? '#fff7f2' : '#ffffff',
-                        color: extensionDays === days ? '#ea580c' : '#131b2e',
+                        color: extensionDays === days ? '#B75932' : '#131b2e',
                         fontWeight: 700,
                         fontSize: '0.875rem',
                         cursor: 'pointer',
@@ -489,7 +489,7 @@ export default function AccountRentalsPage() {
                     >
                       <div>+{days} {locale === 'hi' ? 'दिन' : 'Days'}</div>
                       {days === 30 && (
-                        <div style={{ fontSize: '0.6875rem', color: '#005c55', fontWeight: 800, marginTop: 2 }}>
+                        <div style={{ fontSize: '0.6875rem', color: '#16453A', fontWeight: 800, marginTop: 2 }}>
                           {locale === 'hi' ? '28% बचत' : '28% Saved'}
                         </div>
                       )}
@@ -521,7 +521,7 @@ export default function AccountRentalsPage() {
                       <span style={{ color: '#6e7977' }}>
                         {locale === 'hi' ? 'सुरक्षा जमा (पहले से जमा):' : 'Security Deposit (Retained):'}
                       </span>
-                      <span style={{ color: '#005c55', fontWeight: 600 }}>
+                      <span style={{ color: '#16453A', fontWeight: 600 }}>
                         ₹{extensionRental.totalDeposit.toLocaleString('en-IN')} ({locale === 'hi' ? 'कोई नया जमा नहीं' : 'No extra charge'})
                       </span>
                     </div>
@@ -536,14 +536,14 @@ export default function AccountRentalsPage() {
                       }}
                     >
                       <span style={{ color: '#131b2e' }}>{locale === 'hi' ? 'देय राशि:' : 'Amount to Pay:'}</span>
-                      <span style={{ color: '#ea580c' }}>₹{extensionFee.toLocaleString('en-IN')}</span>
+                      <span style={{ color: '#B75932' }}>₹{extensionFee.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 );
               })()}
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.75rem', color: '#6e7977' }}>
-                <ShieldCheck size={16} color="#005c55" />
+                <ShieldCheck size={16} color="#16453A" />
                 <span>
                   {locale === 'hi'
                     ? 'उपकरण आपके घर में ही रहेगा। तकनीशियन द्वारा कोई सेवा बाधा नहीं आएगी।'
@@ -581,7 +581,7 @@ export default function AccountRentalsPage() {
                 type="button"
                 onClick={handleConfirmExtension}
                 style={{
-                  background: '#ea580c',
+                  background: '#B75932',
                   color: '#ffffff',
                   border: 'none',
                   padding: '10px 22px',
@@ -636,7 +636,7 @@ export default function AccountRentalsPage() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <RotateCcw size={20} color="#005c55" />
+                <RotateCcw size={20} color="#16453A" />
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
                   {locale === 'hi' ? 'वापसी पिकअप शेड्यूलिंग' : 'Schedule Equipment Return Pickup'}
                 </h3>
@@ -658,7 +658,7 @@ export default function AccountRentalsPage() {
                 <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#131b2e', marginTop: 4 }}>
                   {returnRental.items[0]?.productName}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 4 }}>
+                <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 4 }}>
                   {locale === 'hi' ? 'सुरक्षा जमा वापसी:' : 'Refundable Security Deposit:'} ₹{returnRental.totalDeposit.toLocaleString('en-IN')}
                 </div>
               </div>
@@ -695,9 +695,9 @@ export default function AccountRentalsPage() {
                     style={{
                       padding: '10px',
                       borderRadius: 10,
-                      border: returnSlot === 'morning' ? '2px solid #005c55' : '1px solid #dae2fd',
+                      border: returnSlot === 'morning' ? '2px solid #16453A' : '1px solid #dae2fd',
                       background: returnSlot === 'morning' ? '#eaf8f6' : '#ffffff',
-                      color: returnSlot === 'morning' ? '#005c55' : '#131b2e',
+                      color: returnSlot === 'morning' ? '#16453A' : '#131b2e',
                       fontWeight: 700,
                       fontSize: '0.8125rem',
                       cursor: 'pointer',
@@ -713,9 +713,9 @@ export default function AccountRentalsPage() {
                     style={{
                       padding: '10px',
                       borderRadius: 10,
-                      border: returnSlot === 'evening' ? '2px solid #005c55' : '1px solid #dae2fd',
+                      border: returnSlot === 'evening' ? '2px solid #16453A' : '1px solid #dae2fd',
                       background: returnSlot === 'evening' ? '#eaf8f6' : '#ffffff',
-                      color: returnSlot === 'evening' ? '#005c55' : '#131b2e',
+                      color: returnSlot === 'evening' ? '#16453A' : '#131b2e',
                       fontWeight: 700,
                       fontSize: '0.8125rem',
                       cursor: 'pointer',
@@ -736,7 +736,7 @@ export default function AccountRentalsPage() {
                   alignItems: 'flex-start',
                   gap: 10,
                   fontSize: '0.75rem',
-                  color: '#005c55',
+                  color: '#16453A',
                 }}
               >
                 <ShieldCheck size={18} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -778,7 +778,7 @@ export default function AccountRentalsPage() {
                 type="button"
                 onClick={handleConfirmReturn}
                 style={{
-                  background: '#005c55',
+                  background: '#16453A',
                   color: '#ffffff',
                   border: 'none',
                   padding: '10px 22px',

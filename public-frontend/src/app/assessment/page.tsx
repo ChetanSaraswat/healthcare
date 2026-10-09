@@ -77,26 +77,26 @@ export default function AssessmentPage() {
           'High-purity 10L oxygen therapy requires medical-grade calibration. Renting includes ongoing filter changes and immediate machine swap guarantees.',
         rentSavings: '₹62,000 capital conserved during recovery phase',
       };
-    } else if (condition === 'icu-bed') {
-      matchedProduct = products.find((p) => p.slug.includes('bed') || p.name.toLowerCase().includes('bed')) || products[2] || products[0] || null;
+    } else if (condition === 'suction') {
+      matchedProduct = products.find((p) => p.slug.includes('suction') || p.name.toLowerCase().includes('suction')) || products[2] || products[0] || null;
       const isShort = duration !== 'long';
       return {
         product: matchedProduct,
         mode: isShort ? ('rent' as const) : ('buy' as const),
         days: duration === 'short' ? 15 : 30,
         rationale:
-          'Post-operative recovery and post-ICU transition often require motorized patient elevation for 15-60 days until the patient regains mobility. Renting prevents equipment stranding after recovery.',
-        rentSavings: '₹75,000 saved vs purchasing hospital infrastructure',
+          'Medical-grade high-vacuum suction machines provide vital airway clearance for post-tracheostomy care and acute respiratory secretion management.',
+        rentSavings: '₹18,000 saved vs purchasing hospital equipment',
       };
     } else {
-      matchedProduct = products.find((p) => p.slug.includes('wheelchair') || p.name.toLowerCase().includes('wheelchair')) || products[3] || products[0] || null;
+      matchedProduct = products.find((p) => p.slug.includes('vaporizer') || p.slug.includes('nebulizer') || p.name.toLowerCase().includes('nebulizer')) || products[0] || null;
       return {
         product: matchedProduct,
-        mode: duration === 'short' ? ('rent' as const) : ('buy' as const),
-        days: 15,
+        mode: ('buy' as const),
+        days: 30,
         rationale:
-          'For orthopedic fractures and short-term post-op recovery, an ultralight wheelchair on a 15-day rental provides immediate mobility support.',
-        rentSavings: '₹14,500 saved compared to purchase',
+          'Ultrasonic aerosol nebulizers deliver targeted bronchodilator therapy directly to the bronchial airways. Recommended for outright purchase with 2-year warranty.',
+        rentSavings: 'Includes full clinical aerosol kit and masks',
       };
     }
   };
@@ -151,7 +151,7 @@ export default function AssessmentPage() {
                 padding: '4px 12px',
                 borderRadius: 999,
                 background: '#e8f5f3',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.8125rem',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -200,8 +200,8 @@ export default function AssessmentPage() {
                     gap: 6,
                     padding: '6px 14px',
                     borderRadius: 999,
-                    background: currentStep === s.step ? '#005c55' : currentStep > s.step ? '#e8f5f3' : '#f2f3ff',
-                    color: currentStep === s.step ? '#ffffff' : currentStep > s.step ? '#005c55' : '#6e7977',
+                    background: currentStep === s.step ? '#16453A' : currentStep > s.step ? '#e8f5f3' : '#f2f3ff',
+                    color: currentStep === s.step ? '#ffffff' : currentStep > s.step ? '#16453A' : '#6e7977',
                     fontSize: '0.8125rem',
                     fontWeight: 700,
                   }}
@@ -236,8 +236,8 @@ export default function AssessmentPage() {
                 {[
                   { id: 'sleep', title: 'Sleep Apnea, Heavy Snoring, or Morning Choking', desc: 'Patient stops breathing during sleep or requires CPAP/BiPAP positive airway pressure.' },
                   { id: 'oxygen', title: 'Respiratory Distress or Low Blood Oxygen (SpO2 < 92%)', desc: 'Patient has COPD, post-COVID lung scarring, or doctor recommended continuous oxygen therapy.' },
-                  { id: 'icu-bed', title: 'Post-ICU Recovery / Elderly Bedridden Home Care', desc: 'Patient requires elevation, head/foot tilting, or hospital bed to prevent bed sores and aspiration.' },
-                  { id: 'mobility', title: 'Orthopedic Surgery, Fracture, or Stroke Rehab Mobility', desc: 'Patient has temporary weight-bearing restrictions and requires a wheelchair or walker.' },
+                  { id: 'suction', title: 'Airway Secretion Clearance & Tracheostomy Suction', desc: 'Patient requires emergency phlegm removal or post-operative tracheostomy airway clearance.' },
+                  { id: 'nebulizer', title: 'Bronchial Asthma, Wheezing & Aerosol Medication', desc: 'Patient requires ultrasonic aerosol medication delivery for acute bronchitis or lung congestion.' },
                 ].map((opt) => (
                   <div
                     key={opt.id}
@@ -245,7 +245,7 @@ export default function AssessmentPage() {
                     style={{
                       padding: '1.25rem',
                       borderRadius: 14,
-                      border: condition === opt.id ? '2px solid #005c55' : '1px solid #dae2fd',
+                      border: condition === opt.id ? '2px solid #16453A' : '1px solid #dae2fd',
                       background: condition === opt.id ? '#e8f5f3' : '#ffffff',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -253,7 +253,7 @@ export default function AssessmentPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <strong style={{ fontSize: '1rem', color: '#131b2e' }}>{opt.title}</strong>
-                      {condition === opt.id && <CheckCircle2 size={18} color="#005c55" />}
+                      {condition === opt.id && <CheckCircle2 size={18} color="#16453A" />}
                     </div>
                     <p style={{ fontSize: '0.8125rem', color: '#3e4947', margin: '4px 0 0' }}>{opt.desc}</p>
                   </div>
@@ -270,7 +270,7 @@ export default function AssessmentPage() {
                     gap: 8,
                     padding: '12px 24px',
                     borderRadius: 12,
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontSize: '0.9375rem',
                     fontWeight: 800,
@@ -278,14 +278,14 @@ export default function AssessmentPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Next: Mobility Needs</span>
+                  <span>Next: Therapy Routine</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 2: Mobility Question */}
+          {/* STEP 2: Usage Routine */}
           {currentStep === 2 && (
             <div
               style={{
@@ -297,17 +297,17 @@ export default function AssessmentPage() {
               }}
             >
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131b2e', margin: '0 0 6px' }}>
-                2. What is the patient&apos;s current mobility level?
+                2. What is the prescribed daily therapy schedule?
               </h2>
               <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: '0 0 1.5rem' }}>
-                This determines if pressure-relief mattresses or motorized lift controls are essential.
+                This determines required device durability, backup accessories, and filter maintenance.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
-                  { id: 'bedbound', title: 'Completely Bedridden (Spends 18+ Hours in Bed)', desc: 'High risk of bed sores (decubitus ulcers); requires pressure-relieving ripple air mattress & motorized bed.' },
-                  { id: 'assisted', title: 'Partially Mobile with Full Caregiver Assistance', desc: 'Can sit up with help, needs wheelchair for transfers to bathroom and dining.' },
-                  { id: 'independent', title: 'Fully Mobile / Walks Independently', desc: 'Only requires device assistance (such as night-time CPAP or stationary oxygen while resting).' },
+                  { id: 'bedbound', title: 'Continuous 24/7 Home Oxygen / Airway Therapy', desc: 'Patient requires continuous day and night high-flow oxygen or bi-level airway support.' },
+                  { id: 'assisted', title: 'Nocturnal Sleep Therapy (During Sleep & Naps)', desc: 'Device is used primarily through the night for sleep apnea or nocturnal hypoventilation.' },
+                  { id: 'independent', title: 'Intermittent or On-Demand Daily Treatment', desc: 'Used for scheduled aerosol treatments or situational airway clearance sessions.' },
                 ].map((opt) => (
                   <div
                     key={opt.id}
@@ -315,7 +315,7 @@ export default function AssessmentPage() {
                     style={{
                       padding: '1.25rem',
                       borderRadius: 14,
-                      border: mobility === opt.id ? '2px solid #005c55' : '1px solid #dae2fd',
+                      border: mobility === opt.id ? '2px solid #16453A' : '1px solid #dae2fd',
                       background: mobility === opt.id ? '#e8f5f3' : '#ffffff',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -323,7 +323,7 @@ export default function AssessmentPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <strong style={{ fontSize: '1rem', color: '#131b2e' }}>{opt.title}</strong>
-                      {mobility === opt.id && <CheckCircle2 size={18} color="#005c55" />}
+                      {mobility === opt.id && <CheckCircle2 size={18} color="#16453A" />}
                     </div>
                     <p style={{ fontSize: '0.8125rem', color: '#3e4947', margin: '4px 0 0' }}>{opt.desc}</p>
                   </div>
@@ -356,7 +356,7 @@ export default function AssessmentPage() {
                     gap: 8,
                     padding: '12px 24px',
                     borderRadius: 12,
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontSize: '0.9375rem',
                     fontWeight: 800,
@@ -401,7 +401,7 @@ export default function AssessmentPage() {
                     style={{
                       padding: '1.25rem',
                       borderRadius: 14,
-                      border: duration === opt.id ? '2px solid #005c55' : '1px solid #dae2fd',
+                      border: duration === opt.id ? '2px solid #16453A' : '1px solid #dae2fd',
                       background: duration === opt.id ? '#e8f5f3' : '#ffffff',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -409,7 +409,7 @@ export default function AssessmentPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <strong style={{ fontSize: '1rem', color: '#131b2e' }}>{opt.title}</strong>
-                      {duration === opt.id && <CheckCircle2 size={18} color="#005c55" />}
+                      {duration === opt.id && <CheckCircle2 size={18} color="#16453A" />}
                     </div>
                     <p style={{ fontSize: '0.8125rem', color: '#3e4947', margin: '4px 0 0' }}>{opt.desc}</p>
                   </div>
@@ -442,7 +442,7 @@ export default function AssessmentPage() {
                     gap: 8,
                     padding: '12px 24px',
                     borderRadius: 12,
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontSize: '0.9375rem',
                     fontWeight: 800,
@@ -489,7 +489,7 @@ export default function AssessmentPage() {
                     padding: '4px 10px',
                     borderRadius: 999,
                     background: rec.mode === 'rent' ? '#ffe5dc' : '#e8f5f3',
-                    color: rec.mode === 'rent' ? '#b94200' : '#005c55',
+                    color: rec.mode === 'rent' ? '#b94200' : '#16453A',
                     fontSize: '0.8125rem',
                     fontWeight: 800,
                     textTransform: 'uppercase',
@@ -497,7 +497,7 @@ export default function AssessmentPage() {
                 >
                   Recommended Plan: {rec.mode === 'rent' ? `Rent for ${rec.days} Days` : 'Outright Purchase'}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 700 }}>
                   ✓ {rec.rentSavings}
                 </span>
               </div>
@@ -526,7 +526,7 @@ export default function AssessmentPage() {
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#6e7977', display: 'block' }}>Hospital-Grade Equipment</span>
                   <strong style={{ fontSize: '1.125rem', color: '#131b2e' }}>{rec.product.brand}</strong>
-                  <div style={{ fontSize: '0.75rem', color: '#005c55', marginTop: 4 }}>
+                  <div style={{ fontSize: '0.75rem', color: '#16453A', marginTop: 4 }}>
                     ✓ 10-Step Autoclave Disinfected
                   </div>
                 </div>
@@ -535,7 +535,7 @@ export default function AssessmentPage() {
                   <span style={{ fontSize: '0.75rem', color: '#6e7977', display: 'block' }}>
                     {rec.mode === 'rent' ? `Rental Total (${rec.days} Days)` : 'Purchase Price (incl. GST)'}
                   </span>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#005c55' }}>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#16453A' }}>
                     {rec.mode === 'rent'
                       ? `₹${(rec.product.rentalDailyRate * rec.days).toLocaleString('en-IN')}`
                       : `₹${rec.product.buyPrice.toLocaleString('en-IN')}`}
@@ -557,7 +557,7 @@ export default function AssessmentPage() {
                     flex: 2,
                     padding: '14px 24px',
                     borderRadius: 12,
-                    background: '#005c55',
+                    background: '#16453A',
                     color: '#ffffff',
                     fontSize: '1rem',
                     fontWeight: 800,
@@ -581,7 +581,7 @@ export default function AssessmentPage() {
                     padding: '14px 20px',
                     borderRadius: 12,
                     background: '#f2f3ff',
-                    color: '#006398',
+                    color: '#B75932',
                     fontSize: '0.9375rem',
                     fontWeight: 700,
                     textDecoration: 'none',

@@ -5,11 +5,12 @@ import '@/styles/globals.scss';
 import { AppShell } from '@/components/common/AppShell';
 
 export const metadata: Metadata = {
-  title: 'AarogyaMed — Buy & Rent Hospital-Grade Medical Equipment in India',
+  title: 'Omkar Healthcare — Buy & Rent Hospital-Grade Medical Equipment in India',
   description:
     'Pan-India clinical platform for families & caregivers to buy and rent genuine hospital-grade medical equipment with equal-weight journeys, 10-step sterilization, and 4-hour dispatch.',
   icons: {
-    icon: '/images/logo.svg',
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 

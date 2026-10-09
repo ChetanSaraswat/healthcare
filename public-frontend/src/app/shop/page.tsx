@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { listProducts } from '@/features/products/list-products/list-products.action';
 import { listCategories } from '@/features/categories/list-categories/list-categories.action';
 import { Filter, SlidersHorizontal, ShoppingBag, RefreshCw, AlertCircle } from 'lucide-react';
+import { PaginationControl } from '@/components/common/PaginationControl';
 
 function ShopContent() {
   const dispatch = useAppDispatch();
@@ -18,14 +20,18 @@ function ShopContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedMode, setSelectedMode] = useState<'all' | 'buy' | 'rent'>(initialMode);
   const [sortBy, setSortBy] = useState<'popular' | 'price_low' | 'price_high'>('popular');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(12);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const products = useAppSelector((state) => state.products.products);
+  const total = useAppSelector((state) => state.products.total);
+  const totalPages = useAppSelector((state) => state.products.totalPages);
   const productsLoading = useAppSelector((state) => state.products.loading);
   const productsError = useAppSelector((state) => state.products.error);
   const categories = useAppSelector((state) => state.categories.categories);
 
   useEffect(() => {
-    dispatch(listProducts());
     dispatch(listCategories());
   }, [dispatch]);
 
@@ -40,42 +46,36 @@ function ShopContent() {
     }
   }, [searchParams]);
 
-  const filteredProducts = useMemo(() => {
-    let result = Array.isArray(products) ? [...products] : [];
+  // Reset to page 1 whenever filters or search criteria change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedMode, sortBy, searchQuery]);
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q)
-      );
-    }
+  // Backend-driven fetching synchronized with pagination and filters
+  useEffect(() => {
+    let isCancelled = false;
+    dispatch(
+      listProducts({
+        category: selectedCategory !== 'all' ? selectedCategory : undefined,
+        mode: selectedMode,
+        sort: sortBy,
+        search: searchQuery.trim() || undefined,
+        page: currentPage,
+        limit: pageSize,
+      })
+    ).finally(() => {
+      if (!isCancelled) {
+        setHasFetched(true);
+      }
+    });
 
-    if (selectedCategory !== 'all') {
-      result = result.filter(
-        (p) =>
-          p.categoryId === selectedCategory ||
-          p.categoryName?.toLowerCase() === selectedCategory.toLowerCase() ||
-          p.slug.includes(selectedCategory)
-      );
-    }
+    return () => {
+      isCancelled = true;
+    };
+  }, [dispatch, selectedCategory, selectedMode, sortBy, searchQuery, currentPage, pageSize]);
 
-    if (selectedMode === 'buy') {
-      result = result.filter((p) => p.isAvailableForBuy);
-    } else if (selectedMode === 'rent') {
-      result = result.filter((p) => p.isAvailableForRent);
-    }
-
-    if (sortBy === 'price_low') {
-      result.sort((a, b) => a.buyPrice - b.buyPrice);
-    } else if (sortBy === 'price_high') {
-      result.sort((a, b) => b.buyPrice - a.buyPrice);
-    }
-
-    return result;
-  }, [products, searchQuery, selectedCategory, selectedMode, sortBy]);
+  // Catalog is loading during initial mount/refresh or when fetching without cached items
+  const isCatalogLoading = (!hasFetched && products.length === 0) || (productsLoading && products.length === 0);
 
   return (
     <div style={{ maxWidth: 1280, margin: '2rem auto 5rem', padding: '0 1.5rem' }}>
@@ -105,7 +105,7 @@ function ShopContent() {
       >
         {/* Row 1: Mode Filter (Equal Weight Buy vs Rent) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#00201d', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0C2E27', textTransform: 'uppercase' }}>
             Equipment Mode:
           </span>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -117,13 +117,13 @@ function ShopContent() {
                 borderRadius: 8,
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                background: selectedMode === 'all' ? '#005c55' : '#f2f3ff',
+                background: selectedMode === 'all' ? '#16453A' : '#f2f3ff',
                 color: selectedMode === 'all' ? '#ffffff' : '#3e4947',
                 border: 'none',
                 cursor: 'pointer',
               }}
             >
-              All Equipment ({products.length})
+              All Equipment {!isCatalogLoading && `(${total})`}
             </button>
             <button
               type="button"
@@ -133,8 +133,8 @@ function ShopContent() {
                 borderRadius: 8,
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                background: selectedMode === 'rent' ? '#ea580c' : '#fff7ed',
-                color: selectedMode === 'rent' ? '#ffffff' : '#ea580c',
+                background: selectedMode === 'rent' ? '#B75932' : '#FAF5EC',
+                color: selectedMode === 'rent' ? '#ffffff' : '#B75932',
                 border: selectedMode === 'rent' ? 'none' : '1px solid #ffedd5',
                 cursor: 'pointer',
                 display: 'flex',
@@ -153,8 +153,8 @@ function ShopContent() {
                 borderRadius: 8,
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                background: selectedMode === 'buy' ? '#005c55' : '#eaedff',
-                color: selectedMode === 'buy' ? '#ffffff' : '#005c55',
+                background: selectedMode === 'buy' ? '#16453A' : '#eaedff',
+                color: selectedMode === 'buy' ? '#ffffff' : '#16453A',
                 border: selectedMode === 'buy' ? 'none' : '1px solid #d0e1fd',
                 cursor: 'pointer',
                 display: 'flex',
@@ -204,7 +204,7 @@ function ShopContent() {
               borderRadius: 8,
               fontSize: '0.75rem',
               fontWeight: 700,
-              background: selectedCategory === 'all' ? '#00201d' : '#f2f3ff',
+              background: selectedCategory === 'all' ? '#0C2E27' : '#f2f3ff',
               color: selectedCategory === 'all' ? '#ffffff' : '#3e4947',
               border: 'none',
               cursor: 'pointer',
@@ -222,7 +222,7 @@ function ShopContent() {
                 borderRadius: 8,
                 fontSize: '0.75rem',
                 fontWeight: 600,
-                background: selectedCategory === cat.id ? '#005c55' : '#f2f3ff',
+                background: selectedCategory === cat.id ? '#16453A' : '#f2f3ff',
                 color: selectedCategory === cat.id ? '#ffffff' : '#3e4947',
                 border: 'none',
                 cursor: 'pointer',
@@ -236,14 +236,21 @@ function ShopContent() {
 
       {/* Results Header */}
       <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: '0.9375rem', color: '#3e4947', fontWeight: 600 }}>
-          Showing <strong>{filteredProducts.length}</strong> medical equipment units
-          {searchQuery ? ` matching "${searchQuery}"` : ''}
-        </div>
+        {isCatalogLoading ? (
+          <div style={{ fontSize: '0.9375rem', color: '#6e7977', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#16453A', display: 'inline-block' }} />
+            Loading certified medical equipment catalog...
+          </div>
+        ) : (
+          <div style={{ fontSize: '0.9375rem', color: '#3e4947', fontWeight: 600 }}>
+            Showing <strong>{products.length}</strong> of <strong>{total}</strong> medical equipment units
+            {searchQuery ? ` matching "${searchQuery}"` : ''}
+          </div>
+        )}
       </div>
 
       {/* Products Grid / States */}
-      {productsLoading && products.length === 0 ? (
+      {isCatalogLoading ? (
         <div
           style={{
             display: 'grid',
@@ -251,25 +258,8 @@ function ShopContent() {
             gap: '1.75rem',
           }}
         >
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div
-              key={n}
-              style={{
-                height: 440,
-                borderRadius: 16,
-                background: '#ffffff',
-                border: '1px solid #dae2fd',
-                padding: '1.25rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12,
-              }}
-            >
-              <div style={{ width: '100%', height: 200, borderRadius: 12, background: '#f1f5f9' }} />
-              <div style={{ width: '40%', height: 16, borderRadius: 6, background: '#f1f5f9' }} />
-              <div style={{ width: '80%', height: 22, borderRadius: 6, background: '#f1f5f9' }} />
-              <div style={{ width: '100%', height: 36, borderRadius: 8, background: '#f1f5f9', marginTop: 'auto' }} />
-            </div>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : productsError ? (
@@ -287,10 +277,22 @@ function ShopContent() {
           <p style={{ color: '#6e7977', marginTop: 8 }}>{productsError}</p>
           <button
             type="button"
-            onClick={() => dispatch(listProducts())}
+            onClick={() => {
+              setHasFetched(false);
+              dispatch(
+                listProducts({
+                  category: selectedCategory !== 'all' ? selectedCategory : undefined,
+                  mode: selectedMode,
+                  sort: sortBy,
+                  search: searchQuery.trim() || undefined,
+                  page: currentPage,
+                  limit: pageSize,
+                })
+              ).finally(() => setHasFetched(true));
+            }}
             style={{
               marginTop: 16,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 20px',
               borderRadius: 8,
@@ -302,18 +304,35 @@ function ShopContent() {
             Retry Loading
           </button>
         </div>
-      ) : filteredProducts.length > 0 ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
-            gap: '1.75rem',
-          }}
-        >
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+      ) : products.length > 0 ? (
+        <>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+              gap: '1.75rem',
+            }}
+          >
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div style={{ marginTop: '2.5rem' }}>
+            <PaginationControl
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={total}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setCurrentPage(1);
+              }}
+              isLoading={productsLoading}
+            />
+          </div>
+        </>
       ) : (
         <div
           style={{
@@ -334,10 +353,11 @@ function ShopContent() {
             onClick={() => {
               setSelectedCategory('all');
               setSelectedMode('all');
+              setCurrentPage(1);
             }}
             style={{
               marginTop: 16,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 20px',
               borderRadius: 8,

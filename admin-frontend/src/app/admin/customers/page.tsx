@@ -22,42 +22,48 @@ export default function AdminCustomersPage() {
   const customers = useAppSelector((state) => state.user.customers);
   const selectedHistory = useAppSelector((state) => state.user.selectedCustomerHistory);
   const customerLoading = useAppSelector((state) => state.user.customerLoading);
+  const total = useAppSelector((state) => state.user.total);
+  const totalPages = useAppSelector((state) => state.user.totalPages);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [segmentFilter, setSegmentFilter] = useState<'all' | 'rentees' | 'buyers'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTab, setModalTab] = useState<'all' | 'buy' | 'rent' | 'addresses'>('all');
 
+  // Debounce search query to prevent hammering the backend
   useEffect(() => {
-    dispatch(getCustomers());
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 whenever search query or segment changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, segmentFilter]);
+
+  // Fetch paginated customers from the backend API
+  useEffect(() => {
+    dispatch(
+      getCustomers({
+        page: currentPage,
+        limit: pageSize,
+        search: debouncedSearch.trim() || undefined,
+        segment: segmentFilter !== 'all' ? segmentFilter : undefined,
+      })
+    );
+  }, [dispatch, currentPage, pageSize, debouncedSearch, segmentFilter]);
 
   // Aggregate metrics
-  const totalCustomers = customers.length;
+  const totalCustomers = total || customers.length;
   const activeRenteesCount = customers.filter((c) => c.totalRentalsCount > 0).length;
   const repeatBuyersCount = customers.filter((c) => c.totalOrdersCount > 1).length;
   const buyersCount = customers.filter((c) => c.totalOrdersCount > 0).length;
   const totalLifetimeSpend = customers.reduce((sum, c) => sum + (c.totalSpend || 0), 0);
-
-  // Filtered customer list
-  const filteredCustomers = customers.filter((customer) => {
-    const query = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !query ||
-      customer.name.toLowerCase().includes(query) ||
-      customer.email.toLowerCase().includes(query) ||
-      customer.phone.includes(query) ||
-      (customer.primaryCity && customer.primaryCity.toLowerCase().includes(query));
-
-    let matchesSegment = true;
-    if (segmentFilter === 'rentees') {
-      matchesSegment = customer.totalRentalsCount > 0;
-    } else if (segmentFilter === 'buyers') {
-      matchesSegment = customer.totalOrdersCount > 0;
-    }
-
-    return matchesSearch && matchesSegment;
-  });
 
   const handleOpenHistory = async (customer: CustomerSummary) => {
     dispatch(getCustomerCareHistory(customer.id));
@@ -91,7 +97,7 @@ export default function AdminCustomersPage() {
                 height: 36,
                 borderRadius: 8,
                 background: 'rgba(0, 99, 152, 0.1)',
-                color: '#006398',
+                color: '#B75932',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -138,7 +144,7 @@ export default function AdminCustomersPage() {
                 height: 32,
                 borderRadius: 8,
                 background: 'rgba(0, 99, 152, 0.1)',
-                color: '#006398',
+                color: '#B75932',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -212,7 +218,7 @@ export default function AdminCustomersPage() {
                 height: 32,
                 borderRadius: 8,
                 background: 'rgba(0, 99, 152, 0.1)',
-                color: '#006398',
+                color: '#B75932',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -224,7 +230,7 @@ export default function AdminCustomersPage() {
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e', marginTop: 8 }}>
             {repeatBuyersCount}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#006398', marginTop: 4, fontWeight: 600 }}>
+          <div style={{ fontSize: '0.75rem', color: '#B75932', marginTop: 4, fontWeight: 600 }}>
             Multiple purchases &amp; consumables
           </div>
         </div>
@@ -249,7 +255,7 @@ export default function AdminCustomersPage() {
                 height: 32,
                 borderRadius: 8,
                 background: 'rgba(0, 92, 85, 0.1)',
-                color: '#005c55',
+                color: '#16453A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -258,7 +264,7 @@ export default function AdminCustomersPage() {
               <IndianRupee size={16} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#005c55', marginTop: 8 }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#16453A', marginTop: 8 }}>
             ₹{totalLifetimeSpend.toLocaleString('en-IN')}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#6e7977', marginTop: 4 }}>
@@ -269,15 +275,25 @@ export default function AdminCustomersPage() {
 
       {/* Customer Directory Table Component */}
       <CustomerTable
-        customers={filteredCustomers}
+        customers={customers}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         segmentFilter={segmentFilter}
         setSegmentFilter={setSegmentFilter}
-        totalCustomersCount={customers.length}
+        totalCustomersCount={totalCustomers}
         activeRenteesCount={activeRenteesCount}
         buyersCount={buyersCount}
         onOpenHistory={handleOpenHistory}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={total}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          setCurrentPage(1);
+        }}
+        isLoading={customerLoading}
       />
 
       {/* Patient Care History Modal / Drawer Component */}

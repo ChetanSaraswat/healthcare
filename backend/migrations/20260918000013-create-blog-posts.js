@@ -38,7 +38,7 @@ module.exports = {
       },
       author_name: {
         type: Sequelize.STRING,
-        defaultValue: 'AarogyaMed Editorial Team',
+        defaultValue: 'Omkar Healthcare Editorial Team',
       },
       status: {
         type: Sequelize.ENUM('draft', 'published'),

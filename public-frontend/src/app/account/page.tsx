@@ -78,7 +78,7 @@ export default function AccountOverviewPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#005c55',
+                color: '#16453A',
               }}
             >
               <CalendarClock size={18} />
@@ -87,7 +87,7 @@ export default function AccountOverviewPage() {
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e' }}>
             {rentals.length}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 4 }}>
+          <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 4 }}>
             ₹{totalDepositHeld.toLocaleString('en-IN')} {locale === 'hi' ? 'जमा सुरक्षित' : 'refundable deposit held'}
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function AccountOverviewPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#006398',
+                color: '#B75932',
               }}
             >
               <ShoppingBag size={18} />
@@ -124,7 +124,7 @@ export default function AccountOverviewPage() {
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#131b2e' }}>
             {orders.length}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#006398', fontWeight: 600, marginTop: 4 }}>
+          <div style={{ fontSize: '0.75rem', color: '#B75932', fontWeight: 600, marginTop: 4 }}>
             {locale === 'hi' ? 'वारंटी एवं इनवॉइस सक्रिय' : 'Full warranty & invoices active'}
           </div>
         </div>
@@ -148,11 +148,11 @@ export default function AccountOverviewPage() {
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                background: '#fff0eb',
+                background: '#FBF2ED',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ea580c',
+                color: '#B75932',
               }}
             >
               <MapPin size={18} />
@@ -189,13 +189,13 @@ export default function AccountOverviewPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#005c55',
+                color: '#16453A',
               }}
             >
               <HeartPulse size={18} />
             </div>
           </div>
-          <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#005c55', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16453A', display: 'flex', alignItems: 'center', gap: 6 }}>
             <CheckCircle2 size={18} />
             <span>{locale === 'hi' ? 'सत्यापित' : 'Tier-1 Verified'}</span>
           </div>
@@ -229,7 +229,7 @@ export default function AccountOverviewPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <CalendarClock size={20} color="#005c55" />
+              <CalendarClock size={20} color="#16453A" />
               <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
                 {locale === 'hi' ? 'वर्तमान सक्रिय रेंटल अनुबंध' : 'Current Active Rental Agreement'}
               </h3>
@@ -240,7 +240,7 @@ export default function AccountOverviewPage() {
               style={{
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                color: '#005c55',
+                color: '#16453A',
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -278,7 +278,7 @@ export default function AccountOverviewPage() {
                   <div style={{ fontSize: '0.8125rem', color: '#6e7977' }}>
                     Agreement #{latestRental.rentalOrderNumber} • {item.durationDays} Days (₹{item.dailyRate}/day)
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#005c55', fontWeight: 600, marginTop: 2 }}>
+                  <div style={{ fontSize: '0.75rem', color: '#16453A', fontWeight: 600, marginTop: 2 }}>
                     Active range: {item.startDate} &rarr; {item.endDate}
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function AccountOverviewPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <ShoppingBag size={20} color="#006398" />
+              <ShoppingBag size={20} color="#B75932" />
               <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0 }}>
                 {locale === 'hi' ? 'हालिया खरीद आदेश' : 'Recent Purchase Order'}
               </h3>
@@ -332,7 +332,7 @@ export default function AccountOverviewPage() {
               style={{
                 fontSize: '0.8125rem',
                 fontWeight: 700,
-                color: '#006398',
+                color: '#B75932',
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -356,7 +356,7 @@ export default function AccountOverviewPage() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: '#005c55' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: '#16453A' }}>
                   ₹{latestOrder.total.toLocaleString('en-IN')}
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: '#6e7977' }}>
@@ -367,7 +367,7 @@ export default function AccountOverviewPage() {
               <span
                 style={{
                   background: '#eaf8f6',
-                  color: '#005c55',
+                  color: '#16453A',
                   fontSize: '0.75rem',
                   fontWeight: 700,
                   padding: '4px 10px',
@@ -399,7 +399,7 @@ export default function AccountOverviewPage() {
           }}
         >
           <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <User size={18} color="#005c55" />
+            <User size={18} color="#16453A" />
             <span>{locale === 'hi' ? 'देखभालकर्ता विवरण' : 'Caregiver Information'}</span>
           </h3>
 
@@ -418,7 +418,7 @@ export default function AccountOverviewPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 2 }}>
               <span style={{ color: '#6e7977' }}>{locale === 'hi' ? 'पसंदीदा भाषा:' : 'Preferred Language:'}</span>
-              <strong style={{ color: '#005c55' }}>
+              <strong style={{ color: '#16453A' }}>
                 {locale === 'hi' ? 'हिन्दी (Hindi)' : 'English (EN)'}
               </strong>
             </div>
@@ -436,13 +436,13 @@ export default function AccountOverviewPage() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#131b2e', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <MapPin size={18} color="#005c55" />
+              <MapPin size={18} color="#16453A" />
               <span>{locale === 'hi' ? 'प्राथमिक वितरण पता' : 'Default Delivery Address'}</span>
             </h3>
 
             <Link
               href="/account/addresses"
-              style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#005c55', textDecoration: 'none' }}
+              style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#16453A', textDecoration: 'none' }}
             >
               {locale === 'hi' ? 'प्रबंधित करें' : 'Manage'}
             </Link>
@@ -450,7 +450,7 @@ export default function AccountOverviewPage() {
 
           {defaultAddress ? (
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eaf8f6', color: '#005c55', fontSize: '0.6875rem', fontWeight: 800, padding: '2px 8px', borderRadius: 9999, marginBottom: 8 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eaf8f6', color: '#16453A', fontSize: '0.6875rem', fontWeight: 800, padding: '2px 8px', borderRadius: 9999, marginBottom: 8 }}>
                 <CheckCircle2 size={12} />
                 <span>{defaultAddress.label || 'Home'}</span>
               </div>

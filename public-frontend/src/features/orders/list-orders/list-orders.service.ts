@@ -8,8 +8,13 @@ export const INITIAL_MOCK_ORDERS: Order[] = [];
 export const listOrdersService = async (): Promise<ListOrdersResponse> => {
   try {
     const response = await axiosInterceptorInstanceClient.get('/orders/my');
-    const rawList = response.data?.data;
-    if (Array.isArray(rawList)) {
+    const rawPayload = response.data?.data;
+    const rawList = Array.isArray(rawPayload?.items)
+      ? rawPayload.items
+      : Array.isArray(rawPayload)
+      ? rawPayload
+      : [];
+    if (rawList.length > 0 || Array.isArray(rawPayload?.items) || Array.isArray(rawPayload)) {
       const orders: Order[] = rawList.map((o: any) => ({
         id: String(o.id),
         orderNumber: `ARM-BUY-${String(o.id).padStart(4, '0')}`,

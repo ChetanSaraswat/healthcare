@@ -30,9 +30,6 @@ export default function AboutPage() {
       <section className={styles.heroSection}>
         <div className={styles.container}>
           <div className={styles.heroContent}>
-            <div className={styles.compliancePill}>
-              <ShieldCheck size={16} /> CDSCO Registered Medical Establishment #MD-40918
-            </div>
             <h1 className={styles.heroTitle}>
               {locale === 'hi' ? (
                 <>
@@ -95,13 +92,13 @@ export default function AboutPage() {
               </h2>
               <p className={styles.paragraph}>
                 {locale === 'hi'
-                  ? 'अक्सर देखा गया है कि जब किसी मरीज को आईसीयू से छुट्टी मिलती है, तो परिवार को ₹1,50,000 या अधिक मूल्य के उपकरण खरीदने के लिए विवश होना पड़ता है, जिनकी जरूरत केवल 3 से 6 सप्ताह के लिए होती है।'
-                  : 'When patients are discharged from the ICU, families are routinely forced into an agonizing choice: spend ₹1,50,000+ on motorized hospital beds and oxygen concentrators needed for only 4-6 weeks, or risk renting unverified, unsterilized equipment from informal channels.'}
+                  ? 'अक्सर देखा गया है कि जब किसी मरीज को अस्पताल से छुट्टी मिलती है, तो परिवार को ₹1,20,000 या अधिक मूल्य के उपकरण खरीदने के लिए विवश होना पड़ता है, जिनकी जरूरत केवल 3 से 6 सप्ताह के लिए होती है।'
+                  : 'When patients transition from the hospital, families are routinely forced into an agonizing choice: spend ₹1,20,000+ on advanced BiPAP systems and oxygen concentrators needed for only 4-6 weeks, or risk renting unverified, unsterilized equipment from informal channels.'}
               </p>
               <p className={styles.paragraph}>
                 {locale === 'hi'
-                  ? 'आरोग्यमेड की स्थापना इस अंतर को पाटने के लिए की गई थी। हम खरीद और किराए को पूरी तरह से समान दर्जा देते हैं। प्रत्येक रेंटल डिवाइस अस्पताल के आईसीयू मानकों के अनुसार प्रमाणित, रोगाणुरहित और कैलिब्रेटेड होता है।'
-                  : 'AarogyaMed was founded to establish parity between outright ownership and clinical rental. We treat Buy and Rent on completely equal footing. Every rented device receives the same rigorous biomedical inspection as new equipment, protected by escrow deposits and 24-hour return guarantees.'}
+                  ? 'ओमकार हेल्थकेयर की स्थापना इस अंतर को पाटने के लिए की गई थी। हम खरीद और किराए को पूरी तरह से समान दर्जा देते हैं। प्रत्येक रेंटल डिवाइस अस्पताल के आईसीयू मानकों के अनुसार प्रमाणित, रोगाणुरहित और कैलिब्रेटेड होता है।'
+                  : 'Omkar Healthcare was founded to establish parity between outright ownership and clinical rental. We treat Buy and Rent on completely equal footing. Every rented device receives the same rigorous biomedical inspection as new equipment, protected by escrow deposits and 24-hour return guarantees.'}
               </p>
             </div>
 
@@ -123,7 +120,7 @@ export default function AboutPage() {
                   "A patient recovering at home deserves equipment as sterile and reliable as the finest tertiary ICU in the country. That is the non-negotiable benchmark we uphold every day."
                 </p>
                 <div className={styles.author}>
-                  — AarogyaMed Biomedical Engineering Division
+                  — Omkar Biomedical Engineering Division
                 </div>
               </div>
             </div>
@@ -144,7 +141,7 @@ export default function AboutPage() {
             <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.6 }}>
               {locale === 'hi'
                 ? 'हर मशीन, हर डिलीवरी और हर डिपॉजिट वापसी में कड़े मानकों का पालन।'
-                : 'Every protocol at AarogyaMed is codified in biomedical standards to guarantee hospital-level efficacy in your living room.'}
+                : 'Every protocol at Omkar Healthcare is codified in biomedical standards to guarantee hospital-level efficacy in your living room.'}
             </p>
           </div>
 
@@ -188,7 +185,7 @@ export default function AboutPage() {
               </div>
               <h3>At-Home Caregiver Onboarding</h3>
               <p>
-                Our trained biomedical technicians do not just drop off a box; they assemble the motorized beds, connect patient interfaces, and train family caregivers on safety alarms and operations.
+                Our trained biomedical technicians do not just drop off a box; they calibrate device flow rates, connect patient interfaces, and train family caregivers on safety alarms and proper cleaning.
               </p>
               <span className={styles.badge}>Certified Field Technicians</span>
             </div>

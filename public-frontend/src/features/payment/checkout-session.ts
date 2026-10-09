@@ -1,5 +1,5 @@
 /**
- * AarogyaMed Frontend - Checkout Session Persistence
+ * Omkar Healthcare Frontend - Checkout Session Persistence
  *
  * Provides durable session state in browser sessionStorage so that
  * page refreshes, remounts, or network retry attempts reuse the exact
@@ -7,7 +7,7 @@
  * orders or payments.
  */
 
-export const CHECKOUT_SESSION_KEY = 'aarogyamed_checkout_session';
+export const CHECKOUT_SESSION_KEY = 'omkar_checkout_session';
 
 export interface DurableCheckoutSession {
   idempotencyKey: string;

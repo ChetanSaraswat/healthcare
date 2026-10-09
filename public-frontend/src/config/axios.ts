@@ -30,7 +30,7 @@ export const axiosInterceptorInstanceClient = axios.create({
 axiosInterceptorInstanceClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('aarogyamed_auth_token');
+      const token = localStorage.getItem('omkar_auth_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -69,7 +69,7 @@ export function extractApiErrorMessage(error: any, fallback = 'An unexpected err
 
   if (error.message && typeof error.message === 'string') {
     if (error.message === 'Network Error') {
-      return 'Unable to connect to AarogyaMed clinical server. Please check your network connection.';
+      return 'Unable to connect to Omkar Healthcare clinical server. Please check your network connection.';
     }
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       return 'Request to clinical service timed out. Please try again.';
@@ -94,7 +94,7 @@ function triggerErrorSnackbar(message: string) {
   lastErrorToast = { message, timestamp: now };
   
   window.dispatchEvent(
-    new CustomEvent('aarogyamed:toast', {
+    new CustomEvent('omkar:toast', {
       detail: { type: 'error', message, duration: 4500 },
     })
   );
@@ -113,7 +113,7 @@ axiosInterceptorInstanceClient.interceptors.response.use(
       userFacingMessage = 'Invalid request parameters. Please verify the entered data.';
     } else if (status === 401) {
       if (typeof window !== 'undefined' && !url.includes('/auth/login') && !url.includes('/auth/register')) {
-        localStorage.removeItem('aarogyamed_auth_token');
+        localStorage.removeItem('omkar_auth_token');
       }
       if (!isSilentCheck && !userFacingMessage) {
         userFacingMessage = 'Your session has expired or credentials are invalid. Please sign in.';
@@ -139,7 +139,7 @@ axiosInterceptorInstanceClient.interceptors.response.use(
     } else if (status && status >= 500) {
       userFacingMessage = 'Clinical service encountered an unexpected error. Our biomedical team has been notified.';
     } else if (!error.response && (error.message === 'Network Error' || error.code === 'ERR_NETWORK')) {
-      userFacingMessage = 'Unable to connect to AarogyaMed clinical server. Please check your network connection.';
+      userFacingMessage = 'Unable to connect to Omkar Healthcare clinical server. Please check your network connection.';
     }
 
     if (!isSilentCheck && userFacingMessage) {

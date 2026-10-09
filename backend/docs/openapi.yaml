@@ -1,14 +1,14 @@
 openapi: 3.0.3
 info:
-  title: AarogyaMed Biomedical & Clinical Equipment Platform API
+  title: Omkar Healthcare Biomedical & Clinical Equipment Platform API
   description: >-
-    Comprehensive REST API for AarogyaMed: pan-India medical equipment platform
+    Comprehensive REST API for Omkar Healthcare: pan-India medical equipment platform
     supporting parallel Buy & Rent journeys, clinical education guides, Razorpay
     payment idempotency, and clinical operations administration.
   version: 1.0.0
   contact:
-    name: AarogyaMed Engineering Team
-    email: support@aarogyamed.com
+    name: Omkar Healthcare Engineering Team
+    email: support@omkarhealthcare.com
 servers:
   - url: http://localhost:8080/api/v1
     description: Local Development Server (API v1)
@@ -102,7 +102,7 @@ components:
         email:
           type: string
           format: email
-          example: admin@aarogyamed.com
+          example: admin@omkarhealthcare.com
         phone:
           type: string
           example: '+91 98765 43210'
@@ -351,7 +351,7 @@ paths:
   /health:
     get:
       summary: Health Check
-      description: Returns the operational status of the AarogyaMed API server.
+      description: Returns the operational status of the Omkar Healthcare API server.
       responses:
         '200':
           description: Service is healthy and responding
@@ -365,7 +365,7 @@ paths:
                     example: ok
                   service:
                     type: string
-                    example: aarogyamed-backend
+                    example: omkar-backend
                   timestamp:
                     type: string
                     format: date-time
@@ -418,7 +418,7 @@ paths:
               properties:
                 email:
                   type: string
-                  example: admin@aarogyamed.com
+                  example: admin@omkarhealthcare.com
                 phone:
                   type: string
                   example: '+91 98765 43210'

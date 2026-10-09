@@ -57,14 +57,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       ? selectedProduct
       : null);
 
-  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const [fetchCompleted, setFetchCompleted] = useState(false);
 
   useEffect(() => {
-    if (!product && !hasAttemptedFetch && !productsLoading) {
-      setHasAttemptedFetch(true);
-      dispatch(getProduct(resolvedParams.slug));
+    if (!product && !fetchCompleted) {
+      dispatch(getProduct(resolvedParams.slug)).finally(() => {
+        setFetchCompleted(true);
+      });
     }
-  }, [product, hasAttemptedFetch, productsLoading, dispatch, resolvedParams.slug]);
+  }, [product, fetchCompleted, dispatch, resolvedParams.slug]);
 
   const initialMode = searchParams.get('mode') === 'rent' ? 'rent' : 'buy';
   const [activeMode, setActiveMode] = useState<'buy' | 'rent'>(initialMode);
@@ -94,9 +95,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     product ? WishlistEntity.isInWishlist(state.wishlist?.items || [], product.id) : false
   );
 
-
-
-  if (productsLoading || (!product && !hasAttemptedFetch)) {
+  if (!product && (!fetchCompleted || productsLoading)) {
     return (
       <div style={{ maxWidth: 1280, margin: '2rem auto 5rem', padding: '0 1.5rem' }}>
         <div style={{ height: 20, width: 220, background: '#e0e5eb', borderRadius: 4, marginBottom: '2rem' }} />
@@ -106,7 +105,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             <div style={{ height: 32, width: '80%', background: '#e0e5eb', borderRadius: 6 }} />
             <div style={{ height: 20, width: '40%', background: '#e0e5eb', borderRadius: 4 }} />
             <div style={{ height: 120, background: '#edf0f5', borderRadius: 16 }} />
-            <div style={{ height: 50, background: '#005c55', opacity: 0.3, borderRadius: 9999 }} />
+            <div style={{ height: 50, background: '#16453A', opacity: 0.3, borderRadius: 9999 }} />
           </div>
         </div>
       </div>
@@ -133,7 +132,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '12px 28px',
             borderRadius: 9999,
@@ -205,7 +204,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
         title: localized.name,
         slug: product.slug,
         image: product.primaryImage,
-        brand: product.brand || 'AarogyaMed Certified',
+        brand: product.brand || 'Omkar Healthcare Certified',
         buyPrice: product.buyPrice,
         rentDailyRate: product.rentalDailyRate,
         rentAvailable: product.isAvailableForRent,
@@ -228,11 +227,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           marginBottom: '2rem',
         }}
       >
-        <Link href="/" style={{ color: '#005c55', textDecoration: 'none' }}>
+        <Link href="/" style={{ color: '#16453A', textDecoration: 'none' }}>
           {locale === 'hi' ? 'होम' : 'Home'}
         </Link>
         <ChevronRight size={14} />
-        <Link href="/shop" style={{ color: '#005c55', textDecoration: 'none' }}>
+        <Link href="/shop" style={{ color: '#16453A', textDecoration: 'none' }}>
           {locale === 'hi' ? 'उपकरण कैटलॉग' : 'Equipment Catalog'}
         </Link>
         <ChevronRight size={14} />
@@ -330,7 +329,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     height: 72,
                     borderRadius: 10,
                     overflow: 'hidden',
-                    border: (selectedImage || product.primaryImage) === img ? '2px solid #005c55' : '1px solid #dae2fd',
+                    border: (selectedImage || product.primaryImage) === img ? '2px solid #16453A' : '1px solid #dae2fd',
                     padding: 0,
                     background: 'none',
                     cursor: 'pointer',
@@ -363,7 +362,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     href={`/learn/${tag}`}
                     style={{
                       background: '#eaedff',
-                      color: '#005c55',
+                      color: '#16453A',
                       fontSize: '0.75rem',
                       fontWeight: 700,
                       padding: '4px 10px',
@@ -418,7 +417,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             }}
           >
             {/* Title & SKU */}
-            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#006398', textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#B75932', textTransform: 'uppercase', marginBottom: 4 }}>
               {product.categoryName || 'Medical Equipment'} • SKU: {product.sku}
             </div>
             <h1 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#131b2e', lineHeight: 1.3, marginBottom: '0.75rem' }}>
@@ -428,16 +427,16 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             {/* Rating - Only display if authentic verified reviews exist */}
             {product.reviewsCount && product.reviewsCount > 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.875rem', color: '#6e7977' }}>
-                <div style={{ display: 'flex', color: '#ea580c' }}>
-                  <Star size={16} fill="#ea580c" />
+                <div style={{ display: 'flex', color: '#B75932' }}>
+                  <Star size={16} fill="#B75932" />
                 </div>
                 <strong style={{ color: '#131b2e' }}>{product.rating}</strong>
                 <span>({product.reviewsCount} {t.product.verifiedReviews})</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.8125rem', color: '#005c55', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.5rem', fontSize: '0.8125rem', color: '#16453A', fontWeight: 600 }}>
                 <ShieldCheck size={16} />
-                <span>{locale === 'hi' ? 'सीधे अधिकृत बायोमेडिकल सप्लायर से सत्यापित' : 'AarogyaMed Verified Biomedical Equipment'}</span>
+                <span>{locale === 'hi' ? 'सीधे अधिकृत बायोमेडिकल सप्लायर से सत्यापित' : 'Omkar Healthcare Verified Biomedical Equipment'}</span>
               </div>
             )}
 
@@ -455,7 +454,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             {activeMode === 'buy' && (
               <div style={{ background: '#faf8ff', borderRadius: 14, padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid #dae2fd' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#005c55' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#16453A' }}>
                     ₹{product.buyPrice.toLocaleString('en-IN')}
                   </span>
                   {product.mrp > product.buyPrice && (
@@ -464,7 +463,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     </span>
                   )}
                   {discountPercent > 0 && (
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ea580c', background: '#fff0eb', padding: '2px 8px', borderRadius: 6 }}>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#B75932', background: '#FBF2ED', padding: '2px 8px', borderRadius: 6 }}>
                       {discountPercent}% OFF
                     </span>
                   )}
@@ -475,17 +474,17 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.8125rem', color: '#131b2e' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <CheckCircle2 size={16} color="#005c55" />
+                    <CheckCircle2 size={16} color="#16453A" />
                     <span>{locale === 'hi' ? 'सीलबंद फैक्ट्री पैकेजिंग के साथ नया यूनिट' : 'Brand New Sealed Factory Packaging'}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <CheckCircle2 size={16} color="#005c55" />
+                    <CheckCircle2 size={16} color="#16453A" />
                     <span>
                       {product.warrantyInfo || (product.warrantyMonths ? `${product.warrantyMonths} ${locale === 'hi' ? 'महीने की व्यापक ओईएम वारंटी' : 'Months Comprehensive OEM Warranty'}` : (locale === 'hi' ? 'ओईएम वारंटी शामिल' : 'OEM Warranty Included'))}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Truck size={16} color="#005c55" />
+                    <Truck size={16} color="#16453A" />
                     <span>{locale === 'hi' ? '4 घंटे में निःशुल्क डोरस्टेप डिलीवरी व डेमो' : 'Free Doorstep Delivery & Demo in 4 Hours'}</span>
                   </div>
                 </div>
@@ -496,11 +495,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             {activeMode === 'rent' && (
               <div style={{ background: '#fff7f2', borderRadius: 14, padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid #ffd8c8' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#ea580c' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#B75932' }}>
                     ₹{rentalCalculation.effectiveDailyRate}/{t.product.day}
                   </span>
                   {rentalCalculation.discountAppliedPercent > 0 && (
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', background: '#ea580c', padding: '2px 8px', borderRadius: 6 }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', background: '#B75932', padding: '2px 8px', borderRadius: 6 }}>
                       {rentalCalculation.discountAppliedPercent}% {locale === 'hi' ? 'दीर्घकालिक छूट' : 'Long Term Discount'}
                     </span>
                   )}
@@ -525,8 +524,8 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                           borderRadius: 8,
                           fontSize: '0.8125rem',
                           fontWeight: 700,
-                          border: rentalDays === days ? '2px solid #ea580c' : '1px solid #dae2fd',
-                          background: rentalDays === days ? '#ea580c' : '#ffffff',
+                          border: rentalDays === days ? '2px solid #B75932' : '1px solid #dae2fd',
+                          background: rentalDays === days ? '#B75932' : '#ffffff',
                           color: rentalDays === days ? '#ffffff' : '#131b2e',
                           cursor: 'pointer',
                           textAlign: 'center',
@@ -567,10 +566,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                         width: 65,
                         padding: '4px 8px',
                         borderRadius: 6,
-                        border: '1.5px solid #ea580c',
+                        border: '1.5px solid #B75932',
                         fontSize: '0.875rem',
                         fontWeight: 700,
-                        color: '#ea580c',
+                        color: '#B75932',
                         textAlign: 'center',
                       }}
                     />
@@ -588,11 +587,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <span style={{ color: '#6e7977' }}>{t.cart.securityDeposit}:</span>
-                    <strong style={{ color: '#005c55' }}>+ ₹{rentalCalculation.securityDeposit.toLocaleString('en-IN')}</strong>
+                    <strong style={{ color: '#16453A' }}>+ ₹{rentalCalculation.securityDeposit.toLocaleString('en-IN')}</strong>
                   </div>
                   <div style={{ borderTop: '1px solid #eaedff', paddingTop: 6, display: 'flex', justifyContent: 'space-between' }}>
                     <strong style={{ color: '#131b2e' }}>{t.cart.totalPayable}:</strong>
-                    <strong style={{ color: '#ea580c', fontSize: '1rem' }}>
+                    <strong style={{ color: '#B75932', fontSize: '1rem' }}>
                       ₹{rentalCalculation.totalPayableNow.toLocaleString('en-IN')}
                     </strong>
                   </div>
@@ -631,7 +630,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     fontSize: '1.125rem',
                     fontWeight: 700,
                     cursor: quantity <= 1 ? 'not-allowed' : 'pointer',
-                    color: quantity <= 1 ? '#cbd5e1' : '#005c55',
+                    color: quantity <= 1 ? '#cbd5e1' : '#16453A',
                   }}
                   title={quantity <= 1 ? 'Minimum quantity is 1' : 'Decrease quantity'}
                   aria-label="Decrease quantity"
@@ -649,7 +648,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     fontSize: '1.125rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    color: '#005c55',
+                    color: '#16453A',
                   }}
                   aria-label="Increase quantity"
                 >
@@ -662,7 +661,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 onClick={handleAddToCart}
                 style={{
                   flex: 1,
-                  background: activeMode === 'buy' ? '#005c55' : '#ea580c',
+                  background: activeMode === 'buy' ? '#16453A' : '#B75932',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: 12,
@@ -742,10 +741,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 color: '#6e7977',
               }}
             >
-              <PhoneCall size={16} color="#005c55" />
+              <PhoneCall size={16} color="#16453A" />
               <span>
                 {locale === 'hi' ? 'प्रिस्क्रिप्शन या सेटअप के बारे में प्रश्न? कॉल करें ' : 'Questions about prescription or setup? Call '}
-                <a href="tel:18008892273" style={{ color: '#005c55', fontWeight: 700 }}>
+                <a href="tel:18008892273" style={{ color: '#16453A', fontWeight: 700 }}>
                   1800-889-2273
                 </a>
               </span>

@@ -12,7 +12,7 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(0, 92, 85, 0.12);
-    border-color: #005c55;
+    border-color: #16453A;
   }
 }
 
@@ -81,7 +81,7 @@
 .categoryTag {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #006398;
+  color: #B75932;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.35rem;
@@ -100,7 +100,7 @@
   text-decoration: none;
 
   &:hover {
-    color: #005c55;
+    color: #16453A;
   }
 }
 
@@ -115,7 +115,7 @@
   .stars {
     display: flex;
     align-items: center;
-    color: #ea580c;
+    color: #B75932;
   }
 
   .score {
@@ -154,13 +154,13 @@
     .amount {
       font-size: 1.0625rem;
       font-weight: 800;
-      color: #005c55;
+      color: #16453A;
     }
 
     .rentAmount {
       font-size: 1.0625rem;
       font-weight: 800;
-      color: #ea580c;
+      color: #B75932;
     }
 
     .subinfo {
@@ -183,7 +183,7 @@
   margin-top: auto;
 
   .buyBtn {
-    background: #005c55;
+    background: #16453A;
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -198,13 +198,13 @@
     gap: 4px;
 
     &:hover {
-      background: #004741;
+      background: #0F352C;
     }
   }
 
   .rentBtn {
-    background: #fff0eb;
-    color: #ea580c;
+    background: #FBF2ED;
+    color: #B75932;
     border: 1px solid #ffdbce;
     border-radius: 8px;
     padding: 0.65rem 0.5rem;
@@ -218,7 +218,7 @@
     gap: 4px;
 
     &:hover {
-      background: #ea580c;
+      background: #B75932;
       color: #ffffff;
     }
   }

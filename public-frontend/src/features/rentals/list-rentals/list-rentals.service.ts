@@ -8,8 +8,13 @@ export const INITIAL_MOCK_RENTALS: RentalOrder[] = [];
 export const listRentalsService = async (): Promise<ListRentalsResponse> => {
   try {
     const response = await axiosInterceptorInstanceClient.get('/rentals/my');
-    const rawList = response.data?.data;
-    if (Array.isArray(rawList)) {
+    const rawPayload = response.data?.data;
+    const rawList = Array.isArray(rawPayload?.items)
+      ? rawPayload.items
+      : Array.isArray(rawPayload)
+      ? rawPayload
+      : [];
+    if (rawList.length > 0 || Array.isArray(rawPayload?.items) || Array.isArray(rawPayload)) {
       const rentals: RentalOrder[] = rawList.map((r: any) => ({
         id: String(r.id),
         rentalOrderNumber: `ARM-RNT-${String(r.id).padStart(4, '0')}`,
@@ -28,7 +33,7 @@ export const listRentalsService = async (): Promise<ListRentalsResponse> => {
               rentalOrderId: String(r.id),
               productId: String(it.product_id),
               productName: it.product?.name || '',
-              productImage: (Array.isArray(it.product?.images) && it.product.images[0]) || '/images/hospital_bed.png',
+              productImage: (Array.isArray(it.product?.images) && it.product.images[0]) || '/images/oxygen_concentrator.png',
               dailyRate: parseFloat(it.rate_amount) || 0,
               durationDays: Number(it.duration_days) || 0,
               securityDeposit: parseFloat(it.deposit_amount) || 0,

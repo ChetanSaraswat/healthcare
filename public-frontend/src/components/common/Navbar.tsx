@@ -1,29 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { setLocale, showToast } from '@/features/ui/ui.slice';
+import { setLocale } from '@/features/ui/ui.slice';
 import { useTranslation } from '@/locales';
+import { CONTACT_CONFIG } from '@/config/contact.config';
 import styles from './Navbar.module.scss';
 import {
   PhoneCall,
-  Search,
-  MapPin,
+  MessageCircle,
   ShoppingCart,
   User,
-  Clock,
-  ShieldCheck,
-  ChevronDown,
-  Sparkles,
-  Globe,
-  Stethoscope,
   Heart,
+  Clock,
   LogOut,
   LayoutDashboard,
   ShoppingBag,
-  CalendarClock,
+  MapPin,
+  LogIn,
 } from 'lucide-react';
 import { AuthModal } from '../auth/AuthModal';
 import { logout } from '@/features/auth/auth.slice';
@@ -33,111 +29,149 @@ import { UserEntity } from '@/domain/entities/user.entity';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { t, locale } = useTranslation();
   const [isMounted, setIsMounted] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState('Bengaluru');
-  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setIsProfileOpen(false);
+  }, [pathname]);
+
   const cartItemCount = useAppSelector((state) => state.cart.pricing.itemCount);
   const wishlistCount = useAppSelector((state) => state.wishlist?.items?.length || 0);
   const { user: authUser, isAuthenticated } = useAppSelector((state) => state.auth);
-
-  const cities = [
-    'Bengaluru',
-    'Delhi NCR',
-    'Mumbai',
-    'Hyderabad',
-    'Chennai',
-    'Kolkata',
-    'Pune',
-  ];
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearCart());
     clearCheckoutSession();
-    setIsUserDropdownOpen(false);
+    setIsProfileOpen(false);
     router.push('/');
   };
 
   const userInitials = authUser?.name ? UserEntity.getInitials(authUser.name) : 'U';
-  const firstName = authUser?.name ? authUser.name.split(' ')[0] : 'User';
-
-
-  const handleHotlineClick = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText('1800-889-2273');
-      dispatch(
-        showToast({
-          type: 'info',
-          message:
-            locale === 'hi'
-              ? '📞 24/7 केयरगिवर हेल्पलाइन (1800-889-2273) क्लिपबोर्ड पर कॉपी हो गई है'
-              : '📞 24/7 Caregiver Clinical Hotline (1800-889-2273) copied to clipboard!',
-        })
-      );
-    }
-  };
 
   return (
     <header className={styles.navbarWrapper}>
-      {/* Main Navigation Bar */}
+      {/* Main Navigation Bar (Clean & Streamlined in ONE Single Line) */}
       <div className={styles.mainNav}>
         <div className={styles.container}>
-          {/* Brand Logo */}
+          {/* Brand Logo (Positioned further to the left) */}
           <Link href="/" className={styles.brandLogo}>
             <img
               src="/images/logo.svg"
-              alt="AarogyaMed - Care Equipment &amp; Rentals"
-              width={220}
-              height={55}
+              alt="Omkar Healthcare"
+              width={165}
+              height={42}
             />
           </Link>
 
-          {/* Search Bar */}
-          <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
-            <Search size={18} className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder={t.common.searchPlaceholder}
-              className={styles.searchInput}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button
-              type="submit"
-              className={styles.searchBtn}
-              aria-label={t.common.searchBtn}
-              title={t.common.searchBtn}
+          {/* Center Navigation Links (All in One Line, including Contact) */}
+          <nav className={styles.navLinks}>
+            {/* Home */}
+            <Link
+              href="/"
+              className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}
             >
-              <Search size={16} />
-            </button>
-          </form>
+              <span>{t.common.home || (locale === 'hi' ? 'होम' : 'Home')}</span>
+            </Link>
 
-          {/* Right Action Icons */}
+            {/* All Medical Equipment */}
+            <Link
+              href="/shop"
+              className={`${styles.navItem} ${pathname === '/shop' || pathname.startsWith('/shop') || pathname.startsWith('/product') ? styles.active : ''}`}
+            >
+              <span>{t.common.allEquipment}</span>
+            </Link>
+
+            {/* Education & Care Guides (Folded Condition Guides + Practical Articles) */}
+            <Link
+              href="/learn"
+              className={`${styles.navItem} ${pathname === '/learn' || pathname.startsWith('/learn') || pathname.startsWith('/conditions') || pathname.startsWith('/blog') ? styles.active : ''}`}
+            >
+              <span>
+                {t.common.educationGuides || (locale === 'hi' ? 'शिक्षा एवं केयर गाइड' : 'Education & Care Guides')}
+              </span>
+            </Link>
+
+            {/* Experience Centers */}
+            <Link
+              href="/experience-centers"
+              className={`${styles.navItem} ${pathname === '/experience-centers' || pathname.startsWith('/experience-centers') ? styles.active : ''}`}
+            >
+              <span>
+                {t.common.experienceCenters || (locale === 'hi' ? 'एक्सपीरियंस सेंटर' : 'Experience Centers')}
+              </span>
+            </Link>
+
+            {/* About Us */}
+            <Link
+              href="/about"
+              className={`${styles.navItem} ${pathname === '/about' || pathname.startsWith('/about') ? styles.active : ''}`}
+            >
+              <span>{locale === 'hi' ? 'हमारे बारे में' : 'About Us'}</span>
+            </Link>
+
+            {/* Contact Information in Contact */}
+            <Link
+              href="/contact"
+              className={`${styles.navItem} ${pathname === '/contact' || pathname.startsWith('/contact') ? styles.active : ''}`}
+            >
+              <span>{t.common.contact || (locale === 'hi' ? 'संपर्क' : 'Contact')}</span>
+            </Link>
+          </nav>
+
+          {/* Right Action Utilities in the Same Line */}
           <div className={styles.navActions}>
-            {/* Language Switcher Pill */}
+            {/* Contact Information in Same Line */}
+            <div className={styles.contactGroup}>
+              {/* Click-to-Call Phone Number Pill */}
+              <a
+                href={`tel:${CONTACT_CONFIG.phone}`}
+                className={styles.contactPill}
+                title={locale === 'hi' ? 'क्लिक करके कॉल करें' : 'Click to call Helpline'}
+              >
+                <div className={styles.phoneIconBox}>
+                  <PhoneCall size={13} />
+                </div>
+                <div className={styles.contactText}>
+                  <span className={styles.contactLabel}>
+                    {locale === 'hi' ? 'हेल्पलाइन' : 'Helpline'}
+                  </span>
+                  <span className={styles.contactNumber}>{CONTACT_CONFIG.phoneDisplay}</span>
+                </div>
+              </a>
+            </div>
+
+            {/* Language Switcher Pill (EN | हिन्दी) */}
             <div className={styles.languageToggle}>
               <button
                 type="button"
                 className={`${styles.langBtn} ${locale === 'en' ? styles.active : ''}`}
                 onClick={() => dispatch(setLocale('en'))}
-                title="Switch to English"
+                title="English"
               >
                 EN
               </button>
@@ -151,267 +185,245 @@ export const Navbar: React.FC = () => {
               </button>
             </div>
 
-            {/* City Selector */}
-            <div style={{ position: 'relative' }}>
+            {/* Standalone Cart Button with Cart Icon ONLY */}
+            <Link
+              href="/cart"
+              className={styles.cartIconBtn}
+              aria-label={locale === 'hi' ? 'कार्ट' : 'Cart'}
+              title={
+                isMounted && cartItemCount > 0
+                  ? locale === 'hi'
+                    ? `कार्ट (${cartItemCount})`
+                    : `Cart (${cartItemCount})`
+                  : locale === 'hi'
+                  ? 'कार्ट'
+                  : 'Cart'
+              }
+            >
+              <ShoppingCart size={19} />
+              {isMounted && cartItemCount > 0 && (
+                <span className={styles.cartBadge} aria-label={`${cartItemCount} items in cart`}>
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Profile Dropdown Container */}
+            <div className={styles.profileDropdownContainer} ref={dropdownRef}>
               <button
                 type="button"
-                className={styles.cityPicker}
-                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                className={styles.profileToggleBtn}
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                aria-expanded={isProfileOpen}
+                aria-label={locale === 'hi' ? 'प्रोफाइल एवं खाता' : 'Profile & Account'}
+                title={
+                  isMounted && isAuthenticated && authUser
+                    ? authUser.name
+                    : locale === 'hi'
+                    ? 'प्रोफाइल एवं खाता'
+                    : 'Profile & Account'
+                }
               >
-                <MapPin size={16} color="#005c55" />
-                <span>{selectedCity}</span>
-                <ChevronDown size={14} />
+                {/* Profile Icon */}
+                {isMounted && isAuthenticated && authUser ? (
+                  <div className={styles.userAvatar}>{userInitials}</div>
+                ) : (
+                  <div className={styles.userAvatar}>
+                    <User size={18} />
+                  </div>
+                )}
               </button>
 
-              {isCityDropdownOpen && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    marginTop: 6,
-                    background: '#ffffff',
-                    border: '1px solid #dae2fd',
-                    borderRadius: 10,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    padding: '8px 0',
-                    width: 170,
-                    zIndex: 100,
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: '4px 12px',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: '#6e7977',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {t.common.selectCity}
+              {/* Scroll Down / Dropdown Menu containing all three items */}
+              {isProfileOpen && (
+                <div className={styles.profileDropdownMenu}>
+                  {/* 1. Profile / Account Header */}
+                  <div className={styles.dropdownHeader}>
+                    {isMounted && isAuthenticated && authUser ? (
+                      <>
+                        <div className={styles.userWelcome}>
+                          {locale === 'hi' ? 'स्वागत है' : 'Signed in as'}
+                        </div>
+                        <div className={styles.dropdownUserName}>{authUser.name}</div>
+                        <div className={styles.dropdownUserRole}>
+                          {authUser.role === 'super_admin' ? 'Administrator' : 'Verified Caregiver'}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className={styles.userWelcome}>
+                          {locale === 'hi' ? 'नमस्ते, अतिथि' : 'Welcome to Omkar'}
+                        </div>
+                        <div className={styles.dropdownUserName} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>
+                          {locale === 'hi' ? 'प्रमाणित चिकित्सा उपकरण सेवाएं' : 'Hospital-grade care & rentals'}
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.authCtaBtn}
+                          onClick={() => {
+                            setIsProfileOpen(false);
+                            setIsAuthModalOpen(true);
+                          }}
+                        >
+                          <LogIn size={15} />
+                          <span>{locale === 'hi' ? 'साइन इन / रजिस्टर करें' : 'Sign In / Register'}</span>
+                        </button>
+                      </>
+                    )}
                   </div>
-                  {cities.map((city) => (
-                    <button
-                      key={city}
-                      type="button"
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '8px 14px',
-                        background: selectedCity === city ? '#eaf8f6' : 'transparent',
-                        color: selectedCity === city ? '#005c55' : '#131b2e',
-                        fontWeight: selectedCity === city ? 700 : 500,
-                        fontSize: '0.875rem',
-                        border: 'none',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => {
-                        setSelectedCity(city);
-                        setIsCityDropdownOpen(false);
-                      }}
-                    >
-                      {city}
-                    </button>
-                  ))}
+
+                  <div className={styles.menuSectionTitle}>
+                    {locale === 'hi' ? 'त्वरित पहुंच' : 'Quick Actions'}
+                  </div>
+
+                  {/* 2. Healthcare Cart Item */}
+                  <Link
+                    href="/cart"
+                    className={styles.dropdownCardItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <div className={styles.itemLeft}>
+                      <div className={`${styles.itemIconBox} ${styles.cartIconBox}`}>
+                        <ShoppingCart size={17} />
+                      </div>
+                      <div className={styles.itemTextGroup}>
+                        <span className={styles.itemTitle}>{t.common.cart}</span>
+                        <span className={styles.itemSubtitle}>
+                          {isMounted && cartItemCount > 0
+                            ? locale === 'hi'
+                              ? `${cartItemCount} उपकरण चयनित`
+                              : `${cartItemCount} item(s) selected`
+                            : locale === 'hi'
+                            ? 'कार्ट खाली है'
+                            : 'No equipment added'}
+                        </span>
+                      </div>
+                    </div>
+                    {isMounted && cartItemCount > 0 && (
+                      <span className={`${styles.itemBadge} ${styles.cartBadge}`}>
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* 3. Saved Wishlist Item */}
+                  <Link
+                    href="/account/wishlist"
+                    className={styles.dropdownCardItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <div className={styles.itemLeft}>
+                      <div className={`${styles.itemIconBox} ${styles.wishlistIconBox}`}>
+                        <Heart size={17} />
+                      </div>
+                      <div className={styles.itemTextGroup}>
+                        <span className={styles.itemTitle}>
+                          {locale === 'hi' ? 'इच्छासूची' : 'Wishlist'}
+                        </span>
+                        <span className={styles.itemSubtitle}>
+                          {isMounted && wishlistCount > 0
+                            ? locale === 'hi'
+                              ? `${wishlistCount} सहेजे गए उपकरण`
+                              : `${wishlistCount} saved item(s)`
+                            : locale === 'hi'
+                            ? 'सहेजे गए उपकरण'
+                            : 'Saved medical devices'}
+                        </span>
+                      </div>
+                    </div>
+                    {isMounted && wishlistCount > 0 && (
+                      <span className={`${styles.itemBadge} ${styles.wishlistBadge}`}>
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* 4. My Account / Profile Item */}
+                  <Link
+                    href="/account"
+                    className={styles.dropdownCardItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <div className={styles.itemLeft}>
+                      <div className={`${styles.itemIconBox} ${styles.profileIconBox}`}>
+                        <User size={17} />
+                      </div>
+                      <div className={styles.itemTextGroup}>
+                        <span className={styles.itemTitle}>{t.common.myAccount}</span>
+                        <span className={styles.itemSubtitle}>
+                          {locale === 'hi' ? 'व्यक्तिगत विवरण व प्राथमिकताएं' : 'Account overview & settings'}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Additional Account Links if logged in */}
+                  {isMounted && isAuthenticated && authUser && (
+                    <>
+                      <div className={styles.menuDivider} />
+                      <div className={styles.menuSectionTitle}>
+                        {locale === 'hi' ? 'रेंटल एवं ऑर्डर' : 'Rentals & Orders'}
+                      </div>
+
+                      <Link
+                        href="/account/rentals"
+                        className={styles.dropdownSimpleItem}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Clock size={15} />
+                        <span>{t.common.activeRentals}</span>
+                      </Link>
+
+                      <Link
+                        href="/account/orders"
+                        className={styles.dropdownSimpleItem}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <ShoppingBag size={15} />
+                        <span>{locale === 'hi' ? 'खरीद आदेश' : 'Purchase Orders'}</span>
+                      </Link>
+
+                      <Link
+                        href="/account/addresses"
+                        className={styles.dropdownSimpleItem}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <MapPin size={15} />
+                        <span>{locale === 'hi' ? 'वितरण पते' : 'Saved Addresses'}</span>
+                      </Link>
+
+                      {authUser.role === 'super_admin' && (
+                        <Link
+                          href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001/admin'}
+                          className={styles.dropdownSimpleItem}
+                          style={{ color: '#16453A', fontWeight: 700 }}
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <LayoutDashboard size={15} />
+                          <span>Admin Console</span>
+                        </Link>
+                      )}
+
+                      <div className={styles.menuDivider} />
+
+                      <button
+                        type="button"
+                        className={`${styles.dropdownSimpleItem} ${styles.logoutBtn}`}
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={15} />
+                        <span>{locale === 'hi' ? 'लॉग आउट करें' : 'Sign Out'}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
-            {/* Wishlist Link */}
-            <Link href="/account/wishlist" className={styles.actionLink} title={locale === 'hi' ? 'इच्छासूची' : 'Wishlist'}>
-              <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-                <Heart size={20} />
-                {isMounted && wishlistCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: -6,
-                      right: -8,
-                      background: '#005c55',
-                      color: '#ffffff',
-                      fontSize: '0.625rem',
-                      fontWeight: 800,
-                      minWidth: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 3px',
-                    }}
-                  >
-                    {wishlistCount}
-                  </span>
-                )}
-              </div>
-              <span>{locale === 'hi' ? 'इच्छासूची' : 'Wishlist'}</span>
-            </Link>
-
-            {/* Account / User Menu */}
-            {!isMounted ? (
-              <div
-                style={{
-                  width: 82,
-                  height: 36,
-                  borderRadius: 8,
-                  background: 'rgba(0, 92, 85, 0.05)',
-                  display: 'inline-block',
-                }}
-              />
-            ) : isAuthenticated && authUser ? (
-              <div className={styles.userDropdownContainer}>
-                <button
-                  type="button"
-                  className={styles.userMenuBtn}
-                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  title={authUser.name}
-                >
-                  <div className={styles.userAvatar}>{userInitials}</div>
-                  <span className={styles.userNameText}>{firstName}</span>
-                  <ChevronDown size={14} color="#6e7977" />
-                </button>
-
-                {isUserDropdownOpen && (
-                  <div className={styles.userMenuDropdown} onMouseLeave={() => setIsUserDropdownOpen(false)}>
-                    <div className={styles.dropdownHeader}>
-                      <div className={styles.dropdownUserName}>{authUser.name}</div>
-                      <div className={styles.dropdownUserRole}>
-                        {authUser.role === 'super_admin'
-                          ? 'Super Admin'
-                          : (locale === 'hi' ? 'सत्यापित रोगी / देखभालकर्ता' : 'Verified Patient')}
-                      </div>
-                    </div>
-
-                    <Link
-                      href="/account"
-                      className={styles.dropdownItem}
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
-                      <User size={15} />
-                      <span>{locale === 'hi' ? 'खाता सारांश' : 'Account Overview'}</span>
-                    </Link>
-
-                    <Link
-                      href="/account/rentals"
-                      className={styles.dropdownItem}
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
-                      <CalendarClock size={15} />
-                      <span>{locale === 'hi' ? 'सक्रिय रेंटल उपकरण' : 'Active Rentals'}</span>
-                    </Link>
-
-                    <Link
-                      href="/account/orders"
-                      className={styles.dropdownItem}
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
-                      <ShoppingBag size={15} />
-                      <span>{locale === 'hi' ? 'खरीद के आदेश' : 'Purchase Orders'}</span>
-                    </Link>
-
-                    <Link
-                      href="/account/addresses"
-                      className={styles.dropdownItem}
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
-                      <MapPin size={15} />
-                      <span>{locale === 'hi' ? 'वितरण पते' : 'Saved Addresses'}</span>
-                    </Link>
-
-                    <Link
-                      href="/account/wishlist"
-                      className={styles.dropdownItem}
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
-                      <Heart size={15} />
-                      <span>{locale === 'hi' ? 'सहेजी गई इच्छासूची' : 'Saved Wishlist'}</span>
-                    </Link>
-
-                    {authUser.role === 'super_admin' && (
-                      <Link
-                        href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001/admin'}
-                        className={styles.dropdownItem}
-                        style={{ color: '#005c55', fontWeight: 700 }}
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        <LayoutDashboard size={15} />
-                        <span>Admin Console</span>
-                      </Link>
-                    )}
-
-                    <button
-                      type="button"
-                      className={`${styles.dropdownItem} ${styles.logout}`}
-                      onClick={handleLogout}
-                    >
-                      <LogOut size={15} />
-                      <span>{locale === 'hi' ? 'लॉग आउट करें' : 'Sign Out'}</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                type="button"
-                className={styles.actionLink}
-                onClick={() => setIsAuthModalOpen(true)}
-              >
-                <User size={20} />
-                <span>{locale === 'hi' ? 'साइन इन' : 'Sign In'}</span>
-              </button>
-            )}
-
-            {/* Cart Button with Counter */}
-            <Link href="/cart" className={styles.cartBtn}>
-              <ShoppingCart size={18} />
-              <span>{t.common.cart}</span>
-              {isMounted && cartItemCount > 0 && <span className={styles.badge}>{cartItemCount}</span>}
-            </Link>
           </div>
         </div>
       </div>
 
-      {/* 3. Category & Clinical Condition Sub-navigation Bar */}
-      <nav className={styles.categorySubNav}>
-        <div className={styles.container}>
-          <Link href="/shop" className={styles.navItem}  >
-            {t.common.allEquipment}
-          </Link>
-          <Link href="/learn/sleep-apnea" className={`${styles.navItem} ${styles.highlight}`}>
-            {t.common.conditionGuides}
-          </Link>
-          <Link href="/blog" className={styles.navItem}>
-            {t.common.knowledgeHub}
-          </Link>
-          <Link href="/about" className={styles.navItem}>
-            {locale === 'hi' ? 'हमारे बारे में' : 'About Us'}
-          </Link>
-          <button
-            type="button"
-            onClick={handleHotlineClick}
-            className={styles.navItem}
-            title={locale === 'hi' ? 'क्लिक करके हॉटलाइन कॉपी करें' : 'Click to copy 24/7 hotline'}
-            style={{
-              marginLeft: 'auto',
-              color: '#005c55',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              font: 'inherit',
-            }}
-          >
-            <PhoneCall size={14} />
-            <span>{t.common.immediateDispatch}</span>
-            <span style={{ fontSize: '0.8125rem', opacity: 0.9, fontWeight: 700 }}>
-              1800-889-2273
-            </span>
-          </button>
-        </div>
-      </nav>
+
 
       {/* Interactive Authentication Modal */}
       <AuthModal
@@ -421,4 +433,3 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
-

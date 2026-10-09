@@ -26,7 +26,7 @@ export default function RentalTermsPage() {
                 padding: '4px 12px',
                 borderRadius: 999,
                 background: '#e8f5f3',
-                color: '#005c55',
+                color: '#16453A',
                 fontSize: '0.8125rem',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -40,7 +40,7 @@ export default function RentalTermsPage() {
               Terms of Medical Equipment Rental
             </h1>
             <p style={{ fontSize: '0.875rem', color: '#6e7977', margin: 0 }}>
-              Effective Date: September 2026 • AarogyaMed Healthcare Systems Pvt. Ltd.
+              Effective Date: September 2026 • Omkar Healthcare Systems Pvt. Ltd.
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export default function RentalTermsPage() {
                 1. Equal Footing &amp; Scope of Rental Agreement
               </h2>
               <p style={{ margin: 0 }}>
-                Every hospital-grade device marked eligible for rental on AarogyaMed is provided under a certified clinical lease contract. The rental agreement is executed directly between AarogyaMed Healthcare Systems Pvt. Ltd. and the customer (patient or designated family caregiver) upon payment of the initial rental duration fee and refundable security deposit.
+                Every hospital-grade device marked eligible for rental on Omkar Healthcare is provided under a certified clinical lease contract. The rental agreement is executed directly between Omkar Healthcare Systems Pvt. Ltd. and the customer (patient or designated family caregiver) upon payment of the initial rental duration fee and refundable security deposit.
               </p>
             </section>
 
@@ -78,13 +78,13 @@ export default function RentalTermsPage() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                <RotateCcw size={20} color="#005c55" />
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#005c55', margin: 0 }}>
+                <RotateCcw size={20} color="#16453A" />
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16453A', margin: 0 }}>
                   2. Refundable Security Deposit Policy (24-Hour SLA)
                 </h2>
               </div>
               <p style={{ margin: '0 0 10px' }}>
-                A security deposit is collected at checkout to safeguard hospital-grade infrastructure. AarogyaMed enforces an inviolable deposit return protocol:
+                A security deposit is collected at checkout to safeguard hospital-grade infrastructure. Omkar Healthcare enforces an inviolable deposit return protocol:
               </p>
               <ul style={{ margin: 0, paddingLeft: 20 }}>
                 <li>Upon scheduling return pickup via the <strong>Active Rentals Dashboard</strong>, our biomedical technician conducts an on-site physical and functional check.</li>
@@ -104,7 +104,7 @@ export default function RentalTermsPage() {
               <ul style={{ margin: 0, paddingLeft: 20 }}>
                 <li>HEPA and bacterial filters on CPAP, BiPAP, and oxygen machines are <strong>100% brand-new</strong> and individually vacuum-sealed for each user.</li>
                 <li>Internal pneumatic chambers and flow sensors are calibrated using calibrated mass-flow analyzers.</li>
-                <li>Hospital bed frames and patient surfaces undergo medical-grade quaternary ammonium antimicrobial washing.</li>
+                <li>Medical equipment housings and outer surfaces undergo medical-grade quaternary ammonium antimicrobial sanitization.</li>
               </ul>
             </section>
 
@@ -127,7 +127,7 @@ export default function RentalTermsPage() {
                 </h3>
               </div>
               <p style={{ fontSize: '0.875rem', margin: 0 }}>
-                The AarogyaMed digital software platform concludes its transaction scope at order confirmation and payment capture. Physical doorstep transportation, elevator maneuvering of motorized ICU beds, and bedside clinical titration are coordinated manually by dedicated operations coordinators via telephone and WhatsApp.
+                The Omkar Healthcare digital software platform concludes its transaction scope at order confirmation and payment capture. Physical doorstep transportation and bedside clinical titration are coordinated manually by dedicated operations coordinators via telephone and WhatsApp.
               </p>
             </section>
           </div>

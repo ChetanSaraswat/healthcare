@@ -65,16 +65,16 @@ export function DeliveryAddressSection({
             gap: 6,
             padding: '6px 12px',
             borderRadius: 8,
-            border: '1.5px solid #005c55',
+            border: '1.5px solid #16453A',
             background: '#f0fdfa',
-            color: '#005c55',
+            color: '#16453A',
             fontSize: '0.75rem',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
         >
-          <Navigation size={13} color="#005c55" />
+          <Navigation size={13} color="#16453A" />
           {locale === 'hi' ? 'मैप से चुनें' : 'Choose from Map'}
         </button>
       </div>
@@ -96,8 +96,8 @@ export function DeliveryAddressSection({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BookmarkCheck size={18} color="#005c55" />
-            <span style={{ fontSize: '0.8125rem', color: '#005c55', fontWeight: 600 }}>
+            <BookmarkCheck size={18} color="#16453A" />
+            <span style={{ fontSize: '0.8125rem', color: '#16453A', fontWeight: 600 }}>
               {locale === 'hi'
                 ? 'सहेजे गए पते स्वतः भरने के लिए अपने खाते में साइन इन करें।'
                 : 'Have an account? Sign in to use your saved patient delivery addresses.'}
@@ -107,7 +107,7 @@ export function DeliveryAddressSection({
             type="button"
             onClick={onOpenAuthModal}
             style={{
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               border: 'none',
               borderRadius: 8,
@@ -135,7 +135,7 @@ export function DeliveryAddressSection({
             gap: 6,
           }}
         >
-          <ShieldCheck size={16} color="#005c55" />
+          <ShieldCheck size={16} color="#16453A" />
           <span>
             {locale === 'hi' ? 'सत्यापित रोगी खाता:' : 'Ordering as:'}{' '}
             <strong style={{ color: '#131b2e' }}>{authUser.name}</strong> ({authUser.email})
@@ -154,13 +154,13 @@ export function DeliveryAddressSection({
             background: '#eaf8f6',
             borderRadius: 8,
             fontSize: '0.75rem',
-            color: '#005c55',
+            color: '#16453A',
             fontWeight: 600,
             marginBottom: '1.25rem',
             border: '1px solid #a3e9de',
           }}
         >
-          <MapPin size={13} color="#005c55" />
+          <MapPin size={13} color="#16453A" />
           <span>
             {locale === 'hi' ? 'मैप जीपीएस स्थान चयनित:' : 'Selected via Map:'}{' '}
             {selectedCoordinates.lat.toFixed(5)}, {selectedCoordinates.lng.toFixed(5)}
@@ -188,9 +188,9 @@ export function DeliveryAddressSection({
                 gap: 6,
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: addressMode === 'saved' ? '2px solid #005c55' : '1px solid #dae2fd',
+                border: addressMode === 'saved' ? '2px solid #16453A' : '1px solid #dae2fd',
                 background: addressMode === 'saved' ? '#eaf8f6' : '#ffffff',
-                color: addressMode === 'saved' ? '#005c55' : '#6e7977',
+                color: addressMode === 'saved' ? '#16453A' : '#6e7977',
                 fontWeight: 700,
                 fontSize: '0.8125rem',
                 cursor: 'pointer',
@@ -215,9 +215,9 @@ export function DeliveryAddressSection({
               gap: 6,
               padding: '10px 14px',
               borderRadius: 10,
-              border: addressMode === 'new' ? '2px solid #005c55' : '1px solid #dae2fd',
+              border: addressMode === 'new' ? '2px solid #16453A' : '1px solid #dae2fd',
               background: addressMode === 'new' ? '#eaf8f6' : '#ffffff',
-              color: addressMode === 'new' ? '#005c55' : '#6e7977',
+              color: addressMode === 'new' ? '#16453A' : '#6e7977',
               fontWeight: 700,
               fontSize: '0.8125rem',
               cursor: 'pointer',
@@ -238,9 +238,9 @@ export function DeliveryAddressSection({
               gap: 6,
               padding: '10px 14px',
               borderRadius: 10,
-              border: '1.5px solid #005c55',
+              border: '1.5px solid #16453A',
               background: '#f0fdfa',
-              color: '#005c55',
+              color: '#16453A',
               fontWeight: 700,
               fontSize: '0.8125rem',
               cursor: 'pointer',
@@ -265,7 +265,7 @@ export function DeliveryAddressSection({
                     gap: 12,
                     padding: '12px 14px',
                     borderRadius: 10,
-                    border: isSelected ? '2px solid #005c55' : '1px solid #dae2fd',
+                    border: isSelected ? '2px solid #16453A' : '1px solid #dae2fd',
                     background: isSelected ? '#eaf8f6' : '#ffffff',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
@@ -280,14 +280,14 @@ export function DeliveryAddressSection({
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <MapPin size={14} color="#005c55" />
+                      <MapPin size={14} color="#16453A" />
                       <strong style={{ fontSize: '0.875rem', color: '#131b2e' }}>
                         {addr.label}
                       </strong>
                       {addr.isDefault && (
                         <span
                           style={{
-                            background: '#005c55',
+                            background: '#16453A',
                             color: '#ffffff',
                             fontSize: '0.625rem',
                             fontWeight: 800,

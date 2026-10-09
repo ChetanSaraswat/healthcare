@@ -7,7 +7,7 @@ const SMTP_HOST = process.env.SMTP_HOST || 'localhost';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '1026', 10);
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'AarogyaMed Healthcare <care@aarogyamed.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Omkar Healthcare <care@omkarhealthcare.com>';
 
 /**
  * Creates and configures the Nodemailer transporter.
@@ -40,7 +40,7 @@ function getTransporter() {
 }
 
 /**
- * Common HTML wrapper with AarogyaMed Warm Clinical Trust design.
+ * Common HTML wrapper with Omkar Healthcare Warm Clinical Trust design.
  */
 function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
   const currentYear = new Date().getFullYear();
@@ -69,7 +69,7 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
     .email-header {
-      background: linear-gradient(135deg, #0d5c58 0%, #083c39 100%);
+      background: linear-gradient(135deg, #16453a 0%, #0c2e27 100%);
       padding: 32px 28px;
       text-align: center;
       color: #ffffff;
@@ -82,14 +82,14 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
     }
     .brand-name {
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.5px;
       color: #ffffff;
     }
     .brand-pill {
-      background: rgba(212, 154, 55, 0.2);
-      border: 1px solid rgba(212, 154, 55, 0.4);
-      color: #e5b358;
+      background: rgba(224, 180, 120, 0.2);
+      border: 1px solid rgba(224, 180, 120, 0.4);
+      color: #e0b478;
       font-size: 11px;
       font-weight: 600;
       padding: 3px 10px;
@@ -107,7 +107,7 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
     }
     .header-subtitle {
       font-size: 14px;
-      color: #99f6e4;
+      color: #c4e8e0;
       margin: 0;
     }
     .email-body {
@@ -115,13 +115,13 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
       line-height: 1.6;
     }
     .trust-banner {
-      background: #f0fdfa;
-      border-left: 4px solid #0d5c58;
+      background: #fbf2ed;
+      border-left: 4px solid #b75932;
       padding: 12px 16px;
       border-radius: 4px;
       margin-bottom: 24px;
       font-size: 13px;
-      color: #134e4a;
+      color: #903418;
     }
     .card-block {
       background: #f8fafc;
@@ -162,14 +162,14 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
     }
     .cta-btn {
       display: inline-block;
-      background: #0d5c58;
+      background: #16453a;
       color: #ffffff !important;
       text-decoration: none;
       padding: 14px 28px;
       border-radius: 8px;
       font-weight: 600;
       font-size: 15px;
-      box-shadow: 0 2px 4px rgba(13, 92, 88, 0.2);
+      box-shadow: 0 2px 4px rgba(22, 69, 58, 0.25);
     }
     .email-footer {
       background: #0f172a;
@@ -203,11 +203,18 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
 <body>
   <div class="email-container">
     <div class="email-header">
-      <div class="brand-logo">
-        <span class="brand-name">AarogyaMed</span>
+      <div class="brand-logo" style="display: inline-block; text-align: left; width: fit-content; margin: 0 auto 12px;">
+        <div style="font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #ffffff; line-height: 1; width: 100%;">OMKAR</div>
+        <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; margin-top: 3px;">
+          <tr>
+            <td style="height: 1.5px; background-color: #e0b478; width: 14px;"></td>
+            <td style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #e0b478; text-transform: uppercase; text-align: center; padding: 0 4px; white-space: nowrap;">HEALTHCARE</td>
+            <td style="height: 1.5px; background-color: #e0b478; width: 14px;"></td>
+          </tr>
+        </table>
       </div>
       <div>
-        <span class="brand-pill">CDSCO Certified Equipment</span>
+        <span class="brand-pill">Hospital-Grade Biomedical Quality</span>
       </div>
       <h1 class="header-title">${title}</h1>
       <p class="header-subtitle">${subtitle}</p>
@@ -237,7 +244,7 @@ function wrapHtmlTemplate({ title, subtitle, contentHtml, ctaText, ctaUrl }) {
         <a href="http://localhost:3000/contact">Support</a>
       </div>
       <p style="margin: 0;">
-        &copy; ${currentYear} AarogyaMed Healthcare Technologies Pvt. Ltd.<br>
+        &copy; ${currentYear} Omkar Healthcare Technologies Pvt. Ltd.<br>
         ISO 13485:2016 Certified &bull; CDSCO Registered Biomedical Provider &bull; Pan-India Express Delivery
       </p>
     </div>
@@ -283,7 +290,7 @@ async function sendMail({ to, subject, html, text }) {
  * 1. Patient Welcome & Onboarding Email
  */
 async function sendPatientWelcomeEmail({ to, name }) {
-  const title = `Welcome to AarogyaMed, ${name || 'Valued Patient'}`;
+  const title = `Welcome to Omkar Healthcare, ${name || 'Valued Patient'}`;
   const subtitle = 'Your trusted partner for hospital-grade medical equipment';
 
   const contentHtml = `
@@ -292,7 +299,7 @@ async function sendPatientWelcomeEmail({ to, name }) {
     </div>
 
     <p>Dear ${name || 'Patient'},</p>
-    <p>Thank you for choosing AarogyaMed. Whether you are managing chronic respiratory health at home, recovering from a surgical procedure, or caring for an elderly family member, our clinical team is here to support you at every step.</p>
+    <p>Thank you for choosing Omkar Healthcare. Whether you are managing chronic respiratory health at home, recovering from a surgical procedure, or caring for an elderly family member, our clinical team is here to support you at every step.</p>
 
     <div class="card-block">
       <div class="card-title">What You Can Do Now</div>
@@ -314,7 +321,7 @@ async function sendPatientWelcomeEmail({ to, name }) {
 
   return sendMail({
     to,
-    subject: 'Welcome to AarogyaMed Healthcare — Your Account is Ready',
+    subject: 'Welcome to Omkar Healthcare — Your Account is Ready',
     html: wrapHtmlTemplate({
       title,
       subtitle,
@@ -419,7 +426,7 @@ async function sendOrderConfirmationEmail({
 
   return sendMail({
     to,
-    subject: `Order Confirmed: ${formattedOrderNum} — AarogyaMed Healthcare`,
+    subject: `Order Confirmed: ${formattedOrderNum} — Omkar Healthcare`,
     html: wrapHtmlTemplate({
       title,
       subtitle,
@@ -477,7 +484,7 @@ async function sendRentalAgreementEmail({
     </div>
 
     <p>Dear ${name || 'Patient'},</p>
-    <p>Your rental agreement with AarogyaMed is confirmed. We ensure prompt doorstep delivery, patient installation guidance, and 24/7 technical assistance.</p>
+    <p>Your rental agreement with Omkar Healthcare is confirmed. We ensure prompt doorstep delivery, patient installation guidance, and 24/7 technical assistance.</p>
 
     <div class="card-block">
       <div class="card-title">Rental Contract Summary</div>
@@ -527,7 +534,7 @@ async function sendRentalAgreementEmail({
     </div>
 
     <div class="card-block" style="border-left: 4px solid #0d5c58; background: #f0fdfa;">
-      <div class="card-title" style="color: #0f766e;">24-Hour Deposit Refund Guarantee</div>
+      <div class="card-title" style="color: #20544C;">24-Hour Deposit Refund Guarantee</div>
       <p style="margin: 0; font-size: 13px; color: #134e4a;">
         Your refundable deposit of ₹${Number(depositAmount).toLocaleString('en-IN')} is safeguarded in escrow. Upon scheduling a return and clinical technician inspection, your refund is credited directly to your original payment method within 24 hours.
       </p>
@@ -536,7 +543,7 @@ async function sendRentalAgreementEmail({
 
   return sendMail({
     to,
-    subject: `Rental Agreement Confirmed: ${formattedRentalNum} — AarogyaMed Healthcare`,
+    subject: `Rental Agreement Confirmed: ${formattedRentalNum} — Omkar Healthcare`,
     html: wrapHtmlTemplate({
       title,
       subtitle,
@@ -572,7 +579,7 @@ async function sendRentalReturnScheduledEmail({
 
   const contentHtml = `
     <div class="trust-banner">
-      <strong>Technician Scheduled:</strong> A certified AarogyaMed biomedical technician will visit your location to inspect and collect the equipment.
+      <strong>Technician Scheduled:</strong> A certified Omkar Healthcare biomedical technician will visit your location to inspect and collect the equipment.
     </div>
 
     <p>Dear ${name || 'Patient'},</p>
@@ -616,7 +623,7 @@ async function sendRentalReturnScheduledEmail({
 
   return sendMail({
     to,
-    subject: `Return Pickup Confirmed: ${formattedRentalNum} — AarogyaMed Healthcare`,
+    subject: `Return Pickup Confirmed: ${formattedRentalNum} — Omkar Healthcare`,
     html: wrapHtmlTemplate({
       title,
       subtitle,
@@ -631,7 +638,7 @@ async function sendRentalReturnScheduledEmail({
  * Sends a transactional admin/owner notification email for new purchases and rentals.
  */
 async function sendAdminNotificationEmail({ to, subject, html, text }) {
-  const targetEmail = to || process.env.ADMIN_NOTIFICATION_EMAIL || 'care@aarogyamed.com';
+  const targetEmail = to || process.env.ADMIN_NOTIFICATION_EMAIL || 'care@omkarhealthcare.com';
   return sendMail({
     to: targetEmail,
     subject,

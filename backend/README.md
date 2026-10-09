@@ -1,4 +1,4 @@
-# AarogyaMed Backend Testing & Database Guide
+# Omkar Healthcare Backend Testing & Database Guide
 
 ## 1. Running the Test PostgreSQL Database
 

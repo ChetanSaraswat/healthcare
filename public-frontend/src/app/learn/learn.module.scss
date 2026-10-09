@@ -1,0 +1,459 @@
+@use '../../styles/variables' as *;
+
+.learnWrapper {
+  min-height: 100vh;
+  background-color: #faf8ff;
+  color: #131b2e;
+  padding-bottom: 5rem;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+// Hero Header
+.heroSection {
+  background: linear-gradient(135deg, #16453A 0%, #1a5246 60%, #B75932 100%);
+  color: #ffffff;
+  padding: 4rem 0 3rem;
+  border-radius: 0 0 28px 28px;
+  box-shadow: 0 8px 24px rgba(22, 69, 58, 0.15);
+  margin-bottom: 2.5rem;
+
+  .heroBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #E0B478;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.25rem;
+  }
+
+  .heroTitle {
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+
+    span {
+      color: #E0B478;
+    }
+  }
+
+  .heroSubtitle {
+    font-size: 1.05rem;
+    color: #d1e7e2;
+    max-width: 720px;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+}
+
+// Filter Tabs
+.filterTabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+
+  .tabBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 1.5px solid #dae2fd;
+    color: #475569;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #16453A;
+      color: #16453A;
+    }
+
+    &.active {
+      background: #16453A;
+      border-color: #16453A;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(22, 69, 58, 0.2);
+    }
+
+    .tabCount {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.08);
+      color: inherit;
+    }
+
+    &.active .tabCount {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+  }
+}
+
+// Section Header
+.sectionHeader {
+  margin: 2.5rem 0 1.5rem;
+
+  .sectionBadge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #B75932;
+    margin-bottom: 0.35rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #131b2e;
+    margin: 0 0 0.35rem;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+// Conditions Grid (Evergreen Guides)
+.conditionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3.5rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.conditionCard {
+  background: #ffffff;
+  border: 1px solid #dae2fd;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(19, 27, 46, 0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(22, 69, 58, 0.14);
+    border-color: #16453A;
+  }
+
+  .cardImage {
+    height: 180px;
+    width: 100%;
+    background: #edf6f4;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  &:hover .cardImage img {
+    transform: scale(1.04);
+  }
+
+  .cardBody {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .typeBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background: #eaf8f6;
+    color: #16453A;
+    font-size: 0.725rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    width: fit-content;
+  }
+
+  .conditionTitle {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #131b2e;
+    margin: 0 0 0.5rem;
+  }
+
+  .conditionDescription {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 1.25rem;
+    flex: 1;
+  }
+
+  .symptomsBlock {
+    margin-bottom: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+
+    .symptomsLabel {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #B75932;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .symptomPills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .symptomPill {
+      font-size: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+  }
+
+  .cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+    color: #16453A;
+    font-weight: 700;
+    font-size: 0.875rem;
+
+    .arrowIcon {
+      transition: transform 0.2s ease;
+    }
+  }
+
+  &:hover .arrowIcon {
+    transform: translateX(4px);
+  }
+}
+
+// Practical Articles Grid (How-tos, comparisons, maintenance)
+.articlesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3.5rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.articleCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 3px 12px rgba(19, 27, 46, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(183, 89, 50, 0.12);
+    border-color: #B75932;
+  }
+
+  .articleImage {
+    height: 170px;
+    background: #fdf5f2;
+    position: relative;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  &:hover .articleImage img {
+    transform: scale(1.04);
+  }
+
+  .articleBody {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .articleMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+
+    .categoryBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      background: #fbf2ed;
+      color: #B75932;
+      font-size: 0.725rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .readTime {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+  }
+
+  .articleTitle {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #131b2e;
+    margin: 0 0 0.5rem;
+    line-height: 1.35;
+  }
+
+  .articleSummary {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 1.25rem;
+    flex: 1;
+  }
+
+  .articleAuthor {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.8125rem;
+    color: #475569;
+
+    .authorName {
+      font-weight: 600;
+    }
+
+    .readBtn {
+      color: #B75932;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+// Modal Reader for Articles
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 27, 46, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modalContent {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  position: relative;
+  padding: 2.5rem;
+
+  @media (max-width: 640px) {
+    padding: 1.5rem;
+  }
+}
+
+.modalCloseBtn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: #f1f5f9;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+}

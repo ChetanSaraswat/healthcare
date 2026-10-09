@@ -62,11 +62,11 @@ export class OrderEntity {
   static getStatusBadge(status: OrderStatus): { bg: string; color: string; label: string } {
     switch (status) {
       case 'delivered':
-        return { bg: '#eaf8f6', color: '#005c55', label: 'Delivered' };
+        return { bg: '#eaf8f6', color: '#16453A', label: 'Delivered' };
       case 'shipped':
-        return { bg: '#e6f4fe', color: '#006398', label: 'Out for Delivery' };
+        return { bg: '#e6f4fe', color: '#B75932', label: 'Out for Delivery' };
       case 'processing':
-        return { bg: '#fff0eb', color: '#ea580c', label: 'Processing & Sterilizing' };
+        return { bg: '#FBF2ED', color: '#B75932', label: 'Processing & Sterilizing' };
       case 'cancelled':
         return { bg: '#fef2f2', color: '#b91c1c', label: 'Cancelled' };
       default:

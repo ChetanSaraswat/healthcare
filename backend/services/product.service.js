@@ -73,28 +73,37 @@ class ProductService {
   }
 
   async update(id, data) {
-    const product = await productRepository.findByPk(id);
+    const isNum = !isNaN(Number(id));
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const where = isNum ? { id: Number(id) } : isUuid ? { uuid: id } : { id };
+
+    const product = await productRepository.model.findOne({ where });
     if (!product) {
       throw new NotFound('Product not found');
     }
 
     if (data.slug && data.slug !== product.slug) {
-      const exists = await productRepository.checkSlugExists(data.slug, id);
+      const exists = await productRepository.checkSlugExists(data.slug, product.id);
       if (exists) {
         throw new Conflict(`Product with slug '${data.slug}' already exists`);
       }
     }
 
     return await productRepository.handleManagedTransaction(async (transaction) => {
-      return await productRepository.updateWithAssociations(id, data, transaction);
+      return await productRepository.updateWithAssociations(product.id, data, transaction);
     });
   }
 
   async delete(id) {
-    const deleted = await productRepository.deleteById(id);
-    if (!deleted) {
+    const isNum = !isNaN(Number(id));
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const where = isNum ? { id: Number(id) } : isUuid ? { uuid: id } : { id };
+
+    const product = await productRepository.model.findOne({ where });
+    if (!product) {
       throw new NotFound('Product not found');
     }
+    await productRepository.deleteById(product.id);
     return { message: 'Product deleted successfully' };
   }
 }

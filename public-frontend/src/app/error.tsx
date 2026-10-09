@@ -12,7 +12,7 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[AarogyaMed Storefront Error]:', error);
+    console.error('[Omkar Healthcare Storefront Error]:', error);
   }, [error]);
 
   return (
@@ -104,7 +104,7 @@ export default function ErrorBoundary({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: '#005c55',
+              background: '#16453A',
               color: '#ffffff',
               padding: '10px 22px',
               borderRadius: 10,
@@ -149,12 +149,12 @@ export default function ErrorBoundary({
             justifyContent: 'center',
             gap: 6,
             fontSize: '0.8rem',
-            color: '#005c55',
+            color: '#16453A',
             fontWeight: 600,
           }}
         >
           <ShieldCheck size={16} />
-          <span>AarogyaMed Verified Patient Care Helpline: 1800-890-CARE</span>
+          <span>Omkar Healthcare Verified Patient Care Helpline: 1800-890-CARE</span>
         </div>
       </div>
     </div>

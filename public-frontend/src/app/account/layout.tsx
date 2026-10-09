@@ -47,7 +47,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               height: 64,
               borderRadius: 20,
               background: '#eaf8f6',
-              color: '#005c55',
+              color: '#16453A',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -70,7 +70,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               type="button"
               onClick={() => setAuthModalOpen(true)}
               style={{
-                background: '#005c55',
+                background: '#16453A',
                 color: '#ffffff',
                 border: 'none',
                 padding: '12px 28px',
@@ -164,7 +164,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       {/* Patient / Caregiver Master Profile Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #005c55 0%, #004741 100%)',
+          background: 'linear-gradient(135deg, #16453A 0%, #0F352C 100%)',
           borderRadius: 20,
           color: '#ffffff',
           padding: '2rem 2.25rem',
@@ -295,21 +295,21 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                     textDecoration: 'none',
                     fontSize: '0.875rem',
                     fontWeight: isActive ? 800 : 600,
-                    color: isActive ? '#005c55' : '#3e4947',
+                    color: isActive ? '#16453A' : '#3e4947',
                     background: isActive ? '#eaf8f6' : 'transparent',
                     border: isActive ? '1px solid #9cf2e8' : '1px solid transparent',
                     transition: 'all 0.15s ease',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Icon size={18} color={isActive ? '#005c55' : '#6e7977'} />
+                    <Icon size={18} color={isActive ? '#16453A' : '#6e7977'} />
                     <span>{link.label}</span>
                   </div>
 
                   {link.badge !== null && (
                     <span
                       style={{
-                        background: isActive ? '#005c55' : '#eaedff',
+                        background: isActive ? '#16453A' : '#eaedff',
                         color: isActive ? '#ffffff' : '#131b2e',
                         fontSize: '0.6875rem',
                         fontWeight: 800,
@@ -335,7 +335,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               border: '1px solid #eaedff',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#005c55', fontWeight: 700, fontSize: '0.8125rem', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#16453A', fontWeight: 700, fontSize: '0.8125rem', marginBottom: 4 }}>
               <Sparkles size={14} />
               <span>{locale === 'hi' ? 'बायोमेडिकल सेवा गारंटी' : 'Biomedical SLA'}</span>
             </div>
@@ -349,7 +349,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               style={{
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                color: '#005c55',
+                color: '#16453A',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',

@@ -55,7 +55,7 @@ export default function AdminNotFound() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            background: '#005c55',
+            background: '#16453A',
             color: '#ffffff',
             padding: '10px 22px',
             borderRadius: 8,

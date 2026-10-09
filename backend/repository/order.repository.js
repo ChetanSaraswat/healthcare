@@ -39,8 +39,12 @@ class OrderRepository extends BaseRepository {
     });
   }
 
-  async findOrdersByUser(userId) {
-    return await this.model.findAll({
+  async findOrdersByUser(userId, filter = {}) {
+    const pageNum = Math.max(1, Number(filter.page || 1));
+    const limitNum = Math.min(100, Math.max(1, Number(filter.limit || 10)));
+    const offset = (pageNum - 1) * limitNum;
+
+    return await this.model.findAndCountAll({
       where: { user_id: userId },
       include: [
         {
@@ -51,6 +55,9 @@ class OrderRepository extends BaseRepository {
         { model: Address, as: 'address' },
       ],
       order: [['created_at', 'DESC']],
+      limit: limitNum,
+      offset,
+      distinct: true,
     });
   }
 
@@ -132,10 +139,50 @@ class OrderRepository extends BaseRepository {
   }
 
   async findAllOrders(filter = {}) {
-    const where = {};
-    if (filter.status) where.status = filter.status;
+    const {
+      status,
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = 'newest',
+    } = filter;
 
-    return await this.model.findAll({
+    const where = {};
+    if (status && status !== 'all') {
+      where.status = status;
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim();
+      const numMatch = q.match(/\d+/);
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q);
+
+      const orClauses = [];
+      if (isUuid) {
+        orClauses.push({ uuid: q });
+      }
+      if (numMatch) {
+        orClauses.push({ id: parseInt(numMatch[0], 10) });
+      }
+      if (orClauses.length > 0) {
+        where[Op.or] = orClauses;
+      }
+    }
+
+    let order = [['created_at', 'DESC']];
+    if (sortBy === 'oldest') {
+      order = [['created_at', 'ASC']];
+    } else if (sortBy === 'amount_high') {
+      order = [['total_amount', 'DESC']];
+    } else if (sortBy === 'amount_low') {
+      order = [['total_amount', 'ASC']];
+    }
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const offset = (pageNum - 1) * limitNum;
+
+    return await this.model.findAndCountAll({
       where,
       include: [
         {
@@ -146,7 +193,10 @@ class OrderRepository extends BaseRepository {
         { model: Address, as: 'address' },
         { model: User, as: 'user', attributes: ['id', 'uuid', 'name', 'email', 'phone'] },
       ],
-      order: [['created_at', 'DESC']],
+      order,
+      limit: limitNum,
+      offset,
+      distinct: true,
     });
   }
 

@@ -12,10 +12,7 @@ class CategoryService {
   }
 
   async getAll() {
-    return await categoryRepository.findAll({
-      where: { is_active: true },
-      order: [['display_order', 'ASC']],
-    });
+    return await categoryRepository.findAllWithProductCount();
   }
 
   async getById(id) {

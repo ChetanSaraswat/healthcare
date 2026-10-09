@@ -78,13 +78,13 @@ export class RentalEntity {
   static getStatusBadge(status: RentalStatus): { bg: string; color: string; label: string } {
     switch (status) {
       case 'active':
-        return { bg: '#eaf8f6', color: '#005c55', label: 'Active on Rent' };
+        return { bg: '#eaf8f6', color: '#16453A', label: 'Active on Rent' };
       case 'pending':
-        return { bg: '#fff0eb', color: '#ea580c', label: 'Dispatch Scheduled' };
+        return { bg: '#FBF2ED', color: '#B75932', label: 'Dispatch Scheduled' };
       case 'confirmed':
-        return { bg: '#e6f4fe', color: '#006398', label: 'Booking Confirmed' };
+        return { bg: '#e6f4fe', color: '#B75932', label: 'Booking Confirmed' };
       case 'returned':
-        return { bg: '#f2f3ff', color: '#006398', label: 'Returned & Inspected' };
+        return { bg: '#f2f3ff', color: '#B75932', label: 'Returned & Inspected' };
       case 'cancelled':
         return { bg: '#fef2f2', color: '#b91c1c', label: 'Cancelled' };
       default:

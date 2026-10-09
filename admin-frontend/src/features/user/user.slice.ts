@@ -7,6 +7,10 @@ export interface AdminUserState {
   selectedCustomerHistory: CustomerCareHistory | null;
   customerLoading: boolean;
   error: string | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: AdminUserState = {
@@ -14,6 +18,10 @@ const initialState: AdminUserState = {
   selectedCustomerHistory: null,
   customerLoading: false,
   error: null,
+  total: 0,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 export const userSlice = createAppSlice({
@@ -33,7 +41,11 @@ export const userSlice = createAppSlice({
       })
       .addCase(getCustomers.fulfilled, (state, action) => {
         state.customerLoading = false;
-        state.customers = action.payload.data;
+        state.customers = action.payload.data.customers;
+        state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.limit = action.payload.data.limit;
+        state.totalPages = action.payload.data.totalPages;
       })
       .addCase(getCustomers.rejected, (state, action) => {
         state.customerLoading = false;
