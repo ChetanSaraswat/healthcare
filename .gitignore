@@ -28,6 +28,11 @@ Thumbs.db
 *.tgz
 *.rar
 
+# Logs
+*.log
+logs/
+backend/logs/
+
 # Legacy / unused submodules
 /rules_docs/crud-revision/crud-revision-typeorm/
 
