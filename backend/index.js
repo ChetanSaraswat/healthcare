@@ -92,8 +92,25 @@ if (openapiSpec) {
 // Static Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// General API rate limiter
+const rateLimit = require('express-rate-limit');
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    statusCode: 429,
+    message: 'Too many requests from this IP address, please try again after 15 minutes',
+    error: 'Rate limit exceeded',
+  },
+  skip: (req) => process.env.NODE_ENV === 'test' || req.path.startsWith('/docs') || req.path === '/health',
+});
+
 // Routes (Supports both standard root and /api/v1 versioned prefix)
-app.use('/api/v1', require('./routes'));
+app.use('/api/v1', apiLimiter, require('./routes'));
+app.use('/api', apiLimiter);
 app.use('/', require('./routes'));
 
 // Handle 404
