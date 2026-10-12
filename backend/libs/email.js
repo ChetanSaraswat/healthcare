@@ -1,13 +1,14 @@
 'use strict';
 
 const nodemailer = require('nodemailer');
+const env = require('../config/env');
 
-// Configuration from environment variables
-const SMTP_HOST = process.env.SMTP_HOST || 'localhost';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '1026', 10);
-const SMTP_USER = process.env.SMTP_USER || '';
-const SMTP_PASS = process.env.SMTP_PASS || '';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Omkar Healthcare <care@omkarhealthcare.com>';
+// Configuration from validated environment
+const SMTP_HOST = env.SMTP_HOST;
+const SMTP_PORT = env.SMTP_PORT;
+const SMTP_USER = env.SMTP_USER;
+const SMTP_PASS = env.SMTP_PASS;
+const EMAIL_FROM = env.EMAIL_FROM;
 
 /**
  * Creates and configures the Nodemailer transporter.
@@ -23,7 +24,7 @@ function getTransporter() {
       secure: SMTP_PORT === 465,
       ignoreTLS: true,
       tls: {
-        rejectUnauthorized: process.env.NODE_ENV === 'production',
+        rejectUnauthorized: env.NODE_ENV === 'production',
       },
     };
 
@@ -638,7 +639,7 @@ async function sendRentalReturnScheduledEmail({
  * Sends a transactional admin/owner notification email for new purchases and rentals.
  */
 async function sendAdminNotificationEmail({ to, subject, html, text }) {
-  const targetEmail = to || process.env.ADMIN_NOTIFICATION_EMAIL || 'care@omkarhealthcare.com';
+  const targetEmail = to || env.ADMIN_NOTIFICATION_EMAIL;
   return sendMail({
     to: targetEmail,
     subject,

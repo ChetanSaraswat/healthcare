@@ -1,12 +1,12 @@
-require('dotenv').config();
+const env = require('../env');
 
 module.exports = {
   development: {
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_DATABASE || 'aarogyamed_db',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+    username: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_DATABASE,
+    host: env.DB_HOST,
+    port: env.DB_PORT,
     dialect: 'postgres',
     seederStorage: 'sequelize',
     logging: false,
@@ -14,15 +14,15 @@ module.exports = {
       underscored: true,
       timestamps: true,
       createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    }
+      updatedAt: 'updated_at',
+    },
   },
   test: {
-    username: process.env.DB_TEST_USER || process.env.DB_USER || 'postgres',
-    password: process.env.DB_TEST_PASSWORD || process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_TEST_DATABASE || 'aarogyamed_test_db',
-    host: process.env.DB_TEST_HOST || process.env.DB_HOST || 'localhost',
-    port: process.env.DB_TEST_PORT ? parseInt(process.env.DB_TEST_PORT, 10) : 5433,
+    username: process.env.DB_TEST_USER || env.DB_USER,
+    password: process.env.DB_TEST_PASSWORD || env.DB_PASSWORD,
+    database: process.env.DB_TEST_DATABASE || env.DB_TEST_DATABASE,
+    host: process.env.DB_TEST_HOST || env.DB_HOST,
+    port: process.env.DB_TEST_PORT ? parseInt(process.env.DB_TEST_PORT, 10) : env.DB_PORT,
     dialect: 'postgres',
     seederStorage: 'sequelize',
     logging: false,
@@ -36,26 +36,26 @@ module.exports = {
       underscored: true,
       timestamps: true,
       createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    }
+      updatedAt: 'updated_at',
+    },
   },
   production: {
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_DATABASE || 'aarogyamed_db',
-    host: process.env.DB_HOST || 'database',
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
+    username: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_DATABASE,
+    host: env.DB_HOST,
+    port: env.DB_PORT,
     dialect: 'postgres',
     seederStorage: 'sequelize',
     logging: false,
     pool: {
-      max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 25,
-      min: process.env.DB_POOL_MIN ? parseInt(process.env.DB_POOL_MIN, 10) : 2,
+      max: env.DB_POOL_MAX,
+      min: env.DB_POOL_MIN,
       acquire: 30000,
       idle: 10000,
     },
     dialectOptions:
-      process.env.DB_SSL === 'true'
+      env.DB_SSL === 'true'
         ? {
             ssl: {
               require: true,

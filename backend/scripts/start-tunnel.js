@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 
 const envPath = path.resolve(__dirname, '../.env');
-const port = process.env.APP_PORT || process.env.APP_FORWARD_PORT || 8080;
+const env = require('../config/env');
+const port = env.PORT;
 const targetUrl = `http://localhost:${port}`;
 
 console.log(`[Cloudflare Tunnel] Starting tunnel for ${targetUrl}...`);

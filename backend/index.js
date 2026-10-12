@@ -8,7 +8,8 @@ const { errorMiddleware } = require('./middlewares');
 const { checkConnection } = require('./config').dbConnection;
 require('./services/admin-notification.service');
 
-const port = process.env.APP_PORT || 8080;
+const env = require('./config/env');
+const port = env.PORT;
 const app = express();
 
 // Security: Disable X-Powered-By header and apply HTTP security headers
@@ -31,9 +32,7 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((url) => url.trim())
-  : ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = env.CLIENT_URL.split(',').map((url) => url.trim());
 
 app.use(
   cors({
@@ -186,13 +185,13 @@ if (process.env.NODE_ENV !== 'test') {
     .then(() => {
       scheduler.start();
       server = app.listen(port, () => {
-        console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port}`);
+        console.log(`[${env.NODE_ENV}] Omkar Healthcare API Server is listening on port ${port}`);
       });
     })
     .catch((err) => {
       console.error('Database connection failed. Starting server in degraded mode for development:', err.message);
       server = app.listen(port, () => {
-        console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port} (DB disconnected)`);
+        console.log(`[${env.NODE_ENV}] Omkar Healthcare API Server is listening on port ${port} (DB disconnected)`);
       });
     });
 }

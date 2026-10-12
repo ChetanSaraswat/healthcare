@@ -3,6 +3,7 @@ const { userRepository } = require('../repository');
 const { hashPassword, comparePassword } = require('../libs/hash');
 const { email } = require('../libs');
 const { BadRequest, Unauthorized, Conflict, NotFound } = require('../libs/error');
+const env = require('../config/env');
 
 class AuthService {
   generateToken(user) {
@@ -13,14 +14,8 @@ class AuthService {
       name: user.name,
       role: user.role,
     };
-    const secret = process.env.JWT_SECRET;
-    if (!secret && process.env.NODE_ENV === 'production') {
-      throw new Error('Fatal configuration: JWT_SECRET environment variable is missing.');
-    }
-    const effectiveSecret = secret || 'aarogyamed_secret_key_default';
-    const expiresIn = process.env.JWT_EXPIRATION || '7d';
 
-    return jwt.sign(payload, effectiveSecret, { expiresIn });
+    return jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRATION });
   }
 
   async register(data) {

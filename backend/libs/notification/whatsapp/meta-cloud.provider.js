@@ -1,6 +1,7 @@
 'use strict';
 
 const WhatsAppProvider = require('./whatsapp.interface');
+const env = require('../../../config/env');
 
 /**
  * Meta WhatsApp Cloud API Provider.
@@ -9,9 +10,9 @@ const WhatsAppProvider = require('./whatsapp.interface');
 class MetaWhatsAppCloudProvider extends WhatsAppProvider {
   constructor(config = {}) {
     super();
-    this.apiToken = config.apiToken || process.env.WHATSAPP_API_TOKEN || '';
-    this.phoneNumberId = config.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || '';
-    this.apiVersion = config.apiVersion || process.env.WHATSAPP_API_VERSION || 'v18.0';
+    this.apiToken = config.apiToken || env.WHATSAPP_API_TOKEN;
+    this.phoneNumberId = config.phoneNumberId || env.WHATSAPP_PHONE_NUMBER_ID;
+    this.apiVersion = config.apiVersion || env.WHATSAPP_API_VERSION;
   }
 
   async sendMessage({ to, message }) {

@@ -73,10 +73,11 @@ export function getProductImageUrl(src?: string | null, variant: ImageVariant = 
   if (trimmed.startsWith('/uploads/')) {
     const backendUrl =
       process.env.NEXT_PUBLIC_CLIENT_URL ||
-      process.env.NEXT_PUBLIC_BACKEND_URL ||
-      'http://localhost:8080';
-    const cleanBackend = backendUrl.replace(/\/+$/, '');
-    return `${cleanBackend}${trimmed}`;
+      process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      const cleanBackend = backendUrl.replace(/\/+$/, '');
+      return `${cleanBackend}${trimmed}`;
+    }
   }
 
   return trimmed;

@@ -1,6 +1,7 @@
 'use strict';
 
 const WhatsAppProvider = require('./whatsapp.interface');
+const env = require('../../../config/env');
 
 /**
  * Twilio WhatsApp API Provider.
@@ -9,10 +10,10 @@ const WhatsAppProvider = require('./whatsapp.interface');
 class TwilioWhatsAppProvider extends WhatsAppProvider {
   constructor(config = {}) {
     super();
-    this.accountSid = config.accountSid || process.env.TWILIO_ACCOUNT_SID || '';
-    this.authToken = config.authToken || process.env.TWILIO_AUTH_TOKEN || '';
-    this.fromNumber = config.fromNumber || process.env.TWILIO_WHATSAPP_FROM || '';
-    this.contentSid = config.contentSid || process.env.TWILIO_CONTENT_SID || '';
+    this.accountSid = config.accountSid || env.TWILIO_ACCOUNT_SID;
+    this.authToken = config.authToken || env.TWILIO_AUTH_TOKEN;
+    this.fromNumber = config.fromNumber || env.TWILIO_WHATSAPP_FROM;
+    this.contentSid = config.contentSid || env.TWILIO_CONTENT_SID;
   }
 
   async sendMessage({ to, message, contentVariables = null }) {

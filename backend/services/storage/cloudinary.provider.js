@@ -2,6 +2,7 @@
 
 const cloudinary = require('cloudinary').v2;
 const stream = require('stream');
+const env = require('../../config/env');
 
 class CloudinaryProvider {
   constructor() {
@@ -10,10 +11,10 @@ class CloudinaryProvider {
   }
 
   init() {
-    this.cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    this.apiKey = process.env.CLOUDINARY_API_KEY;
-    this.apiSecret = process.env.CLOUDINARY_API_SECRET;
-    this.defaultFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || 'products';
+    this.cloudName = process.env.CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME;
+    this.apiKey = process.env.CLOUDINARY_API_KEY || env.CLOUDINARY_API_KEY;
+    this.apiSecret = process.env.CLOUDINARY_API_SECRET || env.CLOUDINARY_API_SECRET;
+    this.defaultFolder = env.CLOUDINARY_UPLOAD_FOLDER;
 
     if (this.isConfigured()) {
       cloudinary.config({
@@ -66,22 +67,22 @@ class CloudinaryProvider {
       throw new Error('Valid file buffer is required for upload');
     }
 
-    if (!this.isConfigured()) {
-      if (process.env.NODE_ENV === 'test' && process.env.MOCK_STORAGE === 'true') {
-        const publicId = options.public_id || `${this.defaultFolder}/mock_${Date.now()}`;
-        return {
-          public_id: publicId,
-          secure_url: `https://res.cloudinary.com/mock-cloud/image/upload/v1/${publicId}.jpg`,
-          format: 'jpg',
-          bytes: buffer.length,
-          resource_type: 'image',
-          variants: this.generateVariants(
-            publicId,
-            `https://res.cloudinary.com/mock-cloud/image/upload/v1/${publicId}.jpg`
-          ),
-        };
-      }
+    if (process.env.NODE_ENV === 'test' && (process.env.MOCK_STORAGE === 'true' || env.MOCK_STORAGE === 'true')) {
+      const publicId = options.public_id || `${this.defaultFolder}/mock_${Date.now()}`;
+      return {
+        public_id: publicId,
+        secure_url: `https://res.cloudinary.com/mock-cloud/image/upload/v1/${publicId}.jpg`,
+        format: 'jpg',
+        bytes: buffer.length,
+        resource_type: 'image',
+        variants: this.generateVariants(
+          publicId,
+          `https://res.cloudinary.com/mock-cloud/image/upload/v1/${publicId}.jpg`
+        ),
+      };
+    }
 
+    if (!this.isConfigured()) {
       throw new Error(
         'Cloud storage provider is not configured. Please define CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in environment variables.'
       );

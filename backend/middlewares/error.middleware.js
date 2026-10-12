@@ -1,5 +1,6 @@
 const { errorHandler } = require('../libs/utils');
 const { ZodError } = require('zod');
+const env = require('../config/env');
 
 module.exports = (err, req, res, next) => {
   const status = errorHandler(err);
@@ -24,7 +25,7 @@ module.exports = (err, req, res, next) => {
     console.warn(`[Client Error ${status}] ${req.method} ${req.originalUrl}: ${message}`);
   }
 
-  const showStack = process.env.NODE_ENV === 'development' && process.env.SHOW_STACK_TRACE === 'true';
+  const showStack = env.NODE_ENV === 'development' && env.SHOW_STACK_TRACE === 'true';
 
   res.status(status).json({
     success: false,

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Unauthorized, Forbidden } = require('../libs/error');
+const env = require('../config/env');
 
 exports.authenticate = (req, res, next) => {
   try {
@@ -9,13 +10,7 @@ exports.authenticate = (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const secret = process.env.JWT_SECRET;
-    if (!secret && process.env.NODE_ENV === 'production') {
-      throw new Error('Fatal configuration: JWT_SECRET environment variable is missing.');
-    }
-    const effectiveSecret = secret || 'aarogyamed_secret_key_default';
-
-    const decoded = jwt.verify(token, effectiveSecret);
+    const decoded = jwt.verify(token, env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
@@ -43,8 +38,7 @@ exports.optionalAuthenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const secret = process.env.JWT_SECRET || 'aarogyamed_secret_key_default';
-      const decoded = jwt.verify(token, secret);
+      const decoded = jwt.verify(token, env.JWT_SECRET);
       req.user = decoded;
     }
     next();

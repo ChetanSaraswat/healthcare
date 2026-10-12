@@ -5,7 +5,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
  * Talks over the internal Docker network or server-side URL
  */
 export const axiosInterceptorInstanceServer = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080',
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 10000,
 });
 
@@ -21,7 +21,7 @@ axiosInterceptorInstanceServer.interceptors.request.use(
  * Scoped to admin authorization token
  */
 export const axiosInterceptorInstanceClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_CLIENT_URL || 'http://localhost:8080',
+  baseURL: process.env.NEXT_PUBLIC_CLIENT_URL,
   timeout: 10000,
   withCredentials: true,
 });

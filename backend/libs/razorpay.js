@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const env = require('../config/env');
 let RazorpaySDK = null;
 
 try {
@@ -11,9 +12,9 @@ try {
 
 class RazorpayGateway {
   constructor() {
-    this.keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_aarogya_med_2026';
-    this.keySecret = process.env.RAZORPAY_KEY_SECRET || 'secret_test_aarogya_med_key_2026';
-    this.webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || 'webhook_secret_aarogya_med_2026';
+    this.keyId = env.RAZORPAY_KEY_ID;
+    this.keySecret = env.RAZORPAY_KEY_SECRET;
+    this.webhookSecret = env.RAZORPAY_WEBHOOK_SECRET;
 
     this.mockOrders = new Map();
     this.mockPayments = new Map();
@@ -22,7 +23,7 @@ class RazorpayGateway {
     this.mockOrdersByReceipt = new Map();
 
     this.client = null;
-    if (RazorpaySDK && this.keyId && this.keySecret && !this.keyId.startsWith('rzp_test_mock') && process.env.NODE_ENV !== 'test') {
+    if (RazorpaySDK && this.keyId && this.keySecret && !this.keyId.startsWith('rzp_test_mock') && env.NODE_ENV !== 'test') {
       try {
         this.client = new RazorpaySDK({
           key_id: this.keyId,
@@ -321,7 +322,7 @@ class RazorpayGateway {
 
     // In local sandbox / testing environments, allow mock payment signatures
     const isMockSignature =
-      process.env.NODE_ENV !== 'production' &&
+      env.NODE_ENV !== 'production' &&
       (razorpay_signature === 'mock_valid_signature' ||
         razorpay_signature.startsWith('sig_mock_') ||
         razorpay_payment_id.startsWith('pay_mock_'));
@@ -357,7 +358,7 @@ class RazorpayGateway {
       .digest('hex');
 
     // Allow mock webhook signature in test environment
-    if (process.env.NODE_ENV === 'test' && signature === 'mock_webhook_signature') {
+    if (env.NODE_ENV === 'test' && signature === 'mock_webhook_signature') {
       return true;
     }
 

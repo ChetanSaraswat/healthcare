@@ -5,11 +5,12 @@ const fs = require('fs');
 const path = require('path');
 const { Product, Category, Banner, BlogPost } = require('../models');
 const { storageService } = require('../services');
+const env = require('../config/env');
 
 async function migrateUploads() {
   const isDryRun = process.argv.includes('--dry-run');
   const uploadsDir = path.join(__dirname, '../uploads');
-  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || 'products';
+  const folder = env.CLOUDINARY_UPLOAD_FOLDER;
 
   console.log('===============================================================');
   console.log('   AAROGYAMED - LOCAL DISK TO CLOUDINARY MEDIA MIGRATION');
