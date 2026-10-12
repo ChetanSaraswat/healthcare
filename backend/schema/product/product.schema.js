@@ -9,6 +9,7 @@ exports.createProductSchema = z.object({
     brand: z.string({ required_error: 'Brand is required' }).min(1),
     description: z.string({ required_error: 'Description is required' }).min(1),
     images: z.array(z.string()).default([]),
+    image_public_ids: z.array(z.string()).optional().default([]),
     videos: z.array(z.string()).optional().default([]),
     specifications: z
       .array(

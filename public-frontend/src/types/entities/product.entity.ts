@@ -130,7 +130,9 @@ export class ProductEntity {
 
 export function mapRawProductToEntity(p: any): Product {
   const productImages: string[] = Array.isArray(p.images) && p.images.length > 0
-    ? p.images.filter(Boolean)
+    ? p.images
+        .map((img: any) => (typeof img === 'string' ? img : img?.url || ''))
+        .filter(Boolean)
     : [];
   const primaryImg = productImages[0] || '';
 
@@ -164,4 +166,3 @@ export function mapRawProductToEntity(p: any): Product {
     translations: p.translations || undefined,
   };
 }
-

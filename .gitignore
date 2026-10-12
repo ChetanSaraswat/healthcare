@@ -5,6 +5,8 @@ out/
 build/
 dist/
 coverage/
+backend/uploads/
+uploads/
 
 # Universal Environment & Secrets
 .env
@@ -36,4 +38,3 @@ Thumbs.db
 /agent.md
 /AGENTS.md
 /context.md
-

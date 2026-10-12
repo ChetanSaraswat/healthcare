@@ -89,8 +89,14 @@ if (openapiSpec) {
   });
 }
 
-// Static Uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Cloud Storage: Ensure cloud storage configuration integrity on startup
+const { storageService } = require('./services');
+if (process.env.NODE_ENV === 'production' && !storageService.isConfigured()) {
+  throw new Error(
+    '[Startup Error] Missing mandatory Cloudinary configuration in production: ' +
+    'CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET must be defined on ephemeral deployments.'
+  );
+}
 
 // General API rate limiter
 const rateLimit = require('express-rate-limit');

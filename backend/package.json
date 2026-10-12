@@ -14,13 +14,16 @@
     "seed:all": "npx sequelize-cli db:seed:all",
     "seed:products": "node scripts/seed-mock-products.js",
     "seed:undo": "npx sequelize-cli db:seed:undo",
-    "test": "node tests/payment-authority.test.js && node tests/api.integration.test.js",
+    "test": "node tests/payment-authority.test.js && node tests/api.integration.test.js && node tests/cloudinary-storage.test.js",
     "test:payments": "node tests/payment-authority.test.js",
     "test:api": "node tests/api.integration.test.js",
+    "test:storage": "node tests/cloudinary-storage.test.js",
+    "migrate:uploads": "node scripts/migrate-uploads-to-cloudinary.js",
     "tunnel": "node scripts/start-tunnel.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

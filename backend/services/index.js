@@ -11,4 +11,5 @@ module.exports = {
   userService: require('./user.service'),
   blogService: require('./blog.service'),
   adminNotificationService: require('./admin-notification.service'),
+  storageService: require('./storage').storageService,
 };

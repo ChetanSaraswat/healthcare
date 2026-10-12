@@ -14,14 +14,14 @@ The Omkar Healthcare platform (Node.js/Express REST API backend, PostgreSQL data
 
 During this production readiness audit, critical vulnerabilities were identified and resolved, including unauthenticated file upload endpoints, IDOR vulnerabilities on payment lookups, database type coercion crashes on address queries, missing security headers, unthrottled API endpoints, error stack trace leaks, database connection pool starvation under production loads, and the lack of healthcheck readiness endpoints and graceful shutdown handlers. Furthermore, complete multi-stage container isolation and GitHub Actions CI pipelines were engineered.
 
-The platform is **Ready with Conditions** for production release. The deployment must not proceed until the **mandatory conditions** outlined below (primarily credential rotation of exposed test keys, external S3 storage migration for file uploads, and managed database provisioning) are resolved.
+The platform is **Ready with Conditions** for production release. The deployment must not proceed until the **mandatory conditions** outlined below (primarily credential rotation of exposed test keys and managed database provisioning; cloud storage migration to Cloudinary has been completed) are resolved.
 
 ### Top 5 Risks
 
 1. **Exposed Test Secrets in Git History Requiring Immediate Rotation:**  
    Development secrets (Razorpay test keys `rzp_test_*`, Twilio account SID/auth token, and sample JWT secrets) were previously present in local configuration files and committed history. Although now decoupled into environment variables, these credentials must be rotated across third-party portals before production deployment.
-2. **Local Disk Storage for Uploaded Media (`/uploads`):**  
-   File uploads currently write to the local file system (`backend/uploads`). In a multi-instance containerized or serverless environment, local disk storage is ephemeral and non-replicated across nodes, resulting in broken product images upon container recreation or horizontal scaling.
+2. **[RESOLVED] Media Storage Migrated from Ephemeral Local Disk to Cloudinary:**  
+   File uploads previously wrote to local disk (`backend/uploads`), which was ephemeral and non-replicated across multi-instance or serverless deployments. Product media storage has now been migrated to Cloudinary via an in-memory streaming `StorageService`, with zero local disk persistence, server-side magic-byte validation, automatic delivery optimization (`f_auto`, `q_auto`), and responsive thumbnail/card/detail variants.
 3. **Database Connection Pool Exhaustion on High Concurrent Traffic:**  
    Sequelize was previously configured with default unpooled settings. While hardened to `max: 25` connections, scaling Node.js horizontally to multiple container replicas without connection pooling middleware (such as PgBouncer or Supabase/RDS Connection Pooling) will quickly exhaust PostgreSQL's `max_connections` limit.
 4. **Out-of-App Manual Fulfillment Operational Bottlenecks:**  
@@ -239,7 +239,7 @@ Load tests were conducted against the live running service on a local Linux benc
 | **Abuse Protection** | Public API and Authentication rate limiting | **Done** | `express-rate-limit` active on API root, `/auth/*`, and `/payments/*`. |
 | **Data Protection** | Database transaction isolation & `FOR UPDATE` locks | **Done** | Atomic transactions applied across order creation, payment capture, and status updates. |
 | **Error Handling** | Production error sanitization (no stack leak) | **Done** | `error.middleware.js` sanitizes error details; stack traces suppressed in production. |
-| **Static Storage** | Cloud Object Storage for user uploads (S3/GCS) | **Partial** | File uploads currently write to local disk (`/uploads`). Needs S3 adapter before multi-instance deploy. |
+| **Static Storage** | Cloud Object Storage for user uploads (Cloudinary) | **Done** | Migrated to official Cloudinary SDK behind StorageService abstraction. Direct in-memory buffer streaming, strict magic bytes security, variants, and zero local disk writes. |
 | **Logging & APM** | Centralized structured logging and Sentry APM | **Partial** | Console logging structured with timestamps; Sentry SDK hooks documented for inclusion. |
 | **Data Backups** | Automated database backup and point-in-time recovery | **Partial** | Documented backup scripts and pg_dump automation; managed cloud PG recommended. |
 
@@ -249,10 +249,9 @@ Load tests were conducted against the live running service on a local Linux benc
 
 Before deploying to a public production environment, the following decisions must be made:
 
-1. **Static Media Storage Strategy (Local Disk vs Cloud S3):**  
-   *Context:* Admin product uploads currently write to the container's local file system (`backend/uploads`).  
-   *Decision Needed:* Should we attach an AWS S3 bucket (or Cloudflare R2 / Supabase Storage) via an S3 SDK upload provider, or deploy with a persistent Docker volume on a single VPS?  
-   *Recommendation:* Use **Cloudflare R2** or **AWS S3** to ensure images persist across container updates and zero-downtime redeployments.
+1. **[RESOLVED] Static Media Storage Strategy (Cloudinary Migration Complete):**  
+   *Context:* Media uploads previously targeted ephemeral disk (`backend/uploads`).  
+   *Resolution:* Implemented official Cloudinary SDK behind a swappable `StorageService` provider abstraction. All uploads stream in-memory with server-side magic byte inspection and automatic variants. Migration script `npm run migrate:uploads` is available to migrate historical assets. Decision needed only on Cloudinary plan sizing and folder naming.
 2. **Third-Party Service Credentials:**  
    *Context:* Test keys exist in historical commits and local files.  
    *Decision Needed:* Provide production Razorpay API keys (live mode) and production Twilio or WhatsApp Business Cloud API credentials.
@@ -438,7 +437,7 @@ To finalize the production hosting setup, please confirm your preferences on the
 |:---:|---|:---:|:---:|:---:|
 | **1** | **Rotate All Third-Party Secrets:** Generate new Razorpay live keys, Twilio credentials, and a strong production `JWT_SECRET`. | **P0 (Immediate)** | 1 Hour | Operations / Security |
 | **2** | **Merge `prod-readiness-audit` Branch:** Review PR containing all 10 focused security, reliability, and CI commits and merge into `main`. | **P0 (Immediate)** | 30 Mins | Lead Developer |
-| **3** | **Migrate File Uploads to Cloud Storage:** Add AWS S3 or Cloudflare R2 upload adapter in `backend/routes/upload.router.js` for persistent product images. | **P1 (Pre-Launch)** | 3–4 Hours | Backend Engineer |
+| **3** | **Migrate File Uploads to Cloud Storage:** Integrated official Cloudinary SDK behind `StorageService`, memory-only uploads in `backend/routes/upload.router.js`, DB tracking via `image_public_ids`, and automated variants. | **Done** | Completed | Backend Engineer |
 | **4** | **Provision Managed Database in Mumbai Region:** Spin up PostgreSQL 16 on Supabase or Render in AWS Mumbai (`ap-south-1`) and execute migrations. | **P1 (Pre-Launch)** | 2 Hours | DevOps Engineer |
 | **5** | **Configure Production Transactional SMTP:** Provision AWS SES or Resend account, verify domain DKIM/SPF records, and wire credentials to backend. | **P1 (Pre-Launch)** | 2 Hours | DevOps Engineer |
 | **6** | **Set Up Sentry Error Tracking & Uptime Monitoring:** Add Sentry DSN across backend and frontends; set up BetterStack 60-second healthcheck alert. | **P2 (Launch)** | 2 Hours | DevOps Engineer |

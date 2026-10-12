@@ -82,6 +82,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSONB,
         defaultValue: [],
       },
+      image_public_ids: {
+        type: DataTypes.JSONB,
+        defaultValue: [],
+      },
       videos: {
         type: DataTypes.JSONB,
         defaultValue: [],
