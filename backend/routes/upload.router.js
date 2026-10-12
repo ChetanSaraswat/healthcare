@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { authenticate, authorize } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -9,6 +10,15 @@ const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']);
+const ALLOWED_MIMETYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -28,17 +38,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 12 * 1024 * 1024 }, // 12MB limit per file
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit per file
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files (JPEG, PNG, WebP, SVG, GIF) are allowed'), false);
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
+      return cb(new Error(`Invalid file extension '${ext}'. Allowed: JPEG, PNG, WebP, GIF, SVG`));
     }
+    if (!ALLOWED_MIMETYPES.has(file.mimetype.toLowerCase())) {
+      return cb(new Error(`Invalid MIME type '${file.mimetype}'. Only authentic image types are allowed`));
+    }
+    cb(null, true);
   },
 });
 
-router.post('/', (req, res) => {
+router.post('/', authenticate, authorize('super_admin'), (req, res) => {
   upload.any()(req, res, (err) => {
     if (err) {
       return res.status(400).json({
@@ -52,6 +65,24 @@ router.post('/', (req, res) => {
         success: false,
         message: 'No files uploaded',
       });
+    }
+
+    // Verify SVGs do not contain embedded scripts (Stored XSS mitigation)
+    for (const file of req.files) {
+      if (path.extname(file.filename).toLowerCase() === '.svg') {
+        const content = fs.readFileSync(file.path, 'utf8');
+        if (/<script|javascript:|onload=|onerror=/i.test(content)) {
+          req.files.forEach((f) => {
+            if (fs.existsSync(f.path)) {
+              try { fs.unlinkSync(f.path); } catch (_) {}
+            }
+          });
+          return res.status(400).json({
+            success: false,
+            message: 'Malicious SVG payload detected (embedded scripts or active event handlers)',
+          });
+        }
+      }
     }
 
     const host = req.get('host') || 'localhost:8080';
