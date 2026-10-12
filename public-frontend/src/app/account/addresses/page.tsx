@@ -14,16 +14,14 @@ import {
   CheckCircle2,
   Trash2,
   Edit2,
-  ShieldCheck,
   Building,
   Home,
   HeartPulse,
   X,
-  AlertCircle,
 } from 'lucide-react';
 
 export default function AccountAddressesPage() {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const dispatch = useAppDispatch();
   const { addresses, submitting } = useAppSelector((state) => state.user);
 

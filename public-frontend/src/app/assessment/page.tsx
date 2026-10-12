@@ -7,35 +7,18 @@ import { useRouter } from 'next/navigation';
 import {
   Stethoscope,
   ArrowRight,
-  ArrowLeft,
   CheckCircle2,
-  HelpCircle,
   ShoppingBag,
   CalendarClock,
-  Sparkles,
-  ShieldCheck,
-  RotateCcw,
-  IndianRupee,
-  Activity,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart } from '@/features/cart/cart.slice';
 import { listProducts } from '@/features/products/list-products/list-products.action';
 
-interface QuestionOption {
-  id: string;
-  title: string;
-  subtitle: string;
-  recommendedSlug: string;
-  recommendedMode: 'rent' | 'buy';
-  recommendedDays: number;
-}
-
 export default function AssessmentPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.products);
-  const productsLoading = useAppSelector((state) => state.products.loading);
 
   React.useEffect(() => {
     if (products.length === 0) {

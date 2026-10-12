@@ -3,7 +3,7 @@
 import React from 'react';
 import { InvoiceEntity } from '@/domain/entities/invoice.entity';
 import { useTranslation } from '@/locales';
-import { Printer, X, ShieldCheck, CheckCircle2, Download } from 'lucide-react';
+import { Printer, X } from 'lucide-react';
 
 interface ClinicalInvoiceModalProps {
   isOpen: boolean;

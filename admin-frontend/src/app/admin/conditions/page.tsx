@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { Condition, ConditionContentBlock } from '@/domain/entities/condition.entity';
+import { Condition } from '@/domain/entities/condition.entity';
 import { updateCondition } from '@/features/conditions/conditions.slice';
 import {
   BookOpen,
-  Plus,
   ExternalLink,
   Edit3,
   CheckCircle2,
@@ -21,8 +20,6 @@ import {
   Sparkles,
   Save,
   X,
-  ChevronRight,
-  ShieldCheck,
 } from 'lucide-react';
 
 export default function AdminConditionsPage() {
@@ -676,7 +673,7 @@ export default function AdminConditionsPage() {
 
                 {editFormData.contentBlocks && editFormData.contentBlocks.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {editFormData.contentBlocks.map((block, idx) => {
+                    {editFormData.contentBlocks.map((block) => {
                       const trBlock = editTab === 'hi'
                         ? editFormData.translations?.hi?.contentBlocks?.find((b) => b.id === block.id || b.slug === block.slug)
                         : block;

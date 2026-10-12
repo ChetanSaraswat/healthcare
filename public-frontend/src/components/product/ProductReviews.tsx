@@ -3,9 +3,7 @@
 import React, { useState } from 'react';
 import {
   Star,
-  ShieldCheck,
   CheckCircle2,
-  ThumbsUp,
   MessageSquare,
   PlusCircle,
   Award,

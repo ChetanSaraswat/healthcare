@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { useAppDispatch } from '@/store/hooks';
 import { useTranslation } from '@/locales';
 import { axiosInterceptorInstanceClient } from '@/config/axios';
 import {
@@ -13,7 +12,6 @@ import {
   RefreshCw,
   Clock,
   ChevronRight,
-  ExternalLink,
 } from 'lucide-react';
 
 interface PolicyData {
@@ -43,12 +41,10 @@ export default function PolicyDetailPage({
 
   const [policy, setPolicy] = useState<PolicyData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    setError(null);
 
     axiosInterceptorInstanceClient
       .get(`/policies/${activeSlug}`, {
@@ -62,7 +58,6 @@ export default function PolicyDetailPage({
       .catch((err) => {
         if (isMounted) {
           console.warn('[PolicyPage] Failed to fetch policy:', err);
-          setError('Unable to load latest policy version. Showing cached standards.');
         }
       })
       .finally(() => {

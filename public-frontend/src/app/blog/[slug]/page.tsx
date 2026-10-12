@@ -3,19 +3,15 @@
 import React, { use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getStaticPostBySlug, STATIC_BLOG_POSTS } from '@/content/blog/posts';
+import { getStaticPostBySlug } from '@/content/blog/posts';
 import { useTranslation } from '@/locales';
 import {
-  BookOpen,
   ArrowLeft,
   Calendar,
   Clock,
   User,
-  Tag,
   ShoppingBag,
   Share2,
-  CheckCircle2,
-  ShieldCheck,
 } from 'lucide-react';
 
 interface BlogPostPageProps {

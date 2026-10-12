@@ -21,7 +21,7 @@ import {
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const { user: authUser, isAuthenticated } = useAppSelector((state) => state.auth);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const orders = useAppSelector((state) => state.orders.orders);

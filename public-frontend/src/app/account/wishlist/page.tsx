@@ -4,23 +4,19 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useTranslation } from '@/locales';
-import { WishlistEntity, WishlistItem } from '@/domain/entities/wishlist.entity';
+import { WishlistItem } from '@/domain/entities/wishlist.entity';
 import { removeItem } from '@/features/wishlist/wishlist.slice';
 import { addToCart } from '@/features/cart/cart.slice';
 import {
   Heart,
   ShoppingCart,
   Trash2,
-  CalendarClock,
-  ArrowRight,
   Sparkles,
-  ShieldCheck,
   CheckCircle2,
-  PackageCheck,
 } from 'lucide-react';
 
 export default function AccountWishlistPage() {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const dispatch = useAppDispatch();
   const wishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const [addedToast, setAddedToast] = useState<string | null>(null);

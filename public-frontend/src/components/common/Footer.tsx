@@ -9,9 +9,7 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  Sparkles,
   PhoneCall,
-  Award,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {

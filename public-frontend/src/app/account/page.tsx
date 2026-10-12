@@ -4,29 +4,23 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useTranslation } from '@/locales';
-import { UserEntity, AddressEntity } from '@/domain/entities/user.entity';
+import { UserEntity } from '@/domain/entities/user.entity';
 import { OrderEntity } from '@/domain/entities/order.entity';
-import { RentalEntity } from '@/domain/entities/rental.entity';
 import { listOrders } from '@/features/orders/list-orders/list-orders.action';
 import { listRentals } from '@/features/rentals/list-rentals/list-rentals.action';
 import {
   CalendarClock,
   ShoppingBag,
   MapPin,
-  ShieldCheck,
   ArrowRight,
-  RotateCcw,
-  Clock,
   User,
   HeartPulse,
-  Award,
-  PhoneCall,
   CheckCircle2,
 } from 'lucide-react';
 
 export default function AccountOverviewPage() {
   const dispatch = useAppDispatch();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const authUser = useAppSelector((state) => state.auth.user);
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const orders = useAppSelector((state) => state.orders.orders);

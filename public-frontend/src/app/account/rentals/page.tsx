@@ -14,18 +14,12 @@ import {
   ShieldCheck,
   PhoneCall,
   CheckCircle2,
-  Clock,
-  AlertCircle,
   X,
-  Calendar,
-  Sparkles,
-  ChevronRight,
-  Info,
 } from 'lucide-react';
 
 export default function AccountRentalsPage() {
   const dispatch = useAppDispatch();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const rentals = useAppSelector((state) => state.rentals.rentals);
   const loading = useAppSelector((state) => state.rentals.loading);
 

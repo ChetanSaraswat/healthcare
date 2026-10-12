@@ -15,30 +15,16 @@ import {
   ArrowRight,
   Clock,
   Tag,
-  CheckCircle2,
-  Sparkles,
-  ShieldCheck,
   X,
-  Share2,
-  ExternalLink,
   ShoppingBag,
 } from 'lucide-react';
 
 export default function LearnEducationHubPage() {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const [activeTab, setActiveTab] = useState<'all' | 'conditions' | 'articles'>('all');
   const [activeReadingPost, setActiveReadingPost] = useState<BlogPost | null>(null);
-  const [copiedLink, setCopiedLink] = useState(false);
 
   const publishedArticles = STATIC_BLOG_POSTS.filter((p) => p.status === 'published');
-
-  const handleShare = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    }
-  };
 
   return (
     <div className={styles.learnWrapper}>

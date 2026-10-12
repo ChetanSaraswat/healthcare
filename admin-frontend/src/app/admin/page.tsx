@@ -5,13 +5,10 @@ import Link from 'next/link';
 import {
   PackageCheck,
   CalendarSync,
-  ShoppingBag,
   ShieldCheck,
   AlertTriangle,
   CheckCircle2,
-  Clock,
   ArrowRight,
-  TrendingUp,
   PlusCircle,
   Truck,
   IndianRupee,
@@ -28,7 +25,6 @@ export default function AdminDashboardPage() {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.products);
   const rentals = useAppSelector((state) => state.rentals.rentals);
-  const orders = useAppSelector((state) => state.orders.orders);
 
   useEffect(() => {
     dispatch(listOrders());

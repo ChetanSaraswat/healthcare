@@ -1,5 +1,5 @@
 import { axiosInterceptorInstanceClient } from '@/config/axios';
-import { CustomerSummary, CustomerCareHistory } from '@/domain/entities/user.entity';
+import { CustomerSummary } from '@/domain/entities/user.entity';
 import {
   GetCustomersFilters,
   GetCustomersResponse,

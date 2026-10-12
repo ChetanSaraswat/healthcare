@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Category } from '@/domain/entities/category.entity';
 import { listCategories } from '@/features/categories/list-categories/list-categories.action';
@@ -18,9 +17,6 @@ import {
   CheckCircle2,
   X,
   ChevronRight,
-  Package,
-  Layers,
-  Sparkles,
   Search,
   RefreshCw,
 } from 'lucide-react';
@@ -80,10 +76,6 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // Helper to count products mapped to category
-  const getProductCount = (categorySlug: string) => {
-    return products.filter((p) => p.categoryId === categorySlug || p.categoryId?.includes(categorySlug)).length;
-  };
 
   const filteredCategories = categories.filter(
     (c) =>
@@ -276,7 +268,6 @@ export default function AdminCategoriesPage() {
           ) : (
             rootCategories.map((root) => {
             const children = categories.filter((c) => c.parentId === root.id);
-            const productCount = getProductCount(root.slug);
 
             return (
               <div key={root.id} style={{ borderBottom: '1px solid #eaedff' }}>

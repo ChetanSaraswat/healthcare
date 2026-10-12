@@ -1,15 +1,11 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 
 import {
-  FileText,
   ShieldCheck,
   RotateCcw,
   AlertCircle,
-  Clock,
-  CheckCircle2,
 } from 'lucide-react';
 
 export default function RentalTermsPage() {

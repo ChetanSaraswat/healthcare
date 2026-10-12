@@ -10,7 +10,6 @@ import { CONTACT_CONFIG } from '@/config/contact.config';
 import styles from './Navbar.module.scss';
 import {
   PhoneCall,
-  MessageCircle,
   ShoppingCart,
   User,
   Heart,

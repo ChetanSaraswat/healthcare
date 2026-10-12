@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams, notFound } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getProduct } from '@/features/products/get-product/get-product.action';
 import { ProductEntity } from '@/domain/entities/product.entity';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -25,8 +25,6 @@ import {
   ShoppingBag,
   PhoneCall,
   ChevronRight,
-  Info,
-  Clock,
   Heart,
   AlertCircle,
 } from 'lucide-react';

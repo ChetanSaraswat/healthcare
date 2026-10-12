@@ -10,13 +10,9 @@ import {
   CheckCircle2,
   ShieldCheck,
   Truck,
-  PhoneCall,
-  CalendarCheck,
   Clock,
   ArrowRight,
   FileText,
-  Printer,
-  CreditCard,
   AlertTriangle,
 } from 'lucide-react';
 

@@ -8,12 +8,8 @@ import { CONTACT_CONFIG } from '@/config/contact.config';
 import {
   PhoneCall,
   MessageCircle,
-  Clock,
-  ShieldCheck,
   Send,
-  MapPin,
   CheckCircle2,
-  AlertCircle,
   Truck,
   HeartHandshake,
 } from 'lucide-react';

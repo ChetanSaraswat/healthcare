@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export default function AdminNotFound() {
   return (

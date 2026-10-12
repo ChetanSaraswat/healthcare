@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { ShieldCheck, Lock, EyeOff } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 export default function PrivacyTermsPage() {
   return (

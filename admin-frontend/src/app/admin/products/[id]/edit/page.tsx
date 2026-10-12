@@ -14,15 +14,11 @@ import {
   Package,
   Layers,
   IndianRupee,
-  ShieldCheck,
-  Sparkles,
   RefreshCw,
   UploadCloud,
   ImageIcon,
   X,
   AlertCircle,
-  CheckCircle2,
-  Tag,
 } from 'lucide-react';
 import { LanguageTabs } from '@/components/admin/LanguageTabs';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -64,7 +60,6 @@ export default function EditProductAdminPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
     reset,
     formState: { errors },

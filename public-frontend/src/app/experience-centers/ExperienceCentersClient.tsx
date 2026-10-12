@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useTranslation } from '@/locales';
 import { OMKAR_LOCATIONS } from '@/config/locations.config';
 import { CONTACT_CONFIG } from '@/config/contact.config';
@@ -17,9 +16,7 @@ import {
   Stethoscope,
   Sparkles,
   ShieldCheck,
-  ChevronRight,
   MessageCircle,
-  HelpCircle,
 } from 'lucide-react';
 
 export const ExperienceCentersClient: React.FC = () => {

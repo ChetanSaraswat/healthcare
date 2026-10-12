@@ -7,7 +7,7 @@ import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { listProducts } from '@/features/products/list-products/list-products.action';
 import { listCategories } from '@/features/categories/list-categories/list-categories.action';
-import { Filter, SlidersHorizontal, ShoppingBag, RefreshCw, AlertCircle } from 'lucide-react';
+import { SlidersHorizontal, ShoppingBag, RefreshCw, AlertCircle } from 'lucide-react';
 import { PaginationControl } from '@/components/common/PaginationControl';
 
 function ShopContent() {

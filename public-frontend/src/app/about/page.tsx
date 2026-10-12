@@ -6,23 +6,14 @@ import { useTranslation } from '@/locales';
 import styles from './about.module.scss';
 import {
   ShieldCheck,
-  Award,
-  Sparkles,
-  Clock,
   HeartPulse,
-  Building2,
-  Users,
-  CheckCircle2,
-  ArrowRight,
-  MapPin,
   Stethoscope,
   RotateCcw,
-  FileText,
   PhoneCall,
 } from 'lucide-react';
 
 export default function AboutPage() {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
 
   return (
     <div className={styles.aboutWrapper}>

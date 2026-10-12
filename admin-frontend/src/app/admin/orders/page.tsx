@@ -4,12 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
   Search,
-  CheckCircle2,
-  Clock,
-  Truck,
-  IndianRupee,
   MapPin,
-  FileText,
   RefreshCw,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';

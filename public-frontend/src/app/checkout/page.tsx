@@ -69,7 +69,7 @@ const loadRazorpaySdk = (): Promise<boolean> => {
 export default function CheckoutPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const { items, pricing, pincode, serviceableCity } = useAppSelector((state) => state.cart);
   const savedAddresses = useAppSelector((state) => state.user.addresses);
   const authUser = useAppSelector((state) => state.auth.user);

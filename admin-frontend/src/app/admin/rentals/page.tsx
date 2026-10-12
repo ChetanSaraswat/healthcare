@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import {
   CalendarSync,
   Search,
@@ -10,7 +9,6 @@ import {
   RotateCcw,
   XCircle,
   Truck,
-  IndianRupee,
   Phone,
   MapPin,
   ShieldAlert,
@@ -27,7 +25,7 @@ import { PaginationControl } from '@/components/common/PaginationControl';
 
 export default function AdminRentalsPage() {
   const dispatch = useAppDispatch();
-  const { rentals, loading, error, total, totalPages } = useAppSelector((state) => state.rentals);
+  const { rentals, loading, total, totalPages } = useAppSelector((state) => state.rentals);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');

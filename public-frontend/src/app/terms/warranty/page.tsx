@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { ShieldCheck, Award, Wrench, CheckCircle2 } from 'lucide-react';
+import { Award } from 'lucide-react';
 
 export default function WarrantyTermsPage() {
   return (

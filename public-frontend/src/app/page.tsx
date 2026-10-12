@@ -11,18 +11,13 @@ import { CONTACT_CONFIG } from '@/config/contact.config';
 import styles from './page.module.scss';
 import {
   ShieldCheck,
-  Truck,
-  RotateCcw,
-  Sparkles,
   ArrowRight,
   Wind,
   Accessibility,
   Activity,
   HeartPulse,
-  CheckCircle2,
   PhoneCall,
   Clock,
-  MapPin,
 } from 'lucide-react';
 
 export default function HomePage() {

@@ -12,20 +12,15 @@ import {
   ShoppingBag,
   FileText,
   RotateCw,
-  Truck,
   CheckCircle2,
-  Clock,
-  ExternalLink,
   ShieldCheck,
-  AlertCircle,
 } from 'lucide-react';
 
 export default function AccountOrdersPage() {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.orders.orders);
   const loading = useAppSelector((state) => state.orders.loading);
-  const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<any | null>(null);
 
   useEffect(() => {
