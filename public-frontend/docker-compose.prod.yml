@@ -1,0 +1,24 @@
+services:
+  public-frontend:
+    container_name: aarogyamed-public-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "${PORT:-3000}:3000"
+    networks:
+      aarogyamed_network:
+        aliases:
+          - public-frontend
+          - aarogyamed-public-frontend
+    restart: always
+
+networks:
+  aarogyamed_network:
+    name: aarogyamed-shared-network
+    external: true

@@ -1,0 +1,24 @@
+services:
+  admin-frontend:
+    container_name: aarogyamed-admin-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "${PORT:-3001}:3001"
+    networks:
+      aarogyamed_network:
+        aliases:
+          - admin-frontend
+          - aarogyamed-admin-frontend
+    restart: always
+
+networks:
+  aarogyamed_network:
+    name: aarogyamed-shared-network
+    external: true
