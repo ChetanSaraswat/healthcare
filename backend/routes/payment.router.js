@@ -30,6 +30,6 @@ router.post('/razorpay/webhook', paymentController.webhook);
 router.get('/my-payments', authMiddleware.authenticate, paymentController.getMyPayments);
 
 // 5. Payment details by ID
-router.get('/:id', authMiddleware.optionalAuthenticate, paymentController.getById);
+router.get('/:id', authMiddleware.authenticate, paymentController.getById);
 
 module.exports = router;

@@ -2,6 +2,7 @@
 
 const paymentService = require('../services/payment.service');
 const { SUCCESS, CREATED } = require('../libs/constants');
+const { Unauthorized } = require('../libs/error');
 
 class PaymentController {
   async createRazorpayOrder(req, res, next) {
@@ -38,7 +39,10 @@ class PaymentController {
   async getById(req, res, next) {
     try {
       const isAdmin = req.user && req.user.role === 'super_admin';
-      const userId = isAdmin ? null : req.user.id;
+      const userId = isAdmin ? null : (req.user ? req.user.id : null);
+      if (!isAdmin && !userId) {
+        throw new Unauthorized('Authentication required');
+      }
       const payment = await paymentService.getPaymentById(req.params.id, userId);
       res.status(SUCCESS).json({ success: true, data: payment });
     } catch (error) {

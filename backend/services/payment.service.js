@@ -952,7 +952,7 @@ class PaymentService {
     if (!payment) {
       throw new NotFound('Payment transaction not found');
     }
-    if (userId && payment.user_id !== userId) {
+    if (userId !== null && payment.user_id !== userId) {
       throw new Forbidden('Unauthorized access to payment details');
     }
     return payment;
