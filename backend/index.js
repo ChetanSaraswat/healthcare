@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { errorMiddleware } = require('./middlewares');
 const { checkConnection } = require('./config').dbConnection;
@@ -9,6 +10,16 @@ require('./services/admin-notification.service');
 
 const port = process.env.APP_PORT || 8080;
 const app = express();
+
+// Security: Disable X-Powered-By header and apply HTTP security headers
+app.disable('x-powered-by');
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Swagger UI and Next.js frontend assets need CSP flexibility; configure via reverse proxy in production
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
 app.use(cookieParser());
 app.use(
@@ -22,17 +33,23 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(',').map((url) => url.trim())
-  : ['http://localhost:3000'];
+  : ['http://localhost:3000', 'http://localhost:3001'];
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (such as mobile apps, curl, or server-to-server webhooks)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+      if (process.env.NODE_ENV !== 'production') {
+        // In development/test, permit local origins
+        if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+          return callback(null, true);
+        }
+      }
+      return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
