@@ -24,13 +24,15 @@ module.exports = (err, req, res, next) => {
     console.warn(`[Client Error ${status}] ${req.method} ${req.originalUrl}: ${message}`);
   }
 
+  const showStack = process.env.NODE_ENV === 'development' && process.env.SHOW_STACK_TRACE === 'true';
+
   res.status(status).json({
     success: false,
     statusCode: status,
     message,
     error: message,
     ...(details ? { details, errors: details } : {}),
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(showStack && { stack: err.stack }),
   });
 };
 

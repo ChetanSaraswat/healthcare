@@ -13,10 +13,14 @@ class AuthService {
       name: user.name,
       role: user.role,
     };
-    const secret = process.env.JWT_SECRET || 'aarogyamed_secret_key_default';
+    const secret = process.env.JWT_SECRET;
+    if (!secret && process.env.NODE_ENV === 'production') {
+      throw new Error('Fatal configuration: JWT_SECRET environment variable is missing.');
+    }
+    const effectiveSecret = secret || 'aarogyamed_secret_key_default';
     const expiresIn = process.env.JWT_EXPIRATION || '7d';
 
-    return jwt.sign(payload, secret, { expiresIn });
+    return jwt.sign(payload, effectiveSecret, { expiresIn });
   }
 
   async register(data) {
