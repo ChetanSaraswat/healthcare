@@ -1,0 +1,139 @@
+name: Omkar Healthcare CI Pipeline
+
+on:
+  push:
+    branches: [ main, prod-readiness-audit ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: Backend CI (Tests, Security & Migrations)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: aarogyamed_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Syntax & Build verification
+        working-directory: backend
+        run: npm run build
+
+      - name: Run database migrations
+        working-directory: backend
+        env:
+          NODE_ENV: development
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: aarogyamed_db
+        run: npx sequelize-cli db:migrate
+
+      - name: Execute automated test suites (Payment Authority & API Integration)
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_TEST_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: aarogyamed_db
+          DB_TEST_DATABASE: aarogyamed_db
+          JWT_SECRET: ci_test_jwt_secret_key_omkar_healthcare
+          WHATSAPP_PROVIDER: mock
+          SMTP_HOST: localhost
+        run: npm test
+
+  public-frontend:
+    name: Public Frontend CI (Lint, Typecheck & Standalone Build)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: public-frontend/package-lock.json
+
+      - name: Install public-frontend dependencies
+        working-directory: public-frontend
+        run: npm ci
+
+      - name: Run tests
+        working-directory: public-frontend
+        run: npm test
+
+      - name: Verify Next.js production build
+        working-directory: public-frontend
+        env:
+          NEXT_PUBLIC_BACKEND_URL: http://aarogyamed-backend:8080
+          NEXT_PUBLIC_CLIENT_URL: http://localhost:8080
+        run: npm run build
+
+  admin-frontend:
+    name: Admin Frontend CI (Lint, Typecheck & Standalone Build)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: admin-frontend/package-lock.json
+
+      - name: Install admin-frontend dependencies
+        working-directory: admin-frontend
+        run: npm ci
+
+      - name: Verify Next.js production build
+        working-directory: admin-frontend
+        env:
+          NEXT_PUBLIC_BACKEND_URL: http://aarogyamed-backend:8080
+          NEXT_PUBLIC_CLIENT_URL: http://localhost:8080
+        run: npm run build
