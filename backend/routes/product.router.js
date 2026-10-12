@@ -5,6 +5,7 @@ const { authenticate, authorize } = require('../middlewares/auth.middleware');
 const {
   createProductSchema,
   listProductSchema,
+  updateProductSchema,
 } = require('../schema/product/product.schema');
 
 // Public routes
@@ -29,6 +30,7 @@ router.patch(
   '/:id',
   authenticate,
   authorize('super_admin'),
+  validate(updateProductSchema),
   (req, res, next) => productController.update(req, res, next)
 );
 
@@ -36,6 +38,7 @@ router.put(
   '/:id',
   authenticate,
   authorize('super_admin'),
+  validate(updateProductSchema),
   (req, res, next) => productController.update(req, res, next)
 );
 
