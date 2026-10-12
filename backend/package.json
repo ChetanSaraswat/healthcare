@@ -14,8 +14,9 @@
     "seed:all": "npx sequelize-cli db:seed:all",
     "seed:products": "node scripts/seed-mock-products.js",
     "seed:undo": "npx sequelize-cli db:seed:undo",
-    "seed:undo:all": "npx sequelize-cli db:seed:undo:all",
-    "test": "node tests/payment-authority.test.js",
+    "test": "node tests/payment-authority.test.js && node tests/api.integration.test.js",
+    "test:payments": "node tests/payment-authority.test.js",
+    "test:api": "node tests/api.integration.test.js",
     "tunnel": "node scripts/start-tunnel.js"
   },
   "dependencies": {

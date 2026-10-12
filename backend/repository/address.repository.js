@@ -29,8 +29,24 @@ class AddressRepository extends BaseRepository {
     );
   }
 
-  async findUserAddress(userId, addressUuid, options = {}) {
-    const where = { uuid: addressUuid, user_id: userId };
+  async findUserAddress(userId, addressIdentifier, options = {}) {
+    if (!addressIdentifier) return null;
+    const isUuid =
+      typeof addressIdentifier === 'string' &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(addressIdentifier);
+    const isInteger =
+      Number.isInteger(addressIdentifier) ||
+      (typeof addressIdentifier === 'string' && /^\d+$/.test(addressIdentifier));
+
+    if (!isUuid && !isInteger) return null;
+
+    const where = { user_id: userId };
+    if (isUuid) {
+      where.uuid = addressIdentifier;
+    } else {
+      where.id = typeof addressIdentifier === 'string' ? parseInt(addressIdentifier, 10) : addressIdentifier;
+    }
+
     return await this.model.findOne({ where, ...options });
   }
 
