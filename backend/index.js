@@ -136,17 +136,56 @@ process.on('unhandledRejection', (reason) => {
 
 const { scheduler } = require('./jobs');
 
+let server = null;
+
+const gracefulShutdown = async (signal) => {
+  console.log(`[Graceful Shutdown] Received ${signal}. Closing server connections...`);
+  try {
+    if (scheduler && typeof scheduler.stop === 'function') {
+      scheduler.stop();
+    }
+  } catch (schedErr) {
+    console.warn('[Graceful Shutdown] Error stopping scheduler:', schedErr.message);
+  }
+
+  if (server) {
+    server.close(async () => {
+      console.log('[Graceful Shutdown] HTTP server closed.');
+      try {
+        const { sequelize } = require('./models');
+        if (sequelize && typeof sequelize.close === 'function') {
+          await sequelize.close();
+          console.log('[Graceful Shutdown] Database pool closed.');
+        }
+      } catch (dbErr) {
+        console.error('[Graceful Shutdown] Error closing database:', dbErr.message);
+      }
+      process.exit(0);
+    });
+
+    setTimeout(() => {
+      console.error('[Graceful Shutdown] Force shutdown after 10s timeout.');
+      process.exit(1);
+    }, 10000).unref();
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 if (process.env.NODE_ENV !== 'test') {
   checkConnection()
     .then(() => {
       scheduler.start();
-      app.listen(port, () => {
+      server = app.listen(port, () => {
         console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port}`);
       });
     })
     .catch((err) => {
       console.error('Database connection failed. Starting server in degraded mode for development:', err.message);
-      app.listen(port, () => {
+      server = app.listen(port, () => {
         console.log(`[${process.env.NODE_ENV || 'development'}] Omkar Healthcare API Server is listening on port ${port} (DB disconnected)`);
       });
     });

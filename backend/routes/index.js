@@ -1,12 +1,34 @@
 const router = require('express').Router();
+const { checkConnection } = require('../config').dbConnection;
 
-// Health and base routes
+// Health and base routes (Liveness probe)
 router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'omkar-healthcare-backend',
+    uptime: Math.round(process.uptime()),
     timestamp: new Date().toISOString(),
   });
+});
+
+// Readiness probe (Database connectivity verification)
+router.get('/health/ready', async (req, res) => {
+  try {
+    await checkConnection();
+    res.status(200).json({
+      status: 'ready',
+      database: 'connected',
+      service: 'omkar-healthcare-backend',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(503).json({
+      status: 'unhealthy',
+      database: 'disconnected',
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 router.get('/', (req, res) => {
