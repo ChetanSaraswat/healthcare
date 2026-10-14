@@ -195,8 +195,8 @@ export const Navbar: React.FC = () => {
                     ? `कार्ट (${cartItemCount})`
                     : `Cart (${cartItemCount})`
                   : locale === 'hi'
-                  ? 'कार्ट'
-                  : 'Cart'
+                    ? 'कार्ट'
+                    : 'Cart'
               }
             >
               <ShoppingCart size={19} />
@@ -219,8 +219,8 @@ export const Navbar: React.FC = () => {
                   isMounted && isAuthenticated && authUser
                     ? authUser.name
                     : locale === 'hi'
-                    ? 'प्रोफाइल एवं खाता'
-                    : 'Profile & Account'
+                      ? 'प्रोफाइल एवं खाता'
+                      : 'Profile & Account'
                 }
               >
                 {/* Profile Icon */}
@@ -293,8 +293,8 @@ export const Navbar: React.FC = () => {
                               ? `${cartItemCount} उपकरण चयनित`
                               : `${cartItemCount} item(s) selected`
                             : locale === 'hi'
-                            ? 'कार्ट खाली है'
-                            : 'No equipment added'}
+                              ? 'कार्ट खाली है'
+                              : 'No equipment added'}
                         </span>
                       </div>
                     </div>
@@ -325,8 +325,8 @@ export const Navbar: React.FC = () => {
                               ? `${wishlistCount} सहेजे गए उपकरण`
                               : `${wishlistCount} saved item(s)`
                             : locale === 'hi'
-                            ? 'सहेजे गए उपकरण'
-                            : 'Saved medical devices'}
+                              ? 'सहेजे गए उपकरण'
+                              : 'Saved medical devices'}
                         </span>
                       </div>
                     </div>
@@ -390,18 +390,6 @@ export const Navbar: React.FC = () => {
                         <MapPin size={15} />
                         <span>{locale === 'hi' ? 'वितरण पते' : 'Saved Addresses'}</span>
                       </Link>
-
-                      {authUser.role === 'super_admin' && (
-                        <Link
-                          href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001/admin'}
-                          className={styles.dropdownSimpleItem}
-                          style={{ color: '#16453A', fontWeight: 700 }}
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          <LayoutDashboard size={15} />
-                          <span>Admin Console</span>
-                        </Link>
-                      )}
 
                       <div className={styles.menuDivider} />
 
